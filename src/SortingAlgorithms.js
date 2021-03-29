@@ -102,8 +102,6 @@ function merge_sort(array, ascending_order) {
  * function for the statistics library of the
  * euriklis package. This function sorts the 
  * elements of an unordered array of numbers.
- * The algorithm is structured with the following
- * design.
  * Definition: Rigid (static) point of an arbitrary 
  * array is a point which preserve its position when
  * the array is sorted. 
@@ -125,6 +123,8 @@ function merge_sort(array, ascending_order) {
 function quick_sort(array, ascending_order) {
     let sorted_array = [...array],
         sorted_indices = array.map((e, i) => i)
+    if (typeof ascending_order == 'undefined') ascending_order = true
+    
     return { array: sorted_array, indices: sorted_indices }
 }
 function bubble_sort(array, ascending_order) {
