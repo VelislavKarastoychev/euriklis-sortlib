@@ -13,7 +13,7 @@ npm install @euriklis/sortlib --save
  or  for more strict mode to save the version you may use the command:
 
  ```sh
- npm install @euriklis/sortlib --save-exact
+ npm install @euriklis/sortlib@x.x.x --save-exact
  ```
 
  # Usage and examples:
