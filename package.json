@@ -1,0 +1,40 @@
+{
+  "name": "@euriklis/sortlib",
+  "version": "1.0.0",
+  "description": "A package that provides a collection of sorting algorithms in javascript. ",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "nodemon ./Tests",
+    "watch": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VelislavKarastoychev/euriklis-sortlib.git"
+  },
+  "keywords": [
+    "MergeSort",
+    "QuickSort",
+    "HeapSort",
+    "InterpolationSorting",
+    "BubbleSort",
+    "Quick sort",
+    "Merge sort",
+    "Bubble sort",
+    "Heap sort",
+    "Interpolation sort"
+  ],
+  "author": "Euriklis <euriklis@hotmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/VelislavKarastoychev/euriklis-sortlib/issues"
+  },
+  "homepage": "https://github.com/VelislavKarastoychev/euriklis-sortlib#readme",
+  "dependencies": {
+    "@euriklis/message": "^1.1.1",
+    "@euriklis/validator": "^1.0.4"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
+  }
+}
