@@ -121,10 +121,62 @@ function merge_sort(array, ascending_order) {
  * alternative to the turning point.
  */
 function quick_sort(array, ascending_order) {
-    let sorted_array = [...array],
-        sorted_indices = array.map((e, i) => i)
+    let sorted_array = [...array], pivot
+        sorted_indices = array.map((e, i) => i),
+        first, last, i, j, temp, tail = [], current_subarray,
+        condition_i, condition_j
     if (typeof ascending_order == 'undefined') ascending_order = true
-    
+    if (ascending_order === 'decrease') ascending_order = false
+    tail.push([0, sorted_array.length - 1])
+    current_subarray = tail.pop()
+    while (typeof current_subarray !== 'undefined') {
+        first = current_subarray[0]
+        last = current_subarray[1]
+        pivot = sorted_array[first]
+        i = first
+        j = last
+        while (i !== j) {
+            // i iteration and decrease j
+            condition_i = ascending_order ? pivot <= sorted_array[j] : pivot >= sorted_array[j]
+            condition_j = ascending_order ? pivot >= sorted_array[i] : pivot <= sorted_array[i] 
+            if (condition_i) {
+                --j
+                continue
+            } else {
+                // swap the pivot and the sorted_array[j]
+                // the pivot is in the sorted_array[i]
+                temp = sorted_array[i]
+                sorted_array[i] = sorted_array[j]
+                sorted_array[j] = temp
+                sorted_indices[i] = temp
+                sorted_indices[i] = sorted_indices[j]
+                sorted_indices[j] = temp
+                ++i
+            }
+            if (condition_j) {
+                ++i
+                continue
+            } else {
+                // swap the pivot and the sorted_array[i]
+                // note that the pivot is in sorted_array[j]
+                temp = sorted_array[i]
+                sorted_array[i] = sorted_array[j]
+                sorted_array[j] = temp
+                temp = sorted_indices[i]
+                sorted_indices[i] = sorted_indices[j]
+                sorted_indices[j] = temp
+                --j
+            }
+        }
+        if (i - first > last - i) {
+            tail.push([first, i - 1])
+            tail.push([i + 1, last])
+        } else {
+            tail.push([i + 1, last])
+            tail.push([first, i - 1])
+        }
+        current_subarray = tail.pop()
+    }
     return { array: sorted_array, indices: sorted_indices }
 }
 function bubble_sort(array, ascending_order) {
@@ -132,6 +184,7 @@ function bubble_sort(array, ascending_order) {
     i, j, sorted_indices = array.map((e, i) => i),
         n = array.length, temp
     if (typeof ascending_order === 'undefined') ascending_order = true
+    if (ascending_order === 'decrease') ascending_order = false
     for (i = 0; i < n; i++) {
         for (j = 0; j < n - 1; j++) {
             if (ascending_order) condition = sorted_array[j + 1] > sorted_array[j]
@@ -177,4 +230,8 @@ module.exports = {
     quick_sort,
     QuickSort: quick_sort,
     Quick_sort: quick_sort,
+    bubble_sort,
+    BubbleSort : bubble_sort,
+    Bubble_sort : bubble_sort,
+     
 }
