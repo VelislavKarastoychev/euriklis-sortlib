@@ -15,14 +15,14 @@
   "keywords": [
     "MergeSort",
     "QuickSort",
-    "HeapSort",
-    "InterpolationSorting",
-    "BubbleSort",
+    "Heap sort",
+    "Insertion sort",
+    "Bubble sort",
     "Quick sort",
     "Merge sort",
     "Bubble sort",
     "Heap sort",
-    "Interpolation sort"
+    "Selection sort"
   ],
   "author": "Euriklis <euriklis@hotmail.com>",
   "license": "MIT",
