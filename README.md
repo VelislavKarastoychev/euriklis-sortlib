@@ -215,7 +215,10 @@ To get or set the identical properties of the SortLib instance you have to use t
 # Bugs and tips
 If you have any well-meaning critique or have noticed any bug you may send me an email on exel_mmm@abv.bg or to euriklis@hotmail.bg
 # Donations
-Donations are welcome at BG27FINV915010BGN0A9G5 BGN
+Donations are welcome at 
+
+> BG27FINV915010BGN0A9G5 BGN
+
 Every cent of your donated money will be used for the implementing of a library for artificial intelligence and econometric estimations (The required or wished donation is from 1 to 5 euro of dollars).
 # License   
 MIT License. This package will be provided for free to any user that use it for personal and non commercial usage. The author of the package is not liable for any errors in third party software, libraries, packages and source code used at these libraries. The author also may not responsible for some possible bugs that may exists in the library.
