@@ -32,6 +32,8 @@ class SortLib {
                         new validator(options.array).is_undefined()
                             .on(true, () => {
                                 warnings.UndefinedArrayInSortLibConstructor()
+                                this.__array__ = []
+                                this.__size__ = 0
                             }).on(false, () => {
                                 errors.IncorrectArrayDeclarationInSortLibConstructor()
                             })
@@ -62,12 +64,18 @@ class SortLib {
                     .and().has_length(this.size).on(true, () => {
                         this.__indices__ = options.indices
                     }).on(false, () => {
-                        this.__indices__ = Array.from({length : this.size}).map((e, i) => {return e = i})
+                        this.__indices__ = Array.from({ length: this.size }).map((e, i) => { return e = i })
                     })
+            }).on(false, () => {
+                this.__array__ = []
+                this.__indices__ = []
+                this.__algorithm__ = 'merge sort'
+                this.__size__ = 0
+                this.__sort_mode__ = 'increase'
             })
     }
     /**
-     * 
+     * @method addElementInSortedArray
      * @param {Array<number | string>} array 
      * @param {number} element
      * @returns {SortLib}
@@ -104,7 +112,7 @@ class SortLib {
         return new SortLib({ array: _array, 'sort mode': ascending_order, status: 'sorted' })
     }
     /**
-     * 
+     * @method merge_sort
      * @param {Array.<number | string>} array 
      * @param {string} sort_mode
      * @returns {{array : Array.<number | string>, indices : Array.<number>}}  
@@ -113,6 +121,37 @@ class SortLib {
      */
     static merge_sort(array, sort_mode) {
         return sort_algorithms.merge_sort(array, sort_mode)
+    }
+    /**
+     * 
+     * @method insertion_sort
+     * @param {Array.<number | string>} array 
+     * @param {boolean | 'increase' | 'decrease'} sort_mode
+     * @description This static method implements
+     * the insertion sort algorithm. If the sort_mode is
+     * true or has the value "increase", then the method
+     * sorts the elements of the array into ascending order
+     * otherwise if the sorted_mode is false or has the value 
+     * "decrease", then the elements of the array are sorted in
+     * descending order.
+     */
+    static insertion_sort(array, sort_mode) {
+        return sort_algorithms.insertion_sort(array, sort_mode)
+    }
+    /**
+     * 
+     * @param {Array.<number | string>} array 
+     * @param {boolean | 'increase' | 'decrease'} sort_mode
+     * @returns {{array : Array.<number | string> , indices : Array.<number>}}
+     * @description this method implements the selection sort algorithms. If the
+     * sort_mode has the value 'increase' or is true, then the algorithm
+     * sorts the elements of the array in ascending order, otherwise if the
+     * sort_mode is 'decrease' or is false, then the algorithm sorts the
+     * elements of the array in descending order. Note that this algorithm is
+     * not fast sorting algorithm. 
+     */
+    static selection_sort(array, sort_mode) {
+        return sort_algorithms.selection_sort(array, sort_mode)
     }
     /**
      * 
@@ -134,7 +173,7 @@ class SortLib {
      * @description This static algorithm implements the trivial
      * bubble sort algorithm. 
      */
-    static bubble_sort (array, sort_mode) {
+    static bubble_sort(array, sort_mode) {
         return sort_algorithms.bubble_sort(array, sort_mode)
     }
     /**
@@ -145,10 +184,10 @@ class SortLib {
      * @description THis static method implements the heap sort
      * algorithm invented by J.W.J. Williams in 1964.
      */
-    static heap_sort (array, sort_mode) {
+    static heap_sort(array, sort_mode) {
         return sort_algorithms.heap_sort(array, sort_mode)
     }
-    
+
     get algorithm() {
         return this.__algorithm__
     }
@@ -180,10 +219,13 @@ class SortLib {
      */
     set array(array) {
         new validator(array).is_number_array().or().is_string_array()
-            .on(true, () => this.__array__ = array)
+            .on(true, () => {
+                this.__array__ = array
+                this.__size__ = array.length
+            })
             .on(false, () => errors.IncorrectArrayInSetterArray())
     }
-    get indices () {
+    get indices() {
         return this.__indices__
     }
     /**
@@ -191,28 +233,28 @@ class SortLib {
      * @description This method set the indices
      * property of the current SortLib instance.
      */
-    set indices (indices) {
+    set indices(indices) {
         new validator(indices).is_number_array().and().has_length(this.size)
-        .and().for_all(elements => {
-            return elements.is_bigger_or_equal(0).is_smaller_than(this.size)
-        }).on(true, () => {
-            this.__indices__ = indices
-        }).on(false, () => errors.IncorrectIndicesParameterInSetter())
+            .and().for_all(elements => {
+                return elements.is_equal_or_bigger_than(0).is_lesser_than(this.size)
+            }).on(true, () => {
+                this.__indices__ = indices
+            }).on(false, () => errors.IncorrectIndicesParameterInSetter())
     }
     /**
      * @param {{index : number, item  : number | string}} options
      * @description This method set the item of some index. 
      */
-    set index (options) {
+    set index(options) {
         new validator(options).is_object()
-        .on(true, () => {
-            new validator(options.index).is_in_closed_range(0, this.size - 1)
-            .and().bind(new validator(options.item).is_number())
-            .on(false, () => errors.IncorrectArgumentInIndexSetter())
             .on(true, () => {
-                this.__array__[options.index] = options.item
-            })
-        }).on(false, () => errors.IncorrectArgumentInIndexSetter())
+                new validator(options.index).is_in_closed_range(0, this.size - 1)
+                    .and().bind(new validator(options.item).is_number())
+                    .on(false, () => errors.IncorrectArgumentInIndexSetter())
+                    .on(true, () => {
+                        this.__array__[options.index] = options.item
+                    })
+            }).on(false, () => errors.IncorrectArgumentInIndexSetter())
     }
     get status() {
         return this.__status__
@@ -222,12 +264,12 @@ class SortLib {
      * @description This method set the status
      * property of the current SortLib instance.
      */
-    set status (status) {
+    set status(status) {
         new validator(status).is_string().and()
-        .is_same_with_any(['sorted', 'unsorted'])
-        .on(true, () => {
-            this.__status__ = status
-        }).on(false, () => errors.IncorrectStatusInSetter())
+            .is_same_with_any(['sorted', 'unsorted'])
+            .on(true, () => {
+                this.__status__ = status
+            }).on(false, () => errors.IncorrectStatusInSetter())
     }
     /**
      * @param {"increase" | "decrease" | boolean } sort_mode
@@ -288,15 +330,19 @@ class SortLib {
             else if (this.algorithm === 'quick sort') output = sort_algorithms.quick_sort(this.array, this["sort mode"])
             else if (this.algorithm === 'bubble sort') output = sort_algorithms.bubble_sort(this.array, this["sort mode"])
             else if (this.algorithm === 'heap sort') output = sort_algorithms.heap_sort(this.array, this["sort mode"])
-            else if (this.algorithm === 'interpolation') output = sort_algorithms.interpolation(this.array, this["sort mode"])
+            else if (this.algorithm === 'insertion sort') output = sort_algorithms.insertion_sort(this.array, this["sort mode"])
+            else if (this.algorithm === 'selection sort') output = sort_algorithms.selection_sort(this.array, this["sort mode"])
             else {
                 infos.UnknownSortingMethod(this.algorithm)
-                infos.AutomaticallySetToDefault({algorithm : "merge sort"})
+                infos.AutomaticallySetToDefault({ algorithm: "merge sort" })
                 output = sort_algorithms.merge_sort(this.array, this["sort mode"])
             }
             this.array = output.array
             this.indices = output.indices
+            this.status = 'sorted'
         }
+        return this
     }
 }
+SortLib.version = '1.0.0'
 module.exports = SortLib

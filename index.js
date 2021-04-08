@@ -9,3 +9,6 @@ new message().bold().italic().underline()
     .append('algorithms for sorting that you may use from the package are the merge sort and quick sort algorithms.')
     .reset()
     .log()
+
+const SortLib = require('./src')
+module.exports = SortLib

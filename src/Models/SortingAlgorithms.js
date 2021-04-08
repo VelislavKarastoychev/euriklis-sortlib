@@ -15,24 +15,37 @@
  * The array is copied for more security. 
  */
 function PutInSortedArray(array, element, ascending_order) {
-    let new_array = [], n = array.length,
-        middle, start, end, i, condition
-    if (typeof ascending_order === 'undefined') ascending_order = true
-    // get the middle of the array:
-    // set the start and the end parameters:
-    start = 0, end = n - 1
-    middle = (start + end) >> 1
-    do {
+    let expanded_array = [], first, last, middle, condition
+    if (typeof ascending_order === 'undefined') ascending_order = true // "increase"
+    if (ascending_order === "decrease") ascending_order = false
+    first = 0, last = array.length - 1
+    while (true) {
+        middle = (first + last) >> 1
         condition = ascending_order ? element > array[middle] : element < array[middle]
-        if (element === array[middle]) break
-        else if (start === end && end === middle) break
-        else if (condition) end = middle
-        else if (!condition) start = middle + 1
-        middle = (start + end) >> 1
-    } while (1)
-    for (i = 0; i < n + 1; i++) new_array[i] = i <= middle ?
-        array[i] : i === middle + 1 ? element : array[i - 1]
-    return new_array
+        if (first === last && last === middle) break
+        if (condition) first = middle + 1
+        else last = middle
+    }
+    if (ascending_order) {
+        if (array[middle] > element) {
+            for (first = 0; first < middle; first++) {
+                expanded_array[first] = array[first]
+            }
+            expanded_array[middle] = element
+            for (last = 0; last < array.length - middle; last++) {
+                expanded_array.push(array[last + middle])
+            }
+        } else {
+            for (first = 0; first < middle + 1; first++) {
+                expanded_array[first] = array[first]
+            }
+            expanded_array.push(element)
+            for (last = 0; last < array.length - middle - 1; last++) {
+                expanded_array.push(array[last + middle + 1])
+            }
+        }
+    }
+    return expanded_array
 }
 /**
  * 
@@ -56,40 +69,60 @@ function merge_sort(array, ascending_order) {
     let sorted_array = [...array], // real array
         sorted_indices = array.map((e, i) => i), // real array
         i, j, // real or integer 
-        k, l, m, n, s, sub_arrays, // integers
-        condition, stop_condition1, stop_condition2 // boolean
+        k, m, n, s, t, // integers
+        condition // boolean
     if (typeof ascending_order === 'undefined') ascending_order = true
+    if (ascending_order === 'decrease') ascending_order = false
     // get the length of the array.
     n = sorted_array.length
     // initializations
-    k = 1, sub_arrays = Math.ceil(n / k)
-    while (sub_arrays !== 1) {
-        for (s = 1; s < sub_arrays; s += 2) {
-            for (l = 0; l < (s + 1) * k > n ? n - s * k : k; l++) {
-                i = 0, j = k - 1, m = (i + j) >> 1
+    // k is the number of elements in every sorted subarray
+    // of the initial array.
+    k = 1
+    while (k < n) {
+        s = 1
+        while (s * k < n) {
+            /**
+             * Create the start and end indices
+             * of the subarray sorted_array[(s - 1) * k : s * k - 1].
+             * When we put an item ito the sorted subarray then
+             * i or j will be set to the median or m element.
+             */
+            for (t = 0; t < k; t++) {
+                i = (s - 1) * k + t
+                j = s * k + t - 1
+                m = (i + j) >> 1
+                if (s * k + t >= n) break
+                // get the element sorted_array[s * k + t]
+                // and put it into the sorted subarray
+                // sorted_array[(s - 1) * k + t : s * k + t - 1]
                 while (1) {
-                    condition = ascending_order ?
-                        sorted_array[(s - 1) * k + m] > sorted_array[s * k + l]
-                        : sorted_array[(s - 1) * k + m] < sorted_array[s * k + l]
-                    stop_condition1 = sorted_array[(s - 1) * k + m] === sorted_array[s * k + l]
-                    stop_condition2 = i === m && m === j
-                    if (stop_condition1) break
-                    else if (stop_condition2) break
-                    else if (condition) i = m + 1
-                    else j = m
+                    if (i === j && j === m) break
+                    condition = ascending_order ? sorted_array[m] > sorted_array[s * k + t] : sorted_array[m] < sorted_array[s * k + t]
+                    if (condition) {
+                        j = m
+                    }
+                    else {
+                        i = m + 1
+                    }
                     m = (i + j) >> 1
-                } // swapping...
-                for (i = 0; i < k - m; i++) {
-                    j = sorted_array[s * k + l]
-                    sorted_array[s * k + l] = sorted_array[(s - 1) * k + i + m]
-                    sorted_array[(s - 1) * k + i + m] = j
-                    j = sorted_indices[s * k + l]
-                    sorted_indices[s * k + l] = sorted_indices[(s - 1) * k + i + m]
-                    sorted_indices[(s - 1) * k + i + m] = j
+                }
+                condition = ascending_order ? sorted_array[m] > sorted_array[s * k + t] ?
+                    true : false
+                    : sorted_array[m] < sorted_array[s * k + t] ?
+                        true : false
+                for (i = condition ? m : m + 1; i < s * k + t; i++) {
+                    j = sorted_array[i]
+                    sorted_array[i] = sorted_array[s * k + t]
+                    sorted_array[s * k + t] = j
+                    j = sorted_indices[i]
+                    sorted_indices[i] = sorted_indices[s * k + t]
+                    sorted_indices[s * k + t] = j
                 }
             }
+            s += 2
         }
-        k << 1, sub_arrays = Math.ceil(n / k)
+        k = k << 1
     }
     return { array: sorted_array, indices: sorted_indices }
 }
@@ -119,69 +152,93 @@ function merge_sort(array, ascending_order) {
  * of an array we have identify its turning points. In the
  * algorithm that follows we use the term "pivot" as an
  * alternative to the turning point.
+ * The algorithm can be described with the following steps:
+ * 1. Initialize the sorted_array to copied array,
+ * mode to true by default and to false if is set to decrease.
+ * Set also the n to the length of the array. Create the tail
+ * queue and set it to [0, n - 1] initially.
+ * 2. Loop forever
+ * 3. If tail is empty, break the loop 2.
+ * 4. [first, last] = tail.pop() // get the last elements of the tail.
+ * 5. i = first, j = last, p = sorted_array[first]
+ * 6. loop forever:
+ * 7. If i === j go to step 12, otherwise 
+ * If mode is true and  sorted_array[j] < p then condition = true
+ * else condition = false
+ * 8. If mode is false and sorted_array[j] > p then condition = true
+ * otherwise the condition = false.
+ * 9. If condition is true, then decrease the j with unit
+ * and go to the step 7, otherwise swap the elements
+ * sorted_array[i] with sorted_array[j] and go to step 10.
+ * 10. if i < j increase the i with unit. Else go to step 12.
+ * 11. If sorted_array[j] (this is the p or the pivot element)
+ * is bigger or equal than the sorted_array[i] then
+ * go to the step 10, otherwise swap the elements
+ * sorted_array[i] with the sorted_array[j] and go to the step 7.
+ * 12. In this step i has to be equal to j, so
+ * we have to put the two sequences into the tail element.
+ * if j - first > 1 then tail.push([first, j - 1])
+ * if last - j > 1 then tail.push([j + 1, last])
+ * break loop 6.
+ * 
  */
-function quick_sort(array, ascending_order) {
-    let sorted_array = [...array], pivot
-        sorted_indices = array.map((e, i) => i),
-        first, last, i, j, temp, tail = [], current_subarray,
-        condition_i, condition_j
-    if (typeof ascending_order == 'undefined') ascending_order = true
-    if (ascending_order === 'decrease') ascending_order = false
-    tail.push([0, sorted_array.length - 1])
-    current_subarray = tail.pop()
-    while (typeof current_subarray !== 'undefined') {
-        first = current_subarray[0]
-        last = current_subarray[1]
-        pivot = sorted_array[first]
+function quickSort(array, mode) {
+    let i, j, p, sorted_array = [...array], temp,
+        tail = [], condition, first, last, sorted_indices
+    const n = sorted_array.length
+    sorted_indices = Array.from({ length: n }).map((e, i) => e = i)
+    if (mode === 'decrease') mode = false
+    if (typeof mode === 'undefined') mode = true
+    tail.push([0, n - 1])
+    while (1) {
+        if (!tail.length) break
+        [first, last] = tail.pop()
         i = first
         j = last
-        while (i !== j) {
-            // i iteration and decrease j
-            condition_i = ascending_order ? pivot <= sorted_array[j] : pivot >= sorted_array[j]
-            condition_j = ascending_order ? pivot >= sorted_array[i] : pivot <= sorted_array[i] 
-            if (condition_i) {
-                --j
-                continue
-            } else {
-                // swap the pivot and the sorted_array[j]
-                // the pivot is in the sorted_array[i]
-                temp = sorted_array[i]
-                sorted_array[i] = sorted_array[j]
-                sorted_array[j] = temp
-                sorted_indices[i] = temp
-                sorted_indices[i] = sorted_indices[j]
-                sorted_indices[j] = temp
-                ++i
-            }
-            if (condition_j) {
-                ++i
-                continue
-            } else {
-                // swap the pivot and the sorted_array[i]
-                // note that the pivot is in sorted_array[j]
+        p = sorted_array[first]
+        while (1) {
+            if (i === j || i >= j) break
+            condition = mode ? p > sorted_array[j] : p < sorted_array[j]
+            if (condition) {
                 temp = sorted_array[i]
                 sorted_array[i] = sorted_array[j]
                 sorted_array[j] = temp
                 temp = sorted_indices[i]
                 sorted_indices[i] = sorted_indices[j]
                 sorted_indices[j] = temp
-                --j
-            }
+                while (1) {
+                    if (i === j || i >= j) break
+                    ++i // note that p = sorted_array[j]
+                    condition = mode ? sorted_array[i] > p : sorted_array[i] < p
+                    if (condition) {
+                        temp = sorted_array[i]
+                        sorted_array[i] = sorted_array[j]
+                        sorted_array[j] = temp
+                        temp = sorted_indices[i]
+                        sorted_indices[i] = sorted_indices[j]
+                        sorted_indices[j] = temp
+                        break
+                    } else continue
+                }
+            } else --j
         }
-        if (i - first > last - i) {
-            tail.push([first, i - 1])
-            tail.push([i + 1, last])
-        } else {
-            tail.push([i + 1, last])
-            tail.push([first, i - 1])
-        }
-        current_subarray = tail.pop()
+        if (j - first > 1) tail.push([first, j - 1])
+        if (last - j > 1) tail.push([j + 1, last])
     }
     return { array: sorted_array, indices: sorted_indices }
 }
+/**
+ * 
+ * @method bubble_sort
+ * @param {Array} array 
+ * @param {boolean | 'decrease' | 'increase'} ascending_order
+ * @description this utility function function
+ * implements the bubble sort algorithm for the
+ * sorting of an array.  
+ */
 function bubble_sort(array, ascending_order) {
-    let sorted_array = [...array], condition
-    i, j, sorted_indices = array.map((e, i) => i),
+    let sorted_array = [...array], condition,
+        i, j, sorted_indices = array.map((e, i) => i),
         n = array.length, temp
     if (typeof ascending_order === 'undefined') ascending_order = true
     if (ascending_order === 'decrease') ascending_order = false
@@ -189,7 +246,7 @@ function bubble_sort(array, ascending_order) {
         for (j = 0; j < n - 1; j++) {
             if (ascending_order) condition = sorted_array[j + 1] > sorted_array[j]
             else condition = sorted_array[j + 1] < sorted_array[j]
-            if (condition) {
+            if (!condition) {
                 temp = sorted_array[j]
                 sorted_array[j] = sorted_array[j + 1]
                 sorted_array[j + 1] = temp
@@ -201,6 +258,149 @@ function bubble_sort(array, ascending_order) {
     }
     return { array: sorted_array, indices: sorted_indices }
 }
+
+/**
+ * 
+ * @param {Array} array 
+ * @param {Array} indices 
+ * @param {number} i 
+ * @param {number} k 
+ * @param {boolean | 'decrease' | 'increase'} mode
+ * @description utility function used in the heap_shift_down
+ * and heap_sort algorithm functions. 
+ */
+
+function shift_down(array, indices, i, k, mode) {
+    let m, left, right, condition, temp
+    if (mode === 'decrease') mode = false
+    if (typeof mode === 'undefined') mode = true
+    while (2 * k <= i) {
+        left = 2 * k
+        right = 2 * k + 1
+        m = right
+        condition = mode ? array[right - 1] < array[left - 1] : array[right - 1] > array[left - 1]
+        if (condition || 2 * k === i) m = left
+        condition = mode ? array[m - 1] > array[k - 1] : array[m - 1] < array[k - 1]
+        if (condition) {
+            temp = array[k - 1]
+            array[k - 1] = array[m - 1]
+            array[m - 1] = temp
+            temp = indices[k - 1]
+            indices[k - 1] = indices[m - 1]
+            indices[m - 1] = temp
+        }
+        k = m
+    }
+    return { array, indices }
+}
+
+/**
+ * 
+ * @param {Array} array 
+ * @param {Array} indices 
+ * @param {boolean | 'decrease' | 'increase'} mode
+ * @description this utility function is part of the
+ * heap_sort algorithm. 
+ */
+function heap_shift_down(array, indices, mode) {
+    let k = array.length >> 1, i
+    for (i = k; i >= 1; i--) {
+        let output = shift_down(array, indices, array.length, i, mode)
+        array = output.array
+        indices = output.indices
+    }
+    return { array, indices }
+}
+
+/**
+ * 
+ * @param {Array} array 
+ * @param {boolean | 'decrease' | 'increase'} mode
+ * @description this utility function implements the
+ * Heap sort algorithm. The function uses the two
+ * sub-functions shift_down and heap_shift_down... 
+ */
+function heap_sort(array, mode) {
+    const n = array.length
+    let sorted_array = [...array], temp, output,
+        sorted_indices = sorted_array.map((e, i) => e = i)
+    if (mode === 'decrease') mode = false
+    if (typeof mode === 'undefined') mode = true
+    // implementation...
+    output = heap_shift_down(sorted_array, sorted_indices, mode)
+    sorted_array = output.array
+    sorted_indices = output.indices
+    for (let i = n; i > 1; i--) {
+        temp = sorted_array[0]
+        sorted_array[0] = sorted_array[i - 1]
+        sorted_array[i - 1] = temp
+        temp = sorted_indices[0]
+        sorted_indices[0] = sorted_indices[i - 1]
+        sorted_indices[i - 1] = temp
+        output = shift_down(sorted_array, sorted_indices, (i - 1), 1, mode)
+        sorted_array = [...output.array]
+        sorted_indices = [...output.indices]
+    }
+    return { array: sorted_array, indices: sorted_indices }
+}
+
+
+function insertion_sort(array, ascending_order) {
+    if (typeof ascending_order === 'undefined') ascending_order = true
+    if (ascending_order === 'decrease') ascending_order = false
+    const n = array.length
+    let i, j, sorted_array = [...array], p, k, condition,
+        sorted_indices = sorted_array.map((e, i) => e = i)
+    for (i = 1;i < n;i++) {
+        p = sorted_array[i]
+        k = sorted_indices[i]
+        j = i - 1
+        while (1) {
+            condition = ascending_order ? sorted_array[j] <= p : sorted_array[j] >= p
+            if (j < 0 || condition) break
+            sorted_array[j + 1] = sorted_array[j]
+            sorted_indices[j + 1] = sorted_indices[j]
+            --j
+        }
+        sorted_array[j + 1] = p
+        sorted_indices[j + 1] = k
+    }
+    return { array : sorted_array, indices: sorted_indices }
+}
+
+/**
+ * 
+ * @param {Array.<number | string>} array 
+ * @param {boolean | 'increase' | 'decrease'} mode
+ * @returns {{array : Array.<number | string>, indices : Array.<number>}} 
+ * @description this is an utility function that implements the
+ * selection sort algorithm.
+ */
+function selection_sort (array, mode) {
+    if (mode === 'decrease') mode = false
+    if (typeof mode === 'undefined') mode = true
+    const n = array.length
+    let i, j, m, condition, temp,
+    sorted_array = [...array],
+    sorted_indices = sorted_array.map((e, i) => e = i)
+    for (i = 0;i < n - 1;i++) {
+        m = i
+        for (j = i + 1;j < n;j++) {
+            condition = mode ? sorted_array[j] < sorted_array[m] : sorted_array[j] > sorted_array[m]
+            if (condition) m = j
+        }
+        if (m !== i) {
+            temp = sorted_array[m]
+            sorted_array[m] = sorted_array[i]
+            sorted_array[i] = temp
+            temp = sorted_indices[m]
+            sorted_indices[m] = sorted_indices[i]
+            sorted_indices[i] = temp 
+        }
+    }
+    return {array : sorted_array, indices : sorted_indices}
+}
+
 /**
  * 
  * @param {array} array
@@ -215,9 +415,11 @@ function bubble_sort(array, ascending_order) {
  * selects the 'merge sort' method.
  */
 function SortArray(array, method, ascending_order = true) {
-    if (method === 'quick sort') sorted_array = quick_sort(array)
-    else if (method === 'bubble sort') sorted_array = bubble_sort(array)
-    else sorted_array = merge_sort(array)
+    if (method === 'quick sort') sorted_array = quick_sort(array, ascending_order)
+    else if (method === 'bubble sort') sorted_array = bubble_sort(array, ascending_order)
+    else if (method === 'heap sort') sorted_array = heap_sort(array, ascending_order)
+    else if (method === 'insertion sort') sorted_array = insertion_sort(array, ascending_order)
+    else sorted_array = merge_sort(array, ascending_order)
     return sorted_array
 }
 
@@ -227,11 +429,20 @@ module.exports = {
     merge_sort,
     MergeSort: merge_sort,
     Merge_sort: merge_sort,
-    quick_sort,
-    QuickSort: quick_sort,
-    Quick_sort: quick_sort,
+    quick_sort: quickSort,
+    QuickSort: quickSort,
+    Quick_sort: quickSort,
     bubble_sort,
-    BubbleSort : bubble_sort,
-    Bubble_sort : bubble_sort,
-     
+    BubbleSort: bubble_sort,
+    Bubble_sort: bubble_sort,
+    heap_sort,
+    heapSort: heap_sort,
+    HeapSort: heap_sort,
+    insertion_sort,
+    insertionSort : insertion_sort,
+    InsertionSort : insertion_sort,
+    selection_sort,
+    selectionSort : selection_sort,
+    SelectionSort : selection_sort,
+
 }
