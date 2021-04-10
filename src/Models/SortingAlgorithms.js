@@ -403,6 +403,47 @@ function selection_sort (array, mode) {
 
 /**
  * 
+ * @param {Array.<number | string>} array 
+ * @param {boolean | 'increase' | 'decrease'} mode
+ * @returns {{array : Array.<number | string>, indices : Array.<number>}}
+ * @description this utility function implements
+ * the cocktail sorting algorithm that is a variant
+ * of the bubble sort algorithm. Note that this algorithm
+ * is not fast (has complexity proportional to O(n^2)).
+ */
+function cocktail_sort (array, mode) {
+    const n = array.length, sorted_array = [...array],
+    indices = Array.from({length: n}).map((e, i) => e = i)
+    let i, start, end, temp, condition, swapped = true
+    [start, end] = [0, n - 1]
+    while (swapped) {
+        swapped = false
+        for (i = start;i < end;i++) {
+            condition = mode ? sorted_array[i] > sorted_array[i + 1] : sorted_array[i] < sorted_array[i + 1]
+            if (condition) {
+                [sorted_array[i], sorted_array[i + 1]] = [sorted_array[i + 1], sorted_array[i]]
+                [indices[i], indices[i + 1]] = [indices[i + 1], indices[i]]
+                swapped = true
+            }
+        }
+        if (!swapped) break
+        swapped = false
+        --end
+        for (i = end - 1;i > start - 1;i--) {
+            condition = mode ? sorted_array[i] > sorted_array[i + 1] : sorted_array[i] < sorted_array[i + 1]
+            if (condition) {
+                [sorted_array[i], sorted_array[i + 1]] = [sorted_array[i + 1], sorted_array[i]]
+                [indices[i], indices[i + 1]] = [indices[i + 1], indices[i]]
+                swapped = false
+            }
+            ++start
+        }
+    }
+    return {array : sorted_array, indices}
+}
+
+/**
+ * 
  * @param {array} array
  * @param {"merge sort" | "quick sort" | "bubble sort"} method
  * @param {boolean} ascending_order
@@ -435,6 +476,9 @@ module.exports = {
     bubble_sort,
     BubbleSort: bubble_sort,
     Bubble_sort: bubble_sort,
+    cocktail_sort,
+    CocktailSort : cocktail_sort,
+    cocktailSort : cocktail_sort,
     heap_sort,
     heapSort: heap_sort,
     HeapSort: heap_sort,
