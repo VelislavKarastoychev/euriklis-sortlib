@@ -6,7 +6,7 @@
 
  # installation
 
- to install the @euriklis/sortlib package just run the command 
+ To install the @euriklis/sortlib package just run the command 
  ```sh
 npm install @euriklis/sortlib --save
  ```
@@ -108,7 +108,7 @@ console.log(reversed_output)
 ```
 - *SortLib.insertion_sort(array, mode)* - this method implements the insertion sort algorithm. Note that the algorithm has non linear complexity (0(n<sup>2</sup>)). The array and the mode parameters represent the same values as in the strict methods above. For example:
 ```js
-const sortlib = require('@euriklis/sortlib')
+const SortLib = require('@euriklis/sortlib')
 const array = [12, 1, 54, 34, 67, 13, 109, 32, 88]
 const output = SortLib.insertion_sort(array)
 const reversed_output = SortLib.insertion_sort(array, false)
@@ -125,7 +125,7 @@ console.log(reversed_output)
 ```
 - *SortLib.bubble_sort(array, mode)* - this algorithm implements the bubble sort algorithm. The method does not uses recursion. The "array" and "mode" parameters represent the same values as in the strict methods above.
 ```js
-const sortlib = require('@euriklis/sortlib')
+const SortLib = require('@euriklis/sortlib')
 const array = [2, 18, 3, 84, 24, 13, 1, 42, 21, 11]
 const output = SortLib.bubble_sort(array)
 const reversed_output = SortLib.bubble_sort(array, false)
@@ -142,7 +142,7 @@ console.log(reversed_output)
 ```
 - *SortLib.selection_sort(array, mode)* - this method implements the selection sort algorithm. The "array" and "mode" parameters represent the same values as in the strict methods above.
 ```js
-const sortlib = require('@euriklis/sortlib')
+const SortLib = require('@euriklis/sortlib')
 const array = [4, 1, 5, 35, 9, 289, 3, 24, 14, 21, 6, 28]
 const output = SortLib.selection_sort(array)
 const reversed_output = SortLib.selection_sort(array, false)
