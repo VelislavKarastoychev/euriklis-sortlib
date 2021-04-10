@@ -412,17 +412,25 @@ function selection_sort (array, mode) {
  * is not fast (has complexity proportional to O(n^2)).
  */
 function cocktail_sort (array, mode) {
-    const n = array.length, sorted_array = [...array],
+    let n = array.length, sorted_array = [...array],
     indices = Array.from({length: n}).map((e, i) => e = i)
-    let i, start, end, temp, condition, swapped = true
-    [start, end] = [0, n - 1]
+    let i, start, end, condition, temp, swapped = true
+
+    if (typeof mode === 'undefined') mode = true
+    if (mode === 'decrease') mode = false
+    start = 0
+    end = n - 1
     while (swapped) {
         swapped = false
         for (i = start;i < end;i++) {
             condition = mode ? sorted_array[i] > sorted_array[i + 1] : sorted_array[i] < sorted_array[i + 1]
             if (condition) {
-                [sorted_array[i], sorted_array[i + 1]] = [sorted_array[i + 1], sorted_array[i]]
-                [indices[i], indices[i + 1]] = [indices[i + 1], indices[i]]
+                temp = sorted_array[i]
+                sorted_array[i] = sorted_array[i + 1]
+                sorted_array[i + 1] = temp
+                temp = indices[i]
+                indices[i] = indices[i + 1]
+                indices[i + 1] = temp
                 swapped = true
             }
         }
@@ -432,12 +440,16 @@ function cocktail_sort (array, mode) {
         for (i = end - 1;i > start - 1;i--) {
             condition = mode ? sorted_array[i] > sorted_array[i + 1] : sorted_array[i] < sorted_array[i + 1]
             if (condition) {
-                [sorted_array[i], sorted_array[i + 1]] = [sorted_array[i + 1], sorted_array[i]]
-                [indices[i], indices[i + 1]] = [indices[i + 1], indices[i]]
-                swapped = false
+                temp = sorted_array[i]
+                sorted_array[i] = sorted_array[i + 1]
+                sorted_array[i + 1] = temp
+                temp = indices[i]
+                indices[i] = indices[i + 1]
+                indices[i + 1] = temp
+                swapped = true
             }
-            ++start
         }
+        ++start
     }
     return {array : sorted_array, indices}
 }
