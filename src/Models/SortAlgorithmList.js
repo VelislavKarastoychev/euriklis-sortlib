@@ -5,6 +5,7 @@ const sort_algorithms_list = [
     'merge sort',
     'insertion sort',
     'quick sort',
-    'selection sort'
+    'selection sort',
+    'cocktail sort',
 ]
 module.exports = sort_algorithms_list
