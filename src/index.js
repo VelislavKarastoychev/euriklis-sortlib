@@ -188,6 +188,20 @@ class SortLib {
         return sort_algorithms.heap_sort(array, sort_mode)
     }
 
+    /**
+     * 
+     * @param {Array.<number | string>} array 
+     * @param {boolean | 'increase' | 'decrease'} sort_mode
+     * @returns {{array : Array.<number | string>, indices : Array.<number>}}
+     * @description This method implements the cocktail sort
+     * algorithm which is an improvement and variation of the
+     * bubble sort algorithm. Note that the algorithm is not fast, i.e.
+     * has complexity proportional to O(n^2).
+     */
+    static cocktail_sort (array, sort_mode) {
+        return sort_algorithms.cocktail_sort(array, sort_mode)
+    }
+
     get algorithm() {
         return this.__algorithm__
     }
