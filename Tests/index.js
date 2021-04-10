@@ -10,6 +10,7 @@ const testInsertionSort = require('./TestInsertionSort')
 const testSelectionSort = require('./TestSelectionSort')
 const testVersion = require('./TestVersion')
 const testSortMethod = require('./TestSortMethod')
+const testCocktailSort = require('./TestCocktailSort')
 const tested_method = (name) => {
     return new message().bold().italic().underline()
         .set_color_yellow().append("Euriklis testing message:\n")
@@ -30,6 +31,7 @@ async function testing() {
         const selectionSort = await testSelectionSort()
         const version = await testVersion()
         const sortMethod = await testSortMethod()
+        const cocktailSort = await testCocktailSort()
         tested_method('Constructor')
         tested_method(addElementInSortedArray)
         tested_method(mergeSort)
@@ -39,6 +41,7 @@ async function testing() {
         tested_method(insertionSort)
         tested_method(selectionSort)
         tested_method(sortMethod)
+        tested_method(cocktailSort)
     } catch (err) {
         new message().append(err).log()
     }
