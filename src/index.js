@@ -297,7 +297,7 @@ class SortLib {
      * current SortLib instance. 
      */
     set ['sort mode'](sort_mode) {
-        new validator(sort_mode).is_string()
+        new validator(sort_mode).is_string().or().is_boolean()
             .on(true, () => {
                 new validator(sort_mode).is_same_with_any([true, false, 'increase', 'decrease'])
                     .on(true, () => this.__sort_mode__ = sort_mode)
@@ -346,6 +346,7 @@ class SortLib {
             else if (this.algorithm === 'heap sort') output = sort_algorithms.heap_sort(this.array, this["sort mode"])
             else if (this.algorithm === 'insertion sort') output = sort_algorithms.insertion_sort(this.array, this["sort mode"])
             else if (this.algorithm === 'selection sort') output = sort_algorithms.selection_sort(this.array, this["sort mode"])
+            else if (this.algorithm === 'cocktail sort') output = sort_algorithms.cocktail_sort(this.array, this["sort mode"])
             else {
                 infos.UnknownSortingMethod(this.algorithm)
                 infos.AutomaticallySetToDefault({ algorithm: "merge sort" })
