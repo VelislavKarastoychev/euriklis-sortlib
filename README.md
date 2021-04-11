@@ -260,3 +260,7 @@ You can run the tests of the @euriklis/sortlib package by typing the following c
 ```sh
 npm install && node ./Tests
 ```
+or to run with the nodemon (which will be installed after the execution of the command "npm install") you have to run the following command:
+```sh
+npm install && nodemon ./Tests
+```
