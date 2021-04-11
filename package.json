@@ -1,6 +1,6 @@
 {
   "name": "@euriklis/sortlib",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A package that provides a collection of sorting algorithms in javascript. ",
   "main": "index.js",
   "scripts": {
@@ -15,14 +15,14 @@
   "keywords": [
     "MergeSort",
     "QuickSort",
-    "Heap sort",
     "Insertion sort",
     "Bubble sort",
     "Quick sort",
     "Merge sort",
     "Bubble sort",
     "Heap sort",
-    "Selection sort"
+    "Selection sort",
+    "Cocktail sort"
   ],
   "author": "Euriklis <euriklis@hotmail.com>",
   "license": "MIT",
