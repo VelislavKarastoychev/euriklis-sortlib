@@ -157,6 +157,37 @@ console.log(reversed_output)
     indices: [ 1, 6, 0, 2, 10, 4, 8, 9, 7, 11, 3, 5 ] 
 }
 ```
+- *SortLib.cocktail_sort(array, mode)* - implementation of the cocktail sort algorithm. Note that this algorithm is not fast and has complexity proportional to O(n<sup>2</sup>). The array and the mode parameters represents the same values as was noticed above.
+```js
+const SortLib = require('@euriklis/sortlib')
+const validator = require('@euriklis/validator')
+const array = [45, 1, 5, 2, 423, 23, 21, 55, 16, 24, 67]
+const sorted_array = [1, 2, 5, 16, 21, 23, 24, 45, 55, 67, 423]
+const output = SortLib.cocktail_sort(array)
+const reversed_output = SortLib.cocktail_sort(array, false)
+const sort_lib_instance = new SortLib()
+sort_lib_instance.array = array
+sort_lib_instance.algorithm = 'cocktail sort'
+sort_lib_instance["sort mode"] = true
+sort_lib_instance.sort()
+const reversed_instance = new SortLib()
+reversed_instance.array = array
+reversed_instance.algorithm = 'cocktail sort'
+reversed_instance['sort mode'] = false
+reversed_instance.sort() 
+new validator(output.array).is_same(sorted_array)
+    .and().bind(
+        new validator(reversed_output.array).is_same([...sorted_array].reverse())
+    )
+    .and().bind(
+        new validator(sort_lib_instance.array).is_same(sorted_array)
+    )
+    .and().bind(
+        new validator(reversed_instance.array).is_same([...sorted_array].reverse())
+    )
+    .on(true, () => console.log(true) )
+    .on(false, () => console.log(false))
+```   
 The SortLib package can run any of these methods shown above when the array parameter of the current instance is declared. This can be done with the using of the sort() method of the SortLib package/library. 
 ```js
 const SortLib = require('../index')
