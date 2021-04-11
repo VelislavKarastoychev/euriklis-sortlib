@@ -258,5 +258,5 @@ The project has two dependencies that are the @euriklis/validator and the @eurik
 # Tests
 You can run the tests of the @euriklis/sortlib package by typing the following command in the console/terminal into the directory of your project:
 ```sh
-npm update && node ./Tests
+npm install && node ./Tests
 ```
