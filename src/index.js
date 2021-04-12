@@ -210,6 +210,8 @@ class SortLib {
      * the bucket sort algorithm. 
      */
     static bucket_sort(array, sort_mode) {
+        new validator(array).not().is_number_array()
+        .on(true, () => errors.IncorrectArrayParameterInBucketSort())
         return sort_algorithms.bucket_sort(array, sort_mode)
     }
     get algorithm() {
