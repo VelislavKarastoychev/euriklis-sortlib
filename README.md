@@ -248,7 +248,7 @@ If you have any well-meaning critique or have noticed any bug you may send me an
 # Donations
 Donations are welcome at 
 
-> BG27FINV915010BGN0A9G5 BGN
+> BG52FINV91502015033152 EUR
 
 Every cent of your donated money will be used for the implementing of a library for artificial intelligence and econometric estimations (The required or wished donation is from 1 to 5 euro of dollars).
 # License   
@@ -256,11 +256,8 @@ MIT License. This package will be provided for free to any user that use it for 
 # Dependencies
 The project has two dependencies that are the @euriklis/validator and the @euriklis/message libraries that are used for the testing and the setting of the methods of the SortLib class.
 # Tests
-You can run the tests of the @euriklis/sortlib package by typing the following command in the console/terminal into the directory of your project:
+Some tests of the library are available in the Tests folder of the package. You can run these tests with the trivial way by running of the command:
 ```sh
-npm install && node ./Tests
+node node_nodules/@euriklis/sortlib/Tests
 ```
-or to run with the nodemon (which will be installed after the execution of the command "npm install") you have to run the following command:
-```sh
-npm install && nodemon ./Tests
-```
+or to move the Tests folder to wished form you directory in which are all your tests and to run it from there.
