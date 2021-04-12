@@ -205,14 +205,15 @@ class SortLib {
      * 
      * @param {Array.<number>} array 
      * @param {boolean | 'increase' | 'decrease'} sort_mode
+     * @param {number} buckets
      * @returns {{array : Array.<number>, indices : Array.<number>}}
      * @description this static method implements 
      * the bucket sort algorithm. 
      */
-    static bucket_sort(array, sort_mode) {
+    static bucket_sort(array, sort_mode, buckets) {
         new validator(array).not().is_number_array()
         .on(true, () => errors.IncorrectArrayParameterInBucketSort())
-        return sort_algorithms.bucket_sort(array, sort_mode)
+        return sort_algorithms.bucket_sort(array, sort_mode, buckets)
     }
     get algorithm() {
         return this.__algorithm__
