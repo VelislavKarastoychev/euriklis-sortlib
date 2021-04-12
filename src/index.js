@@ -359,5 +359,5 @@ class SortLib {
         return this
     }
 }
-SortLib.version = '1.0.2'
+SortLib.version = '1.0.3'
 module.exports = SortLib
