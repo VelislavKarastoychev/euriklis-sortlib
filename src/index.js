@@ -198,7 +198,7 @@ class SortLib {
      * bubble sort algorithm. Note that the algorithm is not fast, i.e.
      * has complexity proportional to O(n^2).
      */
-    static cocktail_sort (array, sort_mode) {
+    static cocktail_sort(array, sort_mode) {
         return sort_algorithms.cocktail_sort(array, sort_mode)
     }
     /**
@@ -212,7 +212,8 @@ class SortLib {
      */
     static bucket_sort(array, sort_mode, buckets) {
         new validator(array).not().is_number_array()
-        .on(true, () => errors.IncorrectArrayParameterInBucketSort())
+            .on(true, () => errors.IncorrectArrayParameterInBucketSort())
+        new validator(buckets).is_integer().on(false, () => buckets = 10)
         return sort_algorithms.bucket_sort(array, sort_mode, buckets)
     }
     get algorithm() {
