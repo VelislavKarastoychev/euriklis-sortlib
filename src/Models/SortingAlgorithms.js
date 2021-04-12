@@ -467,10 +467,10 @@ function cocktail_sort (array, mode) {
  * the k is the count of the buckets.
  *  
  */
-function bucket_sort (array, mode, buckets) {
+function bucket_sort (array, buckets, mode) {
     if (typeof mode === 'undefined') mode = true
     if (mode === 'decrease') mode = false
-    let sorted_array = [], i, j, temp,
+    let sorted_array = [], i, j, temp, min, indices = [],
     temp_array = [], temp_indices = [], n, max
     for (i = 0;i < buckets;i++) {
         temp_array.push([])
@@ -485,18 +485,19 @@ function bucket_sort (array, mode, buckets) {
     for (i = 0;i < n;i++) if (array[i] < min) min = array[i]
     // push the arrays into the right sub-array of the temp_array
     for (i = 0;i < n;i++) {
-        j = (((array[i] - min) / (max - min)) * buckets) >> 0
+        j = (((array[i] - min) / (max - min)) * (buckets - 1)) | 0
         temp_array[j].push(array[i])
         temp_indices[j].push(i)
     }
     // sort all the subarrays of the temp and concatenate then to
     // the sorted_array
-    for (j = mode ? 0 : n - 1; mode ? j < n : j >= 0;j = mode ? j + 1 : j - 1) {
-        temp = insertion_sort(temp_array[j])
+    for (j = mode ? 0 : buckets - 1; mode ? j < buckets : j >= 0; mode ? j++ : j--) {
+        temp = insertion_sort(temp_array[j], mode)
         sorted_array.push(...temp.array)
-        sorted_indices.push(...temp.indices.map((el, ind) => el = temp_indices[j][ind]))
+        indices.push(...temp.indices.map(el => {
+            return temp_indices[j][el]
+        }))
     }
-    console.log(sorted_array, sorted_indices)
     return {array : sorted_array, indices}
 }
 
