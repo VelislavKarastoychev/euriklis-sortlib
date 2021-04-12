@@ -213,7 +213,9 @@ class SortLib {
     static bucket_sort(array, buckets, sort_mode) {
         new validator(array).not().is_number_array()
             .on(true, () => errors.IncorrectArrayParameterInBucketSort())
-        new validator(buckets).is_integer().on(false, () => buckets = array.length >> 1)
+        new validator(buckets)
+            .is_integer().on(false, () => buckets = array.length >> 1)
+            .or().not().is_in_range(0, array.length).on(true, () => buckets = array.length - 1)
         return sort_algorithms.bucket_sort(array, buckets, sort_mode)
     }
     get algorithm() {
