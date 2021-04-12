@@ -201,7 +201,17 @@ class SortLib {
     static cocktail_sort (array, sort_mode) {
         return sort_algorithms.cocktail_sort(array, sort_mode)
     }
-
+    /**
+     * 
+     * @param {Array.<number>} array 
+     * @param {boolean | 'increase' | 'decrease'} sort_mode
+     * @returns {{array : Array.<number>, indices : Array.<number>}}
+     * @description this static method implements 
+     * the bucket sort algorithm. 
+     */
+    static bucket_sort(array, sort_mode) {
+        return sort_algorithms.bucket_sort(array, sort_mode)
+    }
     get algorithm() {
         return this.__algorithm__
     }
@@ -347,6 +357,7 @@ class SortLib {
             else if (this.algorithm === 'insertion sort') output = sort_algorithms.insertion_sort(this.array, this["sort mode"])
             else if (this.algorithm === 'selection sort') output = sort_algorithms.selection_sort(this.array, this["sort mode"])
             else if (this.algorithm === 'cocktail sort') output = sort_algorithms.cocktail_sort(this.array, this["sort mode"])
+            else if (this.algorithm === 'bucket sort') output = sorting_algorithms.bucket_sort(this.array, this["sort mode"])
             else {
                 infos.UnknownSortingMethod(this.algorithm)
                 infos.AutomaticallySetToDefault({ algorithm: "merge sort" })
