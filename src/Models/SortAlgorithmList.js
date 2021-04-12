@@ -7,5 +7,7 @@ const sort_algorithms_list = [
     'quick sort',
     'selection sort',
     'cocktail sort',
+    'bucket sort',
+    
 ]
 module.exports = sort_algorithms_list
