@@ -210,11 +210,11 @@ class SortLib {
      * @description this static method implements 
      * the bucket sort algorithm. 
      */
-    static bucket_sort(array, sort_mode, buckets) {
+    static bucket_sort(array, buckets, sort_mode) {
         new validator(array).not().is_number_array()
             .on(true, () => errors.IncorrectArrayParameterInBucketSort())
-        new validator(buckets).is_integer().on(false, () => buckets = 10)
-        return sort_algorithms.bucket_sort(array, sort_mode, buckets)
+        new validator(buckets).is_integer().on(false, () => buckets = array.length >> 1)
+        return sort_algorithms.bucket_sort(array, buckets, sort_mode)
     }
     get algorithm() {
         return this.__algorithm__
