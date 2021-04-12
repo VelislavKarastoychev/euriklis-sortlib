@@ -456,6 +456,52 @@ function cocktail_sort (array, mode) {
 
 /**
  * 
+ * @param {Array.<number>} array 
+ * @param {boolean | 'increase' | 'decrease'} mode
+ * @returns {{array : Array.<number>, indices: Array.<number>}}
+ * @description this utility function implements
+ * the bucket sort algorithm. Note that this
+ * algorithm is not fast sorting algorithm and
+ * has worst complexity of O(n^2) and average
+ * time complexity of O(n + n^2 / k + k), where
+ * the k is the count of the buckets.
+ *  
+ */
+function bucket_sort (array, mode, buckets) {
+    if (typeof mode === 'undefined') mode = true
+    if (mode === 'decrease') mode = false
+    let sorted_array = [], i, j, temp,
+    temp_array = [], temp_indices = [], n, max
+    for (i = 0;i < buckets;i++) {
+        temp_array.push([])
+        temp_indices.push([])
+    }
+    // find the biggest element of the array.
+    max = array[0]
+    n = array.length
+    for (i = 0;i < n;i++) if (array[i] > max) max = array[i]
+    // find the min element:
+    min = array[0]
+    for (i = 0;i < n;i++) if (array[i] < min) min = array[i]
+    // push the arrays into the right sub-array of the temp_array
+    for (i = 0;i < n;i++) {
+        j = (((array[i] - min) / (max - min)) * buckets) >> 0
+        temp_array[j].push(array[i])
+        temp_indices[j].push(i)
+    }
+    // sort all the subarrays of the temp and concatenate then to
+    // the sorted_array
+    for (j = mode ? 0 : n - 1; mode ? j < n : j >= 0;j = mode ? j + 1 : j - 1) {
+        temp = insertion_sort(temp_array[j])
+        sorted_array.push(...temp.array)
+        sorted_indices.push(...temp.indices.map((el, ind) => el = temp_indices[j][ind]))
+    }
+    console.log(sorted_array, sorted_indices)
+    return {array : sorted_array, indices}
+}
+
+/**
+ * 
  * @param {array} array
  * @param {"merge sort" | "quick sort" | "bubble sort"} method
  * @param {boolean} ascending_order
@@ -488,6 +534,9 @@ module.exports = {
     bubble_sort,
     BubbleSort: bubble_sort,
     Bubble_sort: bubble_sort,
+    bucket_sort,
+    bucketSort : bucket_sort,
+    BucketSort : bucket_sort,
     cocktail_sort,
     CocktailSort : cocktail_sort,
     cocktailSort : cocktail_sort,
