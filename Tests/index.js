@@ -44,6 +44,7 @@ async function testing() {
         tested_method(selectionSort)
         tested_method(sortMethod)
         tested_method(cocktailSort)
+        tested_method(bucketSort)
     } catch (err) {
         new message().append(err).log()
     }
