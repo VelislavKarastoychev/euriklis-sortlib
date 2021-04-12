@@ -157,7 +157,7 @@ console.log(reversed_output)
     indices: [ 1, 6, 0, 2, 10, 4, 8, 9, 7, 11, 3, 5 ] 
 }
 ```
-- *SortLib.cocktail_sort(array, mode)* - implementation of the cocktail sort algorithm. Note that this algorithm is not fast and has complexity proportional to O(n<sup>2</sup>). The array and the mode parameters represents the same values as was noticed above.
+- *SortLib.cocktail_sort(array, mode)* - implementation of the cocktail sort algorithm. Note that this algorithm is not fast and has complexity proportional to O(n<sup>2</sup>). The array and the mode parameters represents the same values as was noticed above. The method is available from version 1.0.2.
 ```js
 const SortLib = require('@euriklis/sortlib')
 const validator = require('@euriklis/validator')
@@ -188,6 +188,22 @@ new validator(output.array).is_same(sorted_array)
     .on(true, () => console.log(true) )
     .on(false, () => console.log(false))
 ```   
+- *SortLib.bucket_sort(array, buckets, sort_mode)* - this method implements the bucket sort algorithm. Note that this method is not fast and has worst complexity O(n<sup>2</sup>) and average time complexity O(2 * n + n<sup>2</sup> / k + k), where the k is the number of the buckets. The buckets are lists in which the elements of the array have to be passed. Note that the number of the buckets can not be higher than the length of the array. In the case that the buckets are not declared the method automatically sets this parameter to floor (array.length / 2). In the case in which the number of the buckets is bugger than the length of the array, then the buckets will be set to the length of the array. It is important that this method can be executed only for number arrays. The method is available form version 1.0.3
+```js
+const validator = require('@euriklis/validator')
+const SortLib = require('@euriklis/sortlib')
+let array = [12, 2, -21, 32,1.2, 43, 5, 3],
+    sorted_array = [-21, 1.2, 2, 3, 5, 12, 32, 43],
+    output = SortLib.bucket_sort(array, 3, true),
+    reversed_output = SortLib.bucket_sort(array, 3, false)
+new validator(output.array).is_same(sorted_array)
+    .and().bind(
+        new validator(reversed_output.array).is_same([...sorted_array].reverse())
+    )
+    .on(true, () => console.log('Correctly sorted array with bucket sort static method bucket_sort()'))
+    .on(false, () => console.error('Error in the execution of the bucket sort algorithm from the static method bucket_sort().'))
+```
+
 The SortLib package can run any of these methods shown above when the array parameter of the current instance is declared. This can be done with the using of the sort() method of the SortLib package/library. 
 ```js
 const SortLib = require('../index')
