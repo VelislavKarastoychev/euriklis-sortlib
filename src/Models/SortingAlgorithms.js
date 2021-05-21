@@ -79,9 +79,11 @@ function merge_sort(array, ascending_order) {
     // k is the number of elements in every sorted subarray
     // of the initial array.
     k = 1
-    while (k < n) {
+    while (1) {
+        if (k >= n) break
         s = 1
-        while (s * k < n) {
+        while (1) {
+            if (s * k >= n) break
             /**
              * Create the start and end indices
              * of the subarray sorted_array[(s - 1) * k : s * k - 1].
@@ -126,6 +128,88 @@ function merge_sort(array, ascending_order) {
     }
     return { array: sorted_array, indices: sorted_indices }
 }
+/**
+ * 
+ * @param {Array.<number | string>} array 
+ * @param {boolean | 'decrease' | 'increase'} mode
+ * @returns {{array : Array.<number | string>, indices : Array.<number>}}
+ * @description this utility function implements
+ * the merge sort algorithm that is used in the merge_sort
+ * static method and in the sort method of the SortLib library.
+ * The function is designed to implements the algorithm
+ * in such a way that the time efficiency will be optimal
+ * in comparison with the conventional sort method. Note that
+ * the method is swallow by the quick sort because of the
+ * storage procedures (we need to store the initial array 3 times
+ * in order to save the initial array and two copies to the indices array).
+ * Thus the merge sort can be more efficient than the quick sort only
+ * if the length of the array is greater than 4*10^6.
+ */
+function mergeSort(array, mode) {
+    if (typeof mode === 'undefined') mode = true
+    if (mode === 'decrease') mode = false
+    let i, j, k, l, p, s, t, condition, copied_indices = []
+    let copied_array = [], sorted_array = [], sorted_indices = []
+    const n = array.length
+    for (i = 0; i < (n >> 1); i++) {
+        j = i << 1
+        copied_indices[j] = j
+        sorted_indices[j] = j
+        copied_indices[j + 1] = j + 1
+        sorted_indices[j + 1] = j + 1
+        copied_array[j] = array[j]
+        copied_array[j + 1] = array[j + 1]
+        sorted_array[j] = array[j]
+        sorted_array[j + 1] = array[j + 1]
+    }
+    if (n & 1) {
+        sorted_indices[n - 1] = n - 1
+        copied_indices[n - 1] = n - 1
+        copied_array[n - 1] = array[n - 1]
+        sorted_array[n - 1] = array[n - 1]
+    }
+    k = 1
+    while (k < n) {
+        p = ((n / k) >> 0) + ((n % k) ? 1 : 0)
+        for (s = 0; s < p >> 1; s++) {
+            i = (s << 1) * k
+            j = ((s << 1) + 1) * k
+            t = (((s + 1) << 1) * k > n) ? n : ((s + 1) << 1) * k
+            for (l = (s << 1) * k; l < t; l++) {
+                condition = mode ? copied_array[i] >= copied_array[j] : copied_array[i] <= copied_array[j]
+                if (i >= ((s << 1) + 1) * k) {
+                    sorted_array[l] = copied_array[j]
+                    sorted_indices[l] = copied_indices[j]
+                    ++j
+                } else if (j >= t) {
+                    sorted_array[l] = copied_array[i]
+                    sorted_indices[l] = copied_indices[i]
+                    ++i
+                } else {
+                    if (condition) {
+                        sorted_array[l] = copied_array[j]
+                        sorted_indices[l] = copied_indices[j]
+                        ++j
+                    } else {
+                        sorted_array[l] = copied_array[i]
+                        sorted_indices[l] = copied_indices[i]
+                        ++i
+                    }
+                }
+            }
+        }
+        for (i = 0; i < n >> 1; i++) {
+            j = i << 1
+            copied_array[j] = sorted_array[j]
+            copied_array[j + 1] = sorted_array[j + 1]
+            copied_indices[j] = sorted_indices[j]
+            copied_indices[j + 1] = sorted_indices[j + 1]
+        }
+        k <<= 1
+    }
+    return { array: sorted_array, indices: sorted_indices }
+}
+
 /**
  * 
  * @param {Array} array
@@ -258,60 +342,6 @@ function bubble_sort(array, ascending_order) {
     }
     return { array: sorted_array, indices: sorted_indices }
 }
-
-/**
- * 
- * @param {Array} array 
- * @param {Array} indices 
- * @param {number} i 
- * @param {number} k 
- * @param {boolean | 'decrease' | 'increase'} mode
- * @description utility function used in the heap_shift_down
- * and heap_sort algorithm functions. 
- */
-
-function shift_down(array, indices, i, k, mode) {
-    let m, left, right, condition, temp
-    if (mode === 'decrease') mode = false
-    if (typeof mode === 'undefined') mode = true
-    while (2 * k <= i) {
-        left = 2 * k
-        right = 2 * k + 1
-        m = right
-        condition = mode ? array[right - 1] < array[left - 1] : array[right - 1] > array[left - 1]
-        if (condition || 2 * k === i) m = left
-        condition = mode ? array[m - 1] > array[k - 1] : array[m - 1] < array[k - 1]
-        if (condition) {
-            temp = array[k - 1]
-            array[k - 1] = array[m - 1]
-            array[m - 1] = temp
-            temp = indices[k - 1]
-            indices[k - 1] = indices[m - 1]
-            indices[m - 1] = temp
-        }
-        k = m
-    }
-    return { array, indices }
-}
-
-/**
- * 
- * @param {Array} array 
- * @param {Array} indices 
- * @param {boolean | 'decrease' | 'increase'} mode
- * @description this utility function is part of the
- * heap_sort algorithm. 
- */
-function heap_shift_down(array, indices, mode) {
-    let k = array.length >> 1, i
-    for (i = k; i >= 1; i--) {
-        let output = shift_down(array, indices, array.length, i, mode)
-        array = output.array
-        indices = output.indices
-    }
-    return { array, indices }
-}
-
 /**
  * 
  * @param {Array} array 
@@ -321,26 +351,7 @@ function heap_shift_down(array, indices, mode) {
  * sub-functions shift_down and heap_shift_down... 
  */
 function heap_sort(array, mode) {
-    const n = array.length
-    let sorted_array = [...array], temp, output,
-        sorted_indices = sorted_array.map((e, i) => e = i)
-    if (mode === 'decrease') mode = false
-    if (typeof mode === 'undefined') mode = true
-    // implementation...
-    output = heap_shift_down(sorted_array, sorted_indices, mode)
-    sorted_array = output.array
-    sorted_indices = output.indices
-    for (let i = n; i > 1; i--) {
-        temp = sorted_array[0]
-        sorted_array[0] = sorted_array[i - 1]
-        sorted_array[i - 1] = temp
-        temp = sorted_indices[0]
-        sorted_indices[0] = sorted_indices[i - 1]
-        sorted_indices[i - 1] = temp
-        output = shift_down(sorted_array, sorted_indices, (i - 1), 1, mode)
-        sorted_array = [...output.array]
-        sorted_indices = [...output.indices]
-    }
+    let
     return { array: sorted_array, indices: sorted_indices }
 }
 
@@ -351,7 +362,7 @@ function insertion_sort(array, ascending_order) {
     const n = array.length
     let i, j, sorted_array = [...array], p, k, condition,
         sorted_indices = sorted_array.map((e, i) => e = i)
-    for (i = 1;i < n;i++) {
+    for (i = 1; i < n; i++) {
         p = sorted_array[i]
         k = sorted_indices[i]
         j = i - 1
@@ -365,7 +376,7 @@ function insertion_sort(array, ascending_order) {
         sorted_array[j + 1] = p
         sorted_indices[j + 1] = k
     }
-    return { array : sorted_array, indices: sorted_indices }
+    return { array: sorted_array, indices: sorted_indices }
 }
 
 /**
@@ -376,16 +387,16 @@ function insertion_sort(array, ascending_order) {
  * @description this is an utility function that implements the
  * selection sort algorithm.
  */
-function selection_sort (array, mode) {
+function selection_sort(array, mode) {
     if (mode === 'decrease') mode = false
     if (typeof mode === 'undefined') mode = true
     const n = array.length
     let i, j, m, condition, temp,
-    sorted_array = [...array],
-    sorted_indices = sorted_array.map((e, i) => e = i)
-    for (i = 0;i < n - 1;i++) {
+        sorted_array = [...array],
+        sorted_indices = sorted_array.map((e, i) => e = i)
+    for (i = 0; i < n - 1; i++) {
         m = i
-        for (j = i + 1;j < n;j++) {
+        for (j = i + 1; j < n; j++) {
             condition = mode ? sorted_array[j] < sorted_array[m] : sorted_array[j] > sorted_array[m]
             if (condition) m = j
         }
@@ -395,10 +406,10 @@ function selection_sort (array, mode) {
             sorted_array[i] = temp
             temp = sorted_indices[m]
             sorted_indices[m] = sorted_indices[i]
-            sorted_indices[i] = temp 
+            sorted_indices[i] = temp
         }
     }
-    return {array : sorted_array, indices : sorted_indices}
+    return { array: sorted_array, indices: sorted_indices }
 }
 
 /**
@@ -411,9 +422,9 @@ function selection_sort (array, mode) {
  * of the bubble sort algorithm. Note that this algorithm
  * is not fast (has complexity proportional to O(n^2)).
  */
-function cocktail_sort (array, mode) {
+function cocktail_sort(array, mode) {
     let n = array.length, sorted_array = [...array],
-    indices = Array.from({length: n}).map((e, i) => e = i)
+        indices = Array.from({ length: n }).map((e, i) => e = i)
     let i, start, end, condition, temp, swapped = true
 
     if (typeof mode === 'undefined') mode = true
@@ -422,7 +433,7 @@ function cocktail_sort (array, mode) {
     end = n - 1
     while (swapped) {
         swapped = false
-        for (i = start;i < end;i++) {
+        for (i = start; i < end; i++) {
             condition = mode ? sorted_array[i] > sorted_array[i + 1] : sorted_array[i] < sorted_array[i + 1]
             if (condition) {
                 temp = sorted_array[i]
@@ -437,7 +448,7 @@ function cocktail_sort (array, mode) {
         if (!swapped) break
         swapped = false
         --end
-        for (i = end - 1;i > start - 1;i--) {
+        for (i = end - 1; i > start - 1; i--) {
             condition = mode ? sorted_array[i] > sorted_array[i + 1] : sorted_array[i] < sorted_array[i + 1]
             if (condition) {
                 temp = sorted_array[i]
@@ -451,7 +462,7 @@ function cocktail_sort (array, mode) {
         }
         ++start
     }
-    return {array : sorted_array, indices}
+    return { array: sorted_array, indices }
 }
 
 /**
@@ -467,24 +478,24 @@ function cocktail_sort (array, mode) {
  * the k is the count of the buckets.
  *  
  */
-function bucket_sort (array, buckets, mode) {
+function bucket_sort(array, buckets, mode) {
     if (typeof mode === 'undefined') mode = true
     if (mode === 'decrease') mode = false
     let sorted_array = [], i, j, temp, min, indices = [],
-    temp_array = [], temp_indices = [], n, max
-    for (i = 0;i < buckets;i++) {
+        temp_array = [], temp_indices = [], n, max
+    for (i = 0; i < buckets; i++) {
         temp_array.push([])
         temp_indices.push([])
     }
     // find the biggest element of the array.
     max = array[0]
     n = array.length
-    for (i = 0;i < n;i++) if (array[i] > max) max = array[i]
+    for (i = 0; i < n; i++) if (array[i] > max) max = array[i]
     // find the min element:
     min = array[0]
-    for (i = 0;i < n;i++) if (array[i] < min) min = array[i]
+    for (i = 0; i < n; i++) if (array[i] < min) min = array[i]
     // push the arrays into the right sub-array of the temp_array
-    for (i = 0;i < n;i++) {
+    for (i = 0; i < n; i++) {
         j = (((array[i] - min) / (max - min)) * (buckets - 1)) | 0
         temp_array[j].push(array[i])
         temp_indices[j].push(i)
@@ -498,7 +509,7 @@ function bucket_sort (array, buckets, mode) {
             return temp_indices[j][el]
         }))
     }
-    return {array : sorted_array, indices}
+    return { array: sorted_array, indices }
 }
 
 /**
@@ -526,9 +537,9 @@ function SortArray(array, method, ascending_order = true) {
 module.exports = {
     SortArray,
     PutInSortedArray,
-    merge_sort,
-    MergeSort: merge_sort,
-    Merge_sort: merge_sort,
+    merge_sort: mergeSort,
+    MergeSort: mergeSort,
+    Merge_sort: mergeSort,
     quick_sort: quickSort,
     QuickSort: quickSort,
     Quick_sort: quickSort,
@@ -536,19 +547,19 @@ module.exports = {
     BubbleSort: bubble_sort,
     Bubble_sort: bubble_sort,
     bucket_sort,
-    bucketSort : bucket_sort,
-    BucketSort : bucket_sort,
+    bucketSort: bucket_sort,
+    BucketSort: bucket_sort,
     cocktail_sort,
-    CocktailSort : cocktail_sort,
-    cocktailSort : cocktail_sort,
+    CocktailSort: cocktail_sort,
+    cocktailSort: cocktail_sort,
     heap_sort,
     heapSort: heap_sort,
     HeapSort: heap_sort,
     insertion_sort,
-    insertionSort : insertion_sort,
-    InsertionSort : insertion_sort,
+    insertionSort: insertion_sort,
+    InsertionSort: insertion_sort,
     selection_sort,
-    selectionSort : selection_sort,
-    SelectionSort : selection_sort,
+    selectionSort: selection_sort,
+    SelectionSort: selection_sort,
 
 }
