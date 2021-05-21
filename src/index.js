@@ -114,7 +114,7 @@ class SortLib {
     /**
      * @method merge_sort
      * @param {Array.<number | string>} array 
-     * @param {string} sort_mode
+     * @param {'increase' | 'decrease' | boolean} sort_mode
      * @returns {{array : Array.<number | string>, indices : Array.<number>}}  
      * @description this static method implements the merge sort
      * algorithm that is invented from Jon von Neumann in 1945
@@ -156,7 +156,7 @@ class SortLib {
     /**
      * 
      * @param {array.<number | string>} array 
-     * @param {string} sort_mode
+     * @param {boolean | 'increase' | 'decrease'} sort_mode
      * @returns {{array : Array.<number | string>, indices : Array.<number>}}
      * @description This static method implements the
      * quick sort algorithm that was created form
@@ -168,7 +168,7 @@ class SortLib {
     /**
      * 
      * @param {Array.<number | string>} array 
-     * @param {string} sort_mode
+     * @param {boolean | 'increase' | 'decrease'} sort_mode
      * @returns {{array : Array.<number | string>, indices : Array.<number>}}
      * @description This static algorithm implements the trivial
      * bubble sort algorithm. 
@@ -179,7 +179,7 @@ class SortLib {
     /**
      * 
      * @param {Array.<number | string>} array 
-     * @param {string} sort_mode
+     * @param {boolean | 'increase' | 'decrease'} sort_mode
      * @returns {{array: Array.<number | string>, indices : Array.<number>}}
      * @description THis static method implements the heap sort
      * algorithm invented by J.W.J. Williams in 1964.
