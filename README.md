@@ -259,6 +259,11 @@ SortLib {
 ```
 To get or set the identical properties of the SortLib instance you have to use the get and set methods *array* , *size* (only getting mode), *algorithm* (if you try to set the algorithm to not supported value for the library, then the algorithm will be set automatically to "merge sort"), *sort mode* (getter and setter methods), *status* (getter and setter methods. The only supported values are 'sorted' and 'unsorted') and *indices* (getter and setter methods).
 
+# Why to use this package?
+This package is constructed and designed for the needs of efficient sorting of number of string arrays/lists. It is well known that the javascript language provides a conventional way for sorting of arrays. But because of the generality of the nature of the arrays, the method ___sort()___ of javascript is very inefficient when we need fast sorting of number or character/string arrays. For that reason we created this library that implements the crucial sorting algorithms merge sort, quick sort, bucket sort and the conventional algorithms bubble sort, insertion sort, selection sort, cocktail sort and a dozen of other useful algorithms that may be used for the needs of the econometric or AI package construction or simply for experimental needs (testing of the efficiency of the sorting algorithms for small random arrays, medium random arrays, large random arrays and extremely large random arrays and etc).
+
+To demonstrate the time efficiency of the SortLib library we present the results that was obtained from the comparison of the SortLib algorithms and the conventional javascript method ___sort()___.    
+
 # Bugs and tips
 If you have any well-meaning critique or have noticed any bug you may send me an email on exel_mmm@abv.bg or to euriklis@hotmail.bg
 # Donations
