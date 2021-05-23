@@ -3,7 +3,7 @@ function ComparisonSortLibAndSort () {
     let answer = false
     const validator = require('@euriklis/validator')
     const SortLib = require('../index')
-    const array = Array.from({ length : 10000}).map(Math.random)
+    const array = SortLib.generate_random_array(100000, 123456)
     console.time('Conventional sorting')
     const sorted_array_conventionally = [...array].sort()
     console.timeEnd('Conventional sorting')
