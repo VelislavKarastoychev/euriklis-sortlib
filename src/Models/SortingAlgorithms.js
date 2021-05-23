@@ -1,6 +1,43 @@
 'use strict'
 /**
  * 
+ * @param {number} n 
+ * @param {number} seed
+ * @returns {Array.<number>}
+ * @description this function creates a
+ * random array that has the same elements
+ * for given n. We use the John Burkardt routine
+ * written in Fortran for the usage of the
+ * algorithm 451 (M.Box complex optimization method).
+ * We only utilize the code in such a manner that the
+ * array creating to be more efficient by using
+ * of bitwise operations. 
+ */
+function random_array_generator(n, seed) {
+    let i, k, rand = []
+    for (i = 0; i < n >> 1; i++) {
+        seed <<= 0
+        k = (seed / 127773) >> 0
+        seed = (16807 * (seed - k * 127773) - k * 2836) >> 0
+        if (seed < 0) seed += 2147483647
+        rand[i << 1] = seed * 4.656612875e-10
+        seed <<= 0
+        k = (seed / 127773) >> 0
+        seed = (16807 * (seed - k * 127773) - k * 2836) >> 0
+        if (seed < 0) seed += 2147483647
+        rand[(i << 1) + 1] = seed * 4.656612875e-10
+    }
+    if (n & 1) {
+        seed <<= 0
+        k = (seed / 127773) >> 0
+        seed = (16807 * (seed - k * 127773) - k * 2836) >> 0
+        if (seed < 0) seed += 2147483647
+        rand[n - 1] = seed * 4.656612875e-10
+    }
+    return rand
+}
+/**
+ * 
  * @param {Array} array 
  * @param {number} element 
  * @param {boolean} ascending_order
@@ -65,66 +102,67 @@ function PutInSortedArray(array, element, ascending_order) {
  * improve the speed and the time efficiency of the algorithm
  * more than two times according to our metrics.
  */
-function merge_sort(array, ascending_order) {
-    let sorted_array = [...array], // real array
-        sorted_indices = array.map((e, i) => i), // real array
-        i, j, // real or integer 
-        k, m, n, s, t, // integers
-        condition // boolean
-    if (typeof ascending_order === 'undefined') ascending_order = true
-    if (ascending_order === 'decrease') ascending_order = false
-    // get the length of the array.
-    n = sorted_array.length
-    // initializations
-    // k is the number of elements in every sorted subarray
-    // of the initial array.
+function mergeSort(array, mode) {
+    if (typeof mode === 'undefined') mode = true
+    if (mode === 'decrease') mode = false
+    let i, j, k, l, p, s, t, condition, copied_indices = []
+    let copied_array = [], sorted_array = [], sorted_indices = []
+    const n = array.length
+    for (i = 0; i < (n >> 1); i++) {
+        j = i << 1
+        copied_indices[j] = j
+        sorted_indices[j] = j
+        copied_indices[j + 1] = j + 1
+        sorted_indices[j + 1] = j + 1
+        copied_array[j] = array[j]
+        copied_array[j + 1] = array[j + 1]
+        sorted_array[j] = array[j]
+        sorted_array[j + 1] = array[j + 1]
+    }
+    if (n & 1) {
+        sorted_indices[n - 1] = n - 1
+        copied_indices[n - 1] = n - 1
+        copied_array[n - 1] = array[n - 1]
+        sorted_array[n - 1] = array[n - 1]
+    }
     k = 1
-    while (1) {
-        if (k >= n) break
-        s = 1
-        while (1) {
-            if (s * k >= n) break
-            /**
-             * Create the start and end indices
-             * of the subarray sorted_array[(s - 1) * k : s * k - 1].
-             * When we put an item ito the sorted subarray then
-             * i or j will be set to the median or m element.
-             */
-            for (t = 0; t < k; t++) {
-                i = (s - 1) * k + t
-                j = s * k + t - 1
-                m = (i + j) >> 1
-                if (s * k + t >= n) break
-                // get the element sorted_array[s * k + t]
-                // and put it into the sorted subarray
-                // sorted_array[(s - 1) * k + t : s * k + t - 1]
-                while (1) {
-                    if (i === j && j === m) break
-                    condition = ascending_order ? sorted_array[m] > sorted_array[s * k + t] : sorted_array[m] < sorted_array[s * k + t]
+    while (k < n) {
+        p = ((n / k) >> 0) + ((n % k) ? 1 : 0)
+        for (s = 0; s < p >> 1; s++) {
+            i = (s << 1) * k
+            j = ((s << 1) + 1) * k
+            t = (((s + 1) << 1) * k > n) ? n : ((s + 1) << 1) * k
+            for (l = (s << 1) * k; l < t; l++) {
+                condition = mode ? copied_array[i] >= copied_array[j] : copied_array[i] <= copied_array[j]
+                if (i >= ((s << 1) + 1) * k) {
+                    sorted_array[l] = copied_array[j]
+                    sorted_indices[l] = copied_indices[j]
+                    ++j
+                } else if (j >= t) {
+                    sorted_array[l] = copied_array[i]
+                    sorted_indices[l] = copied_indices[i]
+                    ++i
+                } else {
                     if (condition) {
-                        j = m
+                        sorted_array[l] = copied_array[j]
+                        sorted_indices[l] = copied_indices[j]
+                        ++j
+                    } else {
+                        sorted_array[l] = copied_array[i]
+                        sorted_indices[l] = copied_indices[i]
+                        ++i
                     }
-                    else {
-                        i = m + 1
-                    }
-                    m = (i + j) >> 1
-                }
-                condition = ascending_order ? sorted_array[m] > sorted_array[s * k + t] ?
-                    true : false
-                    : sorted_array[m] < sorted_array[s * k + t] ?
-                        true : false
-                for (i = condition ? m : m + 1; i < s * k + t; i++) {
-                    j = sorted_array[i]
-                    sorted_array[i] = sorted_array[s * k + t]
-                    sorted_array[s * k + t] = j
-                    j = sorted_indices[i]
-                    sorted_indices[i] = sorted_indices[s * k + t]
-                    sorted_indices[s * k + t] = j
                 }
             }
-            s += 2
         }
-        k = k << 1
+        for (i = 0; i < n >> 1; i++) {
+            j = i << 1
+            copied_array[j] = sorted_array[j]
+            copied_array[j + 1] = sorted_array[j + 1]
+            copied_indices[j] = sorted_indices[j]
+            copied_indices[j + 1] = sorted_indices[j + 1]
+        }
+        k <<= 1
     }
     return { array: sorted_array, indices: sorted_indices }
 }
@@ -267,10 +305,19 @@ function mergeSort(array, mode) {
  * 
  */
 function quickSort(array, mode) {
-    let i, j, p, sorted_array = [...array], temp,
-        tail = [], condition, first, last, sorted_indices
-    const n = sorted_array.length
-    sorted_indices = Array.from({ length: n }).map((e, i) => e = i)
+    let i, j, p, sorted_array = [], temp,
+        tail = [], condition, first, last, sorted_indices = []
+    const n = array.length
+    for (i = 0; i < n >> 1; i++) {
+        sorted_array[i << 1] = array[i << 1]
+        sorted_indices[i << 1] = i << 1
+        sorted_array[(i << 1) + 1] = array[(i << 1) + 1]
+        sorted_indices[(i << 1) + 1] = (i << 1) + 1
+    }
+    if (n & 1) {
+        sorted_array[n - 1] = array[n - 1]
+        sorted_indices[n - 1] = n - 1
+    }
     if (mode === 'decrease') mode = false
     if (typeof mode === 'undefined') mode = true
     tail.push([0, n - 1])
@@ -351,7 +398,76 @@ function bubble_sort(array, ascending_order) {
  * sub-functions shift_down and heap_shift_down... 
  */
 function heap_sort(array, mode) {
-    let
+    if (typeof mode === 'undefined') mode = true
+    if (mode === 'decrease') mode = false
+    const n = array.length
+    let i, j, k, m, t, sorted_array = [], sorted_indices = [], condition
+    while (i < (n >> 1)) {
+        sorted_array[i << 1] = array[i << 1]
+        sorted_indices[i << 1] = i << 1
+        sorted_array[(i << 1) + 1] = array[(i << 1) + 1]
+        sorted_indices[(i << 1) + 1] = (i + 1) << 1
+        ++i
+    }
+    if (n & 1) {
+        sorted_array[n - 1] = array[n - 1]
+        sorted_indices[n - 1] = n - 1
+    }
+    // transform the array into heap...
+    k = (n - 2) >> 1
+    while (k >= 0) {
+        // shift down
+        j = k
+        while ((j << 1) + 1 <= n - 1) {
+            m = j
+            condition = mode ? sorted_array[m] < sorted_array[(j << 1) + 1] : sorted_array[m] > sorted_array[(j << 1) + 1]
+            if (condition) m = (j << 1) + 1
+            condition = mode ? sorted_array[m] < sorted_array[(j + 1) << 1] : sorted_array[m] > sorted_array[(j + 1) << 1]
+            if ((j + 1) << 1 <= n - 1 && condition) m = (j + 1) << 1
+            if (m === j) break
+            else {
+                t = sorted_array[m]
+                sorted_array[m] = sorted_array[j]
+                sorted_array[j] = t
+                t = sorted_indices[m]
+                sorted_indices[m] = sorted_indices[j]
+                sorted_indices[j] = t
+                j = m
+            }
+        }
+        --k
+    }
+    // sort the array with the heap sort...
+    k = n - 1
+    while (k > 0) {
+        // swap the k and the 0 elements
+        t = sorted_array[0]
+        sorted_array[0] = sorted_array[k]
+        sorted_array[k] = t
+        t = sorted_indices[0]
+        sorted_indices[0] = sorted_indices[k]
+        sorted_indices[k] = t
+        --k
+        // shift down the subarray sorted_array[0:k]
+        i = 0
+        while ((i << 1) + 1 <= k) {
+            m = i
+            condition = mode ? sorted_array[m] < sorted_array[(i << 1) + 1] : sorted_array[m] > sorted_array[(i << 1) + 1]
+            if (condition) m = (i << 1) + 1
+            condition = mode ? sorted_array[m] < sorted_array[(i + 1) << 1] : sorted_array[m] > sorted_array[(i + 1) << 1]
+            if (((i + 1) << 1) <= k && condition) m = (i + 1) << 1
+            if (i === m) break
+            else {
+                t = sorted_array[m]
+                sorted_array[m] = sorted_array[i]
+                sorted_array[i] = t
+                t = sorted_indices[m]
+                sorted_indices[m] = sorted_indices[i]
+                sorted_indices[i] = t
+                i = m
+            }
+        }
+    }
     return { array: sorted_array, indices: sorted_indices }
 }
 
@@ -561,5 +677,7 @@ module.exports = {
     selection_sort,
     selectionSort: selection_sort,
     SelectionSort: selection_sort,
-
+    generate_random_array: random_array_generator,
+    GenerateRandomArray: random_array_generator,
+    Generate_random_array: random_array_generator,
 }
