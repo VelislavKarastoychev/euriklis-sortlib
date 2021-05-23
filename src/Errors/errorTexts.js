@@ -6,6 +6,7 @@ const IncorrectArrayInSetterArray = 'Incorrect array parameter in the array sett
 const IncorrectArgumentInIndexSetter = 'Incorrect argument in the index setter. Note that the argument of the method has to be an object with keys (properties) index and item.'
 const IncorrectStatusInSetter = 'Incorrect status in the setter method. Note that the status argument of the method has to be a string with possible values "sorted" and "unsorted".'
 const IncorrectArrayParameterInBucketSort = 'Incorrect array parameter in the bucket_sort method. Note that this method requires the array to consists only from number elements.'
+const IncorrectParameterInGRA = 'Incorrect parameter in the generate random array static method. Note that the parameter n has to be an integer.'
 module.exports = {
     ErrorText,
     IncorrectArrayDeclarationInSortLibConstructor,
@@ -14,4 +15,6 @@ module.exports = {
     IncorrectArgumentInIndexSetter,
     IncorrectStatusInSetter,      
     IncorrectArrayParameterInBucketSort,   
+    IncorrectParameterInGRA,
+
 }
