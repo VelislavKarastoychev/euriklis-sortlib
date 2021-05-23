@@ -218,6 +218,25 @@ class SortLib {
             .or().not().is_in_range(0, array.length).on(true, () => buckets = array.length - 1)
         return sort_algorithms.bucket_sort(array, buckets, sort_mode)
     }
+    /**
+     * 
+     * @param {number} n 
+     * @param {number | 123456} seed
+     * @returns {Array.<number>}
+     * @description this is an utility static method,
+     * that creates/generates an array with elements
+     * that are randomly distributed between 0 and 1.
+     * We use as core idea for this method the routine
+     * of John Burkardt used into the Fortran algorithm 451,
+     * or namely the Complex box optimization of M. Box.
+     * (This fortran routine is translated in javascript 
+     * from the author of the package, 
+     * see https://github.com/VelislavKarastoychev/boxOptimizationjs).
+     */
+    static generate_random_array (n, seed = 123456) {
+        if (typeof seed !== 'number') seed = 123456
+        return sort_algorithms.generate_random_array(n, seed)
+    }
     get algorithm() {
         return this.__algorithm__
     }
