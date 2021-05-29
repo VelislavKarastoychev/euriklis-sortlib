@@ -206,7 +206,7 @@ new validator(output.array).is_same(sorted_array)
 - *SortLib.generate_random_array(length, seed)* - this method creates an array of uniform random values from 0 to 1 with length the first parameter of the package and use optionally seed parameter. We use the idea of the John Burkardt Fortran routine used in complex constrained optimization method of M.J.Box. The method is available from version 1.1.0 of the package.  
 The SortLib package can run any of these methods shown above when the array parameter of the current instance is declared. This can be done with the using of the sort() method of the SortLib package/library. 
 ```js
-const SortLib = require('../index')
+const SortLib = require('@euriklis/sortlib')
 const array = [4, 1, 5, 35, 9, 289, 3, 24, 14, 21, 6, 28]
 const sortlib_instance = new SortLib({array})
 // the unsorted array
@@ -289,7 +289,7 @@ function ComparisonSortLibAndSort() {
         bub_time = 0, convent_time = 0, cs_time = 0, is_time = 0,
         sels_time = 0
     const validator = require('@euriklis/validator')
-    const SortLib = require('../index')
+    const SortLib = require('@euriklis/sortlib')
     const array = SortLib.generate_random_array(elements, 123456)
     const conventional_sorting = function (array, mode) {
         if (typeof mode === 'undefined') mode = true
@@ -439,7 +439,7 @@ function ComparisonSortLibAndSort() {
         bub_time = 0, convent_time = 0, cs_time = 0, is_time = 0,
         sels_time = 0
     const validator = require('@euriklis/validator')
-    const SortLib = require('../index')
+    const SortLib = require('@euriklis/sortlib')
     const array = SortLib.generate_random_array(elements, 123456)
     const conventional_sorting = function (array, mode) {
         if (typeof mode === 'undefined') mode = true
