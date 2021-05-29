@@ -232,9 +232,13 @@ class SortLib {
      * (This fortran routine is translated in javascript 
      * from the author of the package, 
      * see https://github.com/VelislavKarastoychev/boxOptimizationjs).
-     */
+     * If the seed parameter is not defined, then it will be set 
+     * by default to 123456. If the n parameter is not defined correctly,then
+     * it will be a fatal error.
+     **/
     static generate_random_array (n, seed = 123456) {
-        if (typeof seed !== 'number') seed = 123456
+        new validator(seed).not().is_number().on(true, () => seed = 123456)
+        new validator(n).is_integer().on(false, () => errors.IncorrectParameterInGRA())
         return sort_algorithms.generate_random_array(n, seed)
     }
     get algorithm() {
