@@ -427,7 +427,7 @@ function ComparisonSortLibAndSort() {
         })
 ```
 output:
-![](./src/assets/SortingAlgorithmSnapshot.png)
+![](./src/assets/SortingAlgorithmsSnapshot.png)
 
 The same paradigm is valid for the large arrays (1000000 elements). The mean results which was obtained for 100 sorting procedures shows that the quick sort and merge sort are the most efficient algorithms, followed from the heap sort and the traditional javascript sorting method. 
 ```js
