@@ -87,7 +87,7 @@ function PutInSortedArray(array, element, ascending_order) {
 /**
  * 
  * @param {Array} array 
- * @param {boolean} ascending_order
+ * @param {boolean} mode
  * @returns {{array : Array, indices : Array}} 
  * @description this is an utility function for the
  * statistics library of the euriklis package. The
@@ -102,150 +102,104 @@ function PutInSortedArray(array, element, ascending_order) {
  * improve the speed and the time efficiency of the algorithm
  * more than two times according to our metrics.
  */
+
 function mergeSort(array, mode) {
     if (typeof mode === 'undefined') mode = true
     if (mode === 'decrease') mode = false
-    let i, j, k, l, p, s, t, condition, copied_indices = []
-    let copied_array = [], sorted_array = [], sorted_indices = []
     const n = array.length
-    for (i = 0; i < (n >> 1); i++) {
-        j = i << 1
-        copied_indices[j] = j
-        sorted_indices[j] = j
-        copied_indices[j + 1] = j + 1
-        sorted_indices[j + 1] = j + 1
-        copied_array[j] = array[j]
-        copied_array[j + 1] = array[j + 1]
-        sorted_array[j] = array[j]
-        sorted_array[j + 1] = array[j + 1]
+    let condition, i, j, k, l, p, s, t, w, v,x,
+        sorted_array = [], sorted_indices = [],
+        copied_array = [], copied_indices = []
+    // copy the array
+    for (i = 0; i < n >> 2; i++) {
+        copied_array[i << 2] = array[i << 2]
+        copied_indices[i << 2] = i << 2
+        copied_array[(i << 2) + 1] = array[(i << 2) + 1]
+        copied_indices[(i << 2) + 1] = (i << 2) + 1
+        copied_array[(i << 2) + 2] = array[(i << 2) + 2]
+        copied_indices[(i << 2) + 2] = (i << 2) + 2
+        copied_array[(i << 2) + 3] = array[(i << 2) + 3]
+        copied_indices[(i << 2) + 3] = (i << 2) + 3
     }
-    if (n & 1) {
-        sorted_indices[n - 1] = n - 1
-        copied_indices[n - 1] = n - 1
+    if (n % 4 >= 1) {
         copied_array[n - 1] = array[n - 1]
-        sorted_array[n - 1] = array[n - 1]
+        copied_indices[n - 1] = n - 1
+    }
+    if (n % 4 >= 2) {
+        copied_array[n - 2] = array[n - 2]
+        copied_indices[n - 2] = n - 2
+    }
+    if (n % 4 >= 3) {
+        copied_array[n - 3] = array[n - 3]
+        copied_indices[n - 3] = n - 3
     }
     k = 1
     while (k < n) {
-        p = ((n / k) >> 0) + ((n % k) ? 1 : 0)
-        for (s = 0; s < p >> 1; s++) {
-            i = (s << 1) * k
-            j = ((s << 1) + 1) * k
-            t = (((s + 1) << 1) * k > n) ? n : ((s + 1) << 1) * k
-            for (l = (s << 1) * k; l < t; l++) {
-                condition = mode ? copied_array[i] >= copied_array[j] : copied_array[i] <= copied_array[j]
-                if (i >= ((s << 1) + 1) * k) {
-                    sorted_array[l] = copied_array[j]
-                    sorted_indices[l] = copied_indices[j]
-                    ++j
-                } else if (j >= t) {
+        p = (((n / k) >> 0) + ((n % k) ? 1 : 0))
+        for (s = 0;s < p >> 1;s++) {
+            w = (s << 1) * k
+            v = ((s << 1) + 1) * k
+            t = ((s + 1) << 1) * k >= n ? n : ((s + 1) << 1) * k
+            i = w
+            j = v
+            l = w
+            while (i < v && j < t) {
+                condition = mode ? copied_array[i] < copied_array[j] : copied_array[i] > copied_array[j]
+                if (condition) {
                     sorted_array[l] = copied_array[i]
                     sorted_indices[l] = copied_indices[i]
                     ++i
-                } else {
-                    if (condition) {
-                        sorted_array[l] = copied_array[j]
-                        sorted_indices[l] = copied_indices[j]
-                        ++j
-                    } else {
-                        sorted_array[l] = copied_array[i]
-                        sorted_indices[l] = copied_indices[i]
-                        ++i
-                    }
                 }
-            }
-        }
-        for (i = 0; i < n >> 1; i++) {
-            j = i << 1
-            copied_array[j] = sorted_array[j]
-            copied_array[j + 1] = sorted_array[j + 1]
-            copied_indices[j] = sorted_indices[j]
-            copied_indices[j + 1] = sorted_indices[j + 1]
-        }
-        k <<= 1
-    }
-    return { array: sorted_array, indices: sorted_indices }
-}
-/**
- * 
- * @param {Array.<number | string>} array 
- * @param {boolean | 'decrease' | 'increase'} mode
- * @returns {{array : Array.<number | string>, indices : Array.<number>}}
- * @description this utility function implements
- * the merge sort algorithm that is used in the merge_sort
- * static method and in the sort method of the SortLib library.
- * The function is designed to implements the algorithm
- * in such a way that the time efficiency will be optimal
- * in comparison with the conventional sort method. Note that
- * the method is swallow by the quick sort because of the
- * storage procedures (we need to store the initial array 3 times
- * in order to save the initial array and two copies to the indices array).
- * Thus the merge sort can be more efficient than the quick sort only
- * if the length of the array is greater than 4*10^6.
- */
-function mergeSort(array, mode) {
-    if (typeof mode === 'undefined') mode = true
-    if (mode === 'decrease') mode = false
-    let i, j, k, l, p, s, t, condition, copied_indices = []
-    let copied_array = [], sorted_array = [], sorted_indices = []
-    const n = array.length
-    for (i = 0; i < (n >> 1); i++) {
-        j = i << 1
-        copied_indices[j] = j
-        sorted_indices[j] = j
-        copied_indices[j + 1] = j + 1
-        sorted_indices[j + 1] = j + 1
-        copied_array[j] = array[j]
-        copied_array[j + 1] = array[j + 1]
-        sorted_array[j] = array[j]
-        sorted_array[j + 1] = array[j + 1]
-    }
-    if (n & 1) {
-        sorted_indices[n - 1] = n - 1
-        copied_indices[n - 1] = n - 1
-        copied_array[n - 1] = array[n - 1]
-        sorted_array[n - 1] = array[n - 1]
-    }
-    k = 1
-    while (k < n) {
-        p = ((n / k) >> 0) + ((n % k) ? 1 : 0)
-        for (s = 0; s < p >> 1; s++) {
-            i = (s << 1) * k
-            j = ((s << 1) + 1) * k
-            t = (((s + 1) << 1) * k > n) ? n : ((s + 1) << 1) * k
-            for (l = (s << 1) * k; l < t; l++) {
-                condition = mode ? copied_array[i] >= copied_array[j] : copied_array[i] <= copied_array[j]
-                if (i >= ((s << 1) + 1) * k) {
+                else {
                     sorted_array[l] = copied_array[j]
                     sorted_indices[l] = copied_indices[j]
                     ++j
-                } else if (j >= t) {
-                    sorted_array[l] = copied_array[i]
-                    sorted_indices[l] = copied_indices[i]
-                    ++i
-                } else {
-                    if (condition) {
-                        sorted_array[l] = copied_array[j]
-                        sorted_indices[l] = copied_indices[j]
-                        ++j
-                    } else {
-                        sorted_array[l] = copied_array[i]
-                        sorted_indices[l] = copied_indices[i]
-                        ++i
-                    }
+                }
+                ++l
+            }
+            if (i >= v) {
+                for (x = j;x < t;x++) {
+                    sorted_array[l + x - j] = copied_array[x]
+                    sorted_indices[l + x - j] = copied_indices[x]
+                }
+            }
+            if(j >= t) {
+                for (x = i;x < v;x++) {
+                    sorted_array[l + x - i] = copied_array[x]
+                    sorted_indices[l + x - i] = copied_indices[x]
                 }
             }
         }
-        for (i = 0; i < n >> 1; i++) {
-            j = i << 1
-            copied_array[j] = sorted_array[j]
-            copied_array[j + 1] = sorted_array[j + 1]
-            copied_indices[j] = sorted_indices[j]
-            copied_indices[j + 1] = sorted_indices[j + 1]
+        if (k === 1 && (n & 1)) {
+          sorted_array[n - 1] = copied_array[n - 1]
+          sorted_indices[n - 1] = copied_indices[n - 1]
         }
-        k <<= 1
+        // copy the sort_indices into the copied indices...
+        for (i = 0;i < n >> 2;i++) {
+            copied_array[i << 2] = sorted_array[i << 2]
+            copied_indices[i << 2] = sorted_indices[i << 2]
+            copied_array[(i << 2) + 1] = sorted_array[(i << 2) + 1]
+            copied_indices[(i << 2) + 1] = sorted_indices[(i << 2) + 1]
+            copied_array[(i << 2) + 2] = sorted_array[(i << 2) + 2]
+            copied_indices[(i << 2) + 2] = sorted_indices[(i << 2) + 2]
+            copied_array[(i << 2) + 3] = sorted_array[(i << 2) + 3]
+            copied_indices[(i << 2) + 3] = sorted_indices[(i << 2) + 3]
+        }
+        if (n % 4 >= 1) {
+            copied_array[n - 1] = sorted_array[n - 1]
+            copied_indices[n - 1] = sorted_indices[n - 1]
+        }
+        if (n % 4 >= 2) {
+            copied_array[n - 2] = sorted_array[n - 2]
+            copied_indices[n - 2] = sorted_indices[n - 2]
+        }
+        if (n % 4 >= 3) {
+            copied_array[n - 3] = sorted_array[n - 3]
+            copied_indices[n - 3] = sorted_indices[n - 3]
+        }
+        k <<= 1 
     }
-    return { array: sorted_array, indices: sorted_indices }
+    return {array : sorted_array, indices : sorted_indices}
 }
 
 /**
@@ -306,58 +260,70 @@ function mergeSort(array, mode) {
  */
 function quickSort(array, mode) {
     let i, j, p, sorted_array = [], temp,
-        tail = [], condition, first, last, sorted_indices = []
+      tail = [], condition, first, last, sorted_indices = []
     const n = array.length
-    for (i = 0; i < n >> 1; i++) {
-        sorted_array[i << 1] = array[i << 1]
-        sorted_indices[i << 1] = i << 1
-        sorted_array[(i << 1) + 1] = array[(i << 1) + 1]
-        sorted_indices[(i << 1) + 1] = (i << 1) + 1
+    for (i = 0; i < n >> 2; i++) {
+      sorted_array[i << 2] = array[i << 2]
+      sorted_indices[i << 2] = i << 2
+      sorted_array[(i << 2) + 1] = array[(i << 2) + 1]
+      sorted_indices[(i << 2) + 1] = (i << 2) + 1
+      sorted_array[(i << 2) + 2] = array[(i << 2) + 2]
+      sorted_indices[(i << 2) + 2] = (i << 2) + 2
+      sorted_array[(i << 2) + 3] = array[(i << 2) + 3]
+      sorted_indices[(i << 2) + 3] = (i << 2) + 3 
     }
-    if (n & 1) {
-        sorted_array[n - 1] = array[n - 1]
-        sorted_indices[n - 1] = n - 1
+    if (n % 4 >= 1) {
+      sorted_array[n - 1] = array[n - 1]
+      sorted_indices[n - 1] = n - 1
+    }
+    if (n % 4 >= 2) {
+      sorted_array[n - 2] = array[n - 2]
+      sorted_indices[n - 2] = n - 2
+    }
+    if (n % 4 >= 3) {
+      sorted_array[n - 3] = array[n - 3]
+      sorted_indices[n - 3] = n - 3
     }
     if (mode === 'decrease') mode = false
     if (typeof mode === 'undefined') mode = true
     tail.push([0, n - 1])
     while (1) {
-        if (!tail.length) break
-        [first, last] = tail.pop()
-        i = first
-        j = last
-        p = sorted_array[first]
-        while (1) {
+      if (!tail.length) break
+      [first, last] = tail.pop()
+      i = first
+      j = last
+      p = sorted_array[first]
+      while (1) {
+        if (i === j || i >= j) break
+        condition = mode ? p > sorted_array[j] : p < sorted_array[j]
+        if (condition) {
+          temp = sorted_array[i]
+          sorted_array[i] = sorted_array[j]
+          sorted_array[j] = temp
+          temp = sorted_indices[i]
+          sorted_indices[i] = sorted_indices[j]
+          sorted_indices[j] = temp
+          while (1) {
             if (i === j || i >= j) break
-            condition = mode ? p > sorted_array[j] : p < sorted_array[j]
+            ++i // note that p = sorted_array[j]
+            condition = mode ? sorted_array[i] > p : sorted_array[i] < p
             if (condition) {
-                temp = sorted_array[i]
-                sorted_array[i] = sorted_array[j]
-                sorted_array[j] = temp
-                temp = sorted_indices[i]
-                sorted_indices[i] = sorted_indices[j]
-                sorted_indices[j] = temp
-                while (1) {
-                    if (i === j || i >= j) break
-                    ++i // note that p = sorted_array[j]
-                    condition = mode ? sorted_array[i] > p : sorted_array[i] < p
-                    if (condition) {
-                        temp = sorted_array[i]
-                        sorted_array[i] = sorted_array[j]
-                        sorted_array[j] = temp
-                        temp = sorted_indices[i]
-                        sorted_indices[i] = sorted_indices[j]
-                        sorted_indices[j] = temp
-                        break
-                    } else continue
-                }
-            } else --j
-        }
-        if (j - first > 1) tail.push([first, j - 1])
-        if (last - j > 1) tail.push([j + 1, last])
+              temp = sorted_array[i]
+              sorted_array[i] = sorted_array[j]
+              sorted_array[j] = temp
+              temp = sorted_indices[i]
+              sorted_indices[i] = sorted_indices[j]
+              sorted_indices[j] = temp
+              break
+            } else continue
+          }
+        } else --j
+      }
+      if (j - first > 1) tail.push([first, j - 1])
+      if (last - j > 1) tail.push([j + 1, last])
     }
     return { array: sorted_array, indices: sorted_indices }
-}
+  }
 /**
  * 
  * @method bubble_sort
@@ -402,16 +368,29 @@ function heap_sort(array, mode) {
     if (mode === 'decrease') mode = false
     const n = array.length
     let i, j, k, m, t, sorted_array = [], sorted_indices = [], condition
-    while (i < (n >> 1)) {
-        sorted_array[i << 1] = array[i << 1]
-        sorted_indices[i << 1] = i << 1
-        sorted_array[(i << 1) + 1] = array[(i << 1) + 1]
-        sorted_indices[(i << 1) + 1] = (i + 1) << 1
+    i = 0
+    while (i < (n >> 2)) {
+        sorted_array[i << 2] = array[i << 2]
+        sorted_indices[i << 2] = i << 2
+        sorted_array[(i << 2) + 1] = array[(i << 2) + 1]
+        sorted_indices[(i << 2) + 1] = (i << 2) + 1
+        sorted_array[(i << 2) + 2] = array[(i << 2) + 2]
+        sorted_indices[(i << 2) + 2] = (i << 2) + 2
+        sorted_array[(i << 2) + 3] = array[(i << 2) + 3]
+        sorted_indices[(i << 2) + 3] = (i << 2) + 3
         ++i
     }
-    if (n & 1) {
+    if (n % 4 >= 1) {
         sorted_array[n - 1] = array[n - 1]
         sorted_indices[n - 1] = n - 1
+    }
+    if (n % 4 >= 2) {
+        sorted_array[n - 2] = array[n - 2]
+        sorted_indices[n - 2] = n - 2
+    }
+    if (n % 4 >= 3) {
+        sorted_array[n - 3] = array[n - 3]
+        sorted_indices[n - 3] = n - 3
     }
     // transform the array into heap...
     k = (n - 2) >> 1
@@ -470,7 +449,6 @@ function heap_sort(array, mode) {
     }
     return { array: sorted_array, indices: sorted_indices }
 }
-
 
 function insertion_sort(array, ascending_order) {
     if (typeof ascending_order === 'undefined') ascending_order = true
