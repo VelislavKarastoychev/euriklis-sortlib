@@ -203,7 +203,7 @@ new validator(output.array).is_same(sorted_array)
     .on(true, () => console.log('Correctly sorted array with bucket sort static method bucket_sort()'))
     .on(false, () => console.error('Error in the execution of the bucket sort algorithm from the static method bucket_sort().'))
 ```
-- *SortLib.generate_random_array(length, seed)* - this method creates an array of uniform random values from 0 to 1 with length the first parameter of the package and use optionally seed parameter. We use the idea of the John Burkardt Fortran routine in this static method. The method is available from version 1.1.0 of the package.  
+- *SortLib.generate_random_array(length, seed)* - this method creates an array of uniform random values from 0 to 1 with length the first parameter of the package and use optionally seed parameter. We use the idea of the John Burkardt Fortran routine used in complex constrained optimization method of M.J.Box. The method is available from version 1.1.0 of the package.  
 The SortLib package can run any of these methods shown above when the array parameter of the current instance is declared. This can be done with the using of the sort() method of the SortLib package/library. 
 ```js
 const SortLib = require('../index')
