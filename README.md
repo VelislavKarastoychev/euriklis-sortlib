@@ -435,9 +435,8 @@ The same paradigm is valid for the large arrays (1000000 elements). The mean res
 const message = require('@euriklis/message')
 function ComparisonSortLibAndSort() {
     let answer = false, elements = 1000000, iterations = 100,
-        dt1, dt2, qs_time = 0, ms_time = 0, hs_time = 0, bs_time = 0,
-        bub_time = 0, convent_time = 0, cs_time = 0, is_time = 0,
-        sels_time = 0
+        dt1, dt2, qs_time = 0, ms_time = 0, hs_time = 0, bs_time = 0, 
+        convent_time = 0
     const validator = require('@euriklis/validator')
     const SortLib = require('@euriklis/sortlib')
     const array = SortLib.generate_random_array(elements, 123456)
@@ -466,10 +465,9 @@ function ComparisonSortLibAndSort() {
     console.clear()
     new message().bold().set_color_green().append_check_mark().append_white_space()
         .set_color_yellow().append(`A random array with ${elements} elements from 0 to 1 was created successfully.`).reset().log()
-    let sorted_array_qs, sorted_array_ms, sorted_array_cs, sorted_array_bubs,
-        sorting_array_conventionally, sorted_array_hs, sorted_array_is, sorted_array_bcs,
-        sorted_array_sels, i
-
+    let sorted_array_qs, sorted_array_ms, 
+    sorting_array_conventionally, sorted_array_hs, i
+    
     new message().bold().italic().underline().set_color_blue()
         .append('Results from the executing of the sorting algorithms efficiency:\n')
         .reset().log()
