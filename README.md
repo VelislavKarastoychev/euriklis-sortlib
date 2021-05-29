@@ -50,7 +50,7 @@ where with the "x.x.x" we denote the current version of the sortlib library
  const extended_array = sortlib.addElementInSortedArray(array, 7)
  console.log(extended_array.array) // [1, 2, 3, 4, 5, 6, 7]
  ```
- - *SortLib.merge_sort(array, mode)* - the method assumes that the array is an number of string value array and the mode is set to true ("increase") if is not declared. The method implements the merge sort algorithms. Note that the returned result is an object with properties "array" that is the sorted array and "indices" that is an array with the index positions of the sorted elements in the initial array. The algorithm does not uses recursion and copies the elements of the initial array only one time. The partition of the array is simulated by swapping procedures. 
+ - *SortLib.merge_sort(array, mode)* - the method assumes that the array is an number or string value array and the mode is set to true ("increase") if is not declared. The method implements the merge sort algorithms. Note that the returned result is an object with properties "array" that is the sorted array and "indices" that is an array with the index positions of the sorted elements in the initial array. The algorithm does not uses recursion and copies the elements of the initial array two times. This copy procedure is the reason for the delaying of the algorithm in comparison with the quick sort. 
 ```js
 const sortlib = require('@euriklis/sortlib')
 const array = [19, 3, 38, 2, 14, 6, 48, 32, 12, 5]
@@ -88,7 +88,7 @@ console.log(reversed_output)
     indices: [ 6, 4, 1, 8, 2, 5, 3, 9, 0, 7 ] 
 }
 ```
-- *SortLib.heap_sort(array, mode)* -  this method implements the heap sort algorithm. The method uses internal functions for the sorting procedure and especially the utility functions ***shift_down*** and ***heap_shift_down*** which are widely used in the implementation of this family of sorting algorithms. The parameter "array" has to be a number or string array and the "mode" as in the other cases noted above, is a boolean or a string variable with the only possible values "increase" and "decrease", when the parameter is of string type. For example:
+- *SortLib.heap_sort(array, mode)* -  this method implements the heap sort algorithm. From version 1.1.0 the method does not use internal functions for the sorting procedure and in particular the utility functions ***shift_down*** and ***heap_shift_down*** which are widely used in the implementation of this family of sorting algorithms are avoided because of the more efficient execution of the algorithm. The parameter "array" has to be a number or string array and the "mode" as in the other cases noted above, is a boolean or a string variable with the only possible values "increase" and "decrease", when the parameter is of string type. For example:
 ```js
 const sortlib = require('@euriklis/sortlib')
 const array = [1, 4, 2, 98, 32, 24, 42, 18, 3, 48, 21]
@@ -188,7 +188,7 @@ new validator(output.array).is_same(sorted_array)
     .on(true, () => console.log(true) )
     .on(false, () => console.log(false))
 ```   
-- *SortLib.bucket_sort(array, buckets, sort_mode)* - this method implements the bucket sort algorithm. Note that this method is not fast and has worst complexity O(n<sup>2</sup>) and average time complexity O(2 * n + n<sup>2</sup> / k + k), where the k is the number of the buckets. The buckets are lists in which the elements of the array have to be passed. Note that the number of the buckets can not be higher than the length of the array. In the case that the buckets are not declared the method automatically sets this parameter to floor (array.length / 2). In the case in which the number of the buckets is bugger than the length of the array, then the buckets will be set to the length of the array. It is important that this method can be executed only for number arrays. The method is available form version 1.0.3
+- *SortLib.bucket_sort(array, buckets, sort_mode)* - this method implements the bucket sort algorithm. Note that this method is not fast and has worst complexity O(n<sup>2</sup>) and average time complexity O(2 * n + n<sup>2</sup> / k + k), where the k is the number of the buckets. The buckets are lists in which the elements of the array have to be passed. Note that the number of the buckets can not be higher than the length of the array. In the case that the buckets are not declared the method automatically sets this parameter to floor (array.length / 2). In the case in which the number of the buckets is bugger than the length of the array, then the buckets will be set to the length of the array. It is important that this method can be executed only for number arrays. The method is available form version 1.0.3 and higher versions.
 ```js
 const validator = require('@euriklis/validator')
 const SortLib = require('@euriklis/sortlib')
@@ -203,7 +203,7 @@ new validator(output.array).is_same(sorted_array)
     .on(true, () => console.log('Correctly sorted array with bucket sort static method bucket_sort()'))
     .on(false, () => console.error('Error in the execution of the bucket sort algorithm from the static method bucket_sort().'))
 ```
-
+- *SortLib.generate_random_array(length, seed)* - this method creates an array of uniform random values from 0 to 1 with length the first parameter of the package and use optionally seed parameter. We use the idea of the John Burkardt Fortran routine in this static method. The method is available from version 1.1.0 of the package.  
 The SortLib package can run any of these methods shown above when the array parameter of the current instance is declared. This can be done with the using of the sort() method of the SortLib package/library. 
 ```js
 const SortLib = require('../index')
@@ -259,11 +259,282 @@ SortLib {
 ```
 To get or set the identical properties of the SortLib instance you have to use the get and set methods *array* , *size* (only getting mode), *algorithm* (if you try to set the algorithm to not supported value for the library, then the algorithm will be set automatically to "merge sort"), *sort mode* (getter and setter methods), *status* (getter and setter methods. The only supported values are 'sorted' and 'unsorted') and *indices* (getter and setter methods).
 
+# Technical information and details
+For more time and memory efficiency we implement all fast sorting algorithms without internal functions and without recursions. Also in the copy  procedure of the arrays we avoid to use the javascript spread operator (...). The copy of the elements is made with bitwise operations and shifting techniques. For example we can realize the loop
+```js
+let i, n = 100, array = []
+for (i = 0;i < n;i++) array[i] = i
+```
+with the following more time efficient form:
+```js
+let i, n = 100, array = []
+for (i = 0;i < n >> 1;i++) {
+    array[i << 1] = i << 1
+    array[(i << 1) + 1] = (i << 1) + 1
+}
+if (n & 1) array[n - 1] = n - 1
+```
+In our library we use two bits shifting for the copy procedures and the loops which allows that technique.
+We also use the minimum count of variables and simulate the multiplication with bitwise techniques when this is possible.
 # Why to use this package?
-This package is constructed and designed for the needs of efficient sorting of number of string arrays/lists. It is well known that the javascript language provides a conventional way for sorting of arrays. But because of the generality of the nature of the arrays, the method ___sort()___ of javascript is very inefficient when we need fast sorting of number or character/string arrays. For that reason we created this library that implements the crucial sorting algorithms merge sort, quick sort, bucket sort and the conventional algorithms bubble sort, insertion sort, selection sort, cocktail sort and a dozen of other useful algorithms that may be used for the needs of the econometric or AI package construction or simply for experimental needs (testing of the efficiency of the sorting algorithms for small random arrays, medium random arrays, large random arrays and extremely large random arrays and etc).
+This package is constructed and designed for the needs of efficient sorting of number or string arrays/lists. It is well known that the javascript language provides a conventional way for sorting of arrays. But because of the generality of the nature of the arrays, the method ___sort()___ of javascript is very inefficient and unstable when we need fast sorting of number or character/string arrays. For that reason we created this library that implements the crucial sorting algorithms merge sort, quick sort, bucket sort and the conventional algorithms bubble sort, insertion sort, selection sort, cocktail sort and a dozen of other useful algorithms that may be used for the needs of the econometric or AI package construction or simply for experimental needs (testing of the efficiency of the sorting algorithms for small random arrays, medium random arrays, large random arrays and extremely large random arrays and etc). 
 
-To demonstrate the time efficiency of the SortLib library we present the results that was obtained from the comparison of the SortLib algorithms and the conventional javascript method ___sort()___.    
+To demonstrate the time efficiency of the SortLib library we present the results that was obtained from the comparison of the SortLib algorithms and the conventional javascript method ___sort()___. First of all for medium arrays (in our case a random array form 100000 number elements) we observe that the most efficient algorithm is the quick sort, then the merge sort, heap sort and the conventional javascript algorithm. Concretely for 1 experiment for an array of 100000 random number elements we obtain:
+```js
+'use strict'
+const message = require('@euriklis/message')
+function ComparisonSortLibAndSort() {
+    let answer = false, elements = 100000, iterations = 1,
+        dt1, dt2, qs_time = 0, ms_time = 0, hs_time = 0, bs_time = 0,
+        bub_time = 0, convent_time = 0, cs_time = 0, is_time = 0,
+        sels_time = 0
+    const validator = require('@euriklis/validator')
+    const SortLib = require('../index')
+    const array = SortLib.generate_random_array(elements, 123456)
+    const conventional_sorting = function (array, mode) {
+        if (typeof mode === 'undefined') mode = true
+        if (mode === 'decrease') mode = false
+        const n = array.length
+        let i, sorted_array = []
+        for (i = 0; i < n >> 2; i++) {
+            sorted_array[i << 2] = array[i << 2]
+            sorted_array[(i << 2) + 1] = array[(i << 2) + 1]
+            sorted_array[(i << 2) + 2] = array[(i << 2) + 2]
+            sorted_array[(i << 2) + 3] = array[(i << 2) + 3]
+        }
+        if ((n % 4) >= 1) {
+            sorted_array[n - 1] = array[n - 1]
+        }
+        if ((n % 4) >= 2) {
+            sorted_array[n - 2] = array[n - 2]
+        }
+        if ((n % 4) >= 2) {
+            sorted_array[n - 3] = array[n - 3]
+        }
+        return mode ? sorted_array.sort((a, b) => a - b) : sorted_array.sort((a, b) => b - a)
+    }
+    console.clear()
+    new message().bold().set_color_green().append_check_mark().append_white_space()
+        .set_color_yellow().append(`A random array with ${elements} elements from 0 to 1 was created successfully.`).reset().log()
+    let sorted_array_qs, sorted_array_ms, sorted_array_cs, sorted_array_bubs,
+        sorting_array_conventionally, sorted_array_hs, sorted_array_is, sorted_array_bcs,
+        sorted_array_sels, i
 
+    new message().bold().italic().underline().set_color_blue()
+        .append('Results from the executing of the sorting algorithms efficiency:\n')
+        .reset().log()
+    for (i = 0; i < iterations; i++) {
+        dt1 = Date.now()
+        sorted_array_qs = SortLib.quick_sort(array).array
+        dt2 = Date.now()
+        qs_time += (dt2 - dt1) / iterations
+    }
+    new message()
+        .set_color_yellow()
+        .append(`quick sort: ${qs_time / 1000} seconds.\n`).reset().log()
+    for (i = 0; i < iterations; i++) {
+        dt1 = Date.now()
+        sorted_array_ms = SortLib.merge_sort(array).array
+        dt2 = Date.now()
+        ms_time += (dt2 - dt1) / iterations
+    }
+    new message().set_color_yellow()
+        .append(`merge sort: ${ms_time / 1000} seconds.\n`).reset().log()
+    for (i = 0; i < iterations; i++) {
+        dt1 = Date.now()
+        sorted_array_hs = SortLib.heap_sort(array).array
+        dt2 = Date.now()
+        hs_time += (dt2 - dt1) / iterations
+    }
+    new message().set_color_yellow()
+        .append(`heap sort: ${hs_time / 1000} seconds.\n`).reset().log()
+
+    for (i = 0; i < iterations; i++) {
+        dt1 = Date.now()
+        sorted_array_bcs = SortLib.bucket_sort(array).array
+        dt2 = Date.now()
+        bs_time += (dt2 - dt1) / iterations
+    }
+    new message().set_color_yellow()
+        .append(`bucket sort: ${bs_time / 1000} seconds.\n`).reset().log()
+    
+    for (i = 0; i < iterations; i++) {
+        dt1 = Date.now()
+        sorted_array_cs = SortLib.cocktail_sort(array).array
+        dt2 = Date.now()
+        cs_time += (dt2 - dt1) / iterations
+    }
+    new message().set_color_yellow()
+        .append(`cocktail sort: ${cs_time / 1000} seconds.\n`).reset().log()
+    
+    for (i = 0; i < iterations; i++) {
+        dt1 = Date.now()
+        sorting_array_conventionally = conventional_sorting(array)
+        dt2 = Date.now()
+        convent_time += (dt2 - dt1) / iterations
+    }
+    new message().set_color_yellow()
+        .append(`conventional js sort: ${convent_time / 1000} seconds.\n`).reset().log()
+    
+    for (i = 0; i < iterations; i++) {
+        dt1 = Date.now()
+        sorted_array_is = SortLib.insertion_sort(array).array
+        dt2 = Date.now()
+        is_time += (dt2 - dt1) / iterations
+    }
+    new message().set_color_yellow()
+        .append(`insertion sort: ${is_time / 1000} seconds.\n`).reset().log()
+    
+    for (i = 0; i < iterations; i++) {
+        dt1 = Date.now()
+        sorted_array_bubs = SortLib.bubble_sort(array).array
+        dt2 = Date.now()
+        bub_time += (dt2 - dt1) / iterations
+    }
+    new message().set_color_yellow()
+        .append(`bubble sort: ${bub_time / 1000} seconds.\n`).reset().log()
+    for (i = 0; i < iterations; i++) {
+        dt1 = Date.now()
+        sorted_array_sels = SortLib.selection_sort(array).array
+        dt2 = Date.now()
+        sels_time += (dt2 - dt1) / iterations
+    }
+    new message().set_color_yellow()
+        .append(`selection sort: ${sels_time / 1000} seconds.\n`).reset().log()
+        
+    new validator(sorting_array_conventionally).is_same(sorted_array_ms)
+        .and().bind(
+            new validator(sorting_array_conventionally).is_same(sorted_array_qs)
+        )
+        .and().bind(
+            new validator(sorting_array_conventionally).is_same(sorted_array_bubs)
+        )
+        .and().bind(
+            new validator(sorting_array_conventionally).is_same(sorted_array_bcs)
+        )
+        .and().bind(
+            new validator(sorting_array_conventionally).is_same(sorted_array_is)
+        )
+        .and().bind(
+            new validator(sorting_array_conventionally).is_same(sorted_array_cs)
+        )
+        .and().bind(
+            new validator(sorting_array_conventionally).is_same(sorted_array_hs)
+        )
+        .on(true, () => console.log(answer))
+        .on(false, () => {
+            throw new Error('Incorrect comparison or internal error into the sorting algorithms of SortLib.')
+        })
+```
+output:
+![](./src/assets/SortingAlgorithmSnapshot.png)
+
+The same paradigm is valid for the large arrays (1000000 elements). The mean results which was obtained for 100 sorting procedures shows that the quick sort and merge sort are the most efficient algorithms, followed from the heap sort and the traditional javascript sorting method. 
+```js
+'use strict'
+const message = require('@euriklis/message')
+function ComparisonSortLibAndSort() {
+    let answer = false, elements = 1000000, iterations = 100,
+        dt1, dt2, qs_time = 0, ms_time = 0, hs_time = 0, bs_time = 0,
+        bub_time = 0, convent_time = 0, cs_time = 0, is_time = 0,
+        sels_time = 0
+    const validator = require('@euriklis/validator')
+    const SortLib = require('../index')
+    const array = SortLib.generate_random_array(elements, 123456)
+    const conventional_sorting = function (array, mode) {
+        if (typeof mode === 'undefined') mode = true
+        if (mode === 'decrease') mode = false
+        const n = array.length
+        let i, sorted_array = []
+        for (i = 0; i < n >> 2; i++) {
+            sorted_array[i << 2] = array[i << 2]
+            sorted_array[(i << 2) + 1] = array[(i << 2) + 1]
+            sorted_array[(i << 2) + 2] = array[(i << 2) + 2]
+            sorted_array[(i << 2) + 3] = array[(i << 2) + 3]
+        }
+        if ((n % 4) >= 1) {
+            sorted_array[n - 1] = array[n - 1]
+        }
+        if ((n % 4) >= 2) {
+            sorted_array[n - 2] = array[n - 2]
+        }
+        if ((n % 4) >= 2) {
+            sorted_array[n - 3] = array[n - 3]
+        }
+        return mode ? sorted_array.sort((a, b) => a - b) : sorted_array.sort((a, b) => b - a)
+    }
+    console.clear()
+    new message().bold().set_color_green().append_check_mark().append_white_space()
+        .set_color_yellow().append(`A random array with ${elements} elements from 0 to 1 was created successfully.`).reset().log()
+    let sorted_array_qs, sorted_array_ms, sorted_array_cs, sorted_array_bubs,
+        sorting_array_conventionally, sorted_array_hs, sorted_array_is, sorted_array_bcs,
+        sorted_array_sels, i
+
+    new message().bold().italic().underline().set_color_blue()
+        .append('Results from the executing of the sorting algorithms efficiency:\n')
+        .reset().log()
+    for (i = 0; i < iterations; i++) {
+        dt1 = Date.now()
+        sorted_array_qs = SortLib.quick_sort(array).array
+        dt2 = Date.now()
+        qs_time += (dt2 - dt1) / iterations
+    }
+    new message()
+        .set_color_yellow()
+        .append(`quick sort: ${qs_time / 1000} seconds.\n`).reset().log()
+    for (i = 0; i < iterations; i++) {
+        dt1 = Date.now()
+        sorted_array_ms = SortLib.merge_sort(array).array
+        dt2 = Date.now()
+        ms_time += (dt2 - dt1) / iterations
+    }
+    new message().set_color_yellow()
+        .append(`merge sort: ${ms_time / 1000} seconds.\n`).reset().log()
+    for (i = 0; i < iterations; i++) {
+        dt1 = Date.now()
+        sorted_array_hs = SortLib.heap_sort(array).array
+        dt2 = Date.now()
+        hs_time += (dt2 - dt1) / iterations
+    }
+    new message().set_color_yellow()
+        .append(`heap sort: ${hs_time / 1000} seconds.\n`).reset().log()
+
+    for (i = 0; i < iterations; i++) {
+        dt1 = Date.now()
+        sorted_array_bcs = SortLib.bucket_sort(array).array
+        dt2 = Date.now()
+        bs_time += (dt2 - dt1) / iterations
+    }
+    new message().set_color_yellow()
+        .append(`bucket sort: ${bs_time / 1000} seconds.\n`).reset().log()
+    
+    for (i = 0; i < iterations; i++) {
+        dt1 = Date.now()
+        sorting_array_conventionally = conventional_sorting(array)
+        dt2 = Date.now()
+        convent_time += (dt2 - dt1) / iterations
+    }
+    new message().set_color_yellow()
+        .append(`conventional js sort: ${convent_time / 1000} seconds.\n`).reset().log()
+    new validator(sorting_array_conventionally).is_same(sorted_array_ms)
+        .and().bind(
+            new validator(sorting_array_conventionally).is_same(sorted_array_qs)
+        )
+        .and().bind(
+            new validator(sorting_array_conventionally).is_same(sorted_array_bcs)
+        )
+        .and().bind(
+            new validator(sorting_array_conventionally).is_same(sorted_array_hs)
+        )
+        .on(true, () => console.log(answer))
+        .on(false, () => {
+            throw new Error('Incorrect comparison or internal error into the sorting algorithms of SortLib.')
+        })
+```
+output:
+![](./src/assets/FastAlgorithmsSnapshot.png)
+
+The obtained results was realized on Dell Latitude E654D machine.
 # Bugs and tips
 If you have any well-meaning critique or have noticed any bug you may send me an email on exel_mmm@abv.bg or to euriklis@hotmail.bg
 # Donations
