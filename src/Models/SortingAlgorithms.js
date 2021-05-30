@@ -756,4 +756,7 @@ module.exports = {
     generate_random_array: random_array_generator,
     GenerateRandomArray: random_array_generator,
     Generate_random_array: random_array_generator,
+    find_best_elements : find_best_elements,
+    findBestElements : find_best_elements,
+    FindBestElements : find_best_elements
 }
