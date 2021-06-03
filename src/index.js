@@ -5,7 +5,7 @@ const validator = require('@euriklis/validator')
 const infos = require('./Infos')
 const warnings = require('./Warnings')
 const errors = require('./Errors')
-
+const package_file = require('../package.json')
 class SortLib {
     /**
      * 
@@ -236,10 +236,187 @@ class SortLib {
      * by default to 123456. If the n parameter is not defined correctly,then
      * it will be a fatal error.
      **/
-    static generate_random_array (n, seed = 123456) {
+    static generate_random_array(n, seed = 123456) {
         new validator(seed).not().is_number().on(true, () => seed = 123456)
         new validator(n).is_integer().on(false, () => errors.IncorrectParameterInGRA())
         return sort_algorithms.generate_random_array(n, seed)
+    }
+    /**
+     * 
+     * @param {Array.<number | string>} array 
+     * @param {number} p
+     * @returns {{array : Array.<number | string>, indices : Array.<number>}}
+     * @description this method finds out the p best elements of an array of
+     * number or string elements. The p has to be either integer which is
+     * bigger than 0 or a real number into the open interval (0, 1). If the
+     * p is omitted or incorrectly declared, then a warning message will be
+     * shown and the p will be assume to be equals to the length of the array.
+     * In this case the speed (time efficiency) of the algorithm will be the same
+     * as the complexity of the heap sort algorithm. 
+     */
+    static find_best_elements(array, n) {
+        new validator(array).not().is_number_array()
+            .and().not().is_string_array()
+            .on(true, () => {
+                errors.IncorrectArrayParameterInFindBestElements()
+            })
+        new validator(n).is_undefined()
+            .on(true, () => n = array.length)
+        new validator(n).not().is_number()
+            .on(true, () => warnings.IncorrectCountParameterInFindBestElements)
+        new validator(n).is_integer().and().is_in_closed_range(1, array.length)
+            .or().is_float().and().is_in_range(0, 1)
+            .on(false, () => warnings.IncorrectCountParameterInFindBestElements)
+        new validator(n).is_float().and().is_in_range(0, 1)
+            .on(true, () => {
+                n = ((array.length * n) >> 0)
+                if (n === 0) n = 1
+                if (n > array.length) n = array.length
+            })
+        return sort_algorithms.find_best_elements(array, n)
+    }
+    /**
+     * 
+     * @param {Array.<number | string>} array 
+     * @param {number} n
+     * @returns {{array : Array.<number | string>, indices : Array.<number>}}
+     * @description this method returns the worst (smallest) n elements
+     * of an string or number array. If the array is not correctly defined,
+     * then the method will throw an error. If the n is not integer
+     * from 1 to the array.length or is not a real number from 0 to 1,
+     * the method throws a warning message and assumes that n is equals to
+     * the array.length.
+     */
+    static find_worst_elements(array, n) {
+        new validator(array).not().is_number_array()
+            .and().not().is_string_array()
+            .on(true, () => errors.IncorrectArrayParameterInFindWorstElements)
+        new validator(n).not().is_integer()
+            .and().not().is_in_closed_range(1, array.length)
+            .or().not().is_float().and().is_in_range(0, 1)
+            .on(true, () => {
+                warnings.IncorrectCountParameterInFindWortsElements
+            })
+        new validator(n).is_bigger_than(array.length).and().is_integer()
+            .or().is_float().and().not().is_in_range(0, 1)
+            .on(true, () => n = array.length)
+        new validator(n).is_in_range(0, 1).on(true, () => n = (array.length * n) >> 0)
+        return sort_algorithms.find_worst_elements(array, n)
+    }
+    /**
+     * 
+     * @param {Array.<object>} array 
+     * @param {string | Array.<string>} property 
+     * @param {boolean | 'increase' | 'decrease'} mode 
+     * @param {'quick sort' | 'merge sort' | 'heap sort' | 'bucket sort'} algorithm
+     * @returns {{array : Array.<object>, indices : Array.<number>}}
+     * @description this method sorts an array of object elements by given property or
+     * by given set of properties. If the array is not constructed form object elements,
+     * then an error message for incorrect array declaration will be thrown. Also if
+     * the property parameter (the second argument of the method) is not string or array
+     * of strings, then an error message for incorrect property parameter will be thrown.
+     * Finally if the mode and algorithm are not defined, then the method will set them automatically to 
+     * "increase"/ true and "quick sort". If the property is array of properties, then if the
+     * array of objects does not cover all the levels of properties except of the last level, an
+     * error message for incorrect array declaration will be thrown. If the last level property is
+     * not defined or is not of number or string type for any item, then this item will be omitted.
+     * @example
+     * let obj_array = [
+     *     { attributes : { id : 13 } },
+     *     { attributes : { id : 1} },
+     *     { attributes : { id : 7} },
+     *     { attributes : { value : 1.245324} },
+     *     { attributes : { id : 2} },
+     *     { attributes : { id : 4} }
+     * ]
+     * let output = SortLib.sort_object_array_by_property(array).array
+     * let result = [
+     *     { attributes : { id : 1 } },
+     *     { attributes : { id : 2 } },
+     *     { attributes : { id : 4 } },
+     *     { attributes : { id : 7} },
+     *     { attributes : { id : 13 } }
+     * ]
+     * let is_same = new validator(output).is_same(result).answer
+     * console.log(is_same) // true (the forth element is omitted)
+     */
+    static sort_object_array_by_property(array, property, mode, algorithm) {
+        new validator(array).not().is_array()
+            .on(true, () => {
+                errors.IncorrectArrayParameterInSortObjectArray()
+            })
+        new validator(property).not().is_string().and().not().is_string_array()
+            .on(true, () => {
+                console.log('now the error is here...')
+                errors.IncorrectPropertyInSortObjectArray()
+            })
+        new validator(mode).is_undefined().or().not().is_same_with_any([true, false, 'decrease', 'increase'])
+            .on(true, () => {
+                warnings.IncorrectOrUndefinedModePropertyInSortObjectArray()
+                mode = true
+            })
+        new validator(algorithm).is_undefined()
+            .or().not().is_same_with_any(['merge sort', 'quick sort', 'heap sort', 'bucket sort'])
+            .on(true, () => {
+                warnings.IncorrectOrUndefinedAlgorithmParameterInSortObjectArray()
+                algorithm = 'quick sort'
+            })
+        return sort_algorithms.sort_object_array_by_property(array, property, mode, algorithm)
+    }
+    /**
+     * 
+     * @param {Array.<object>} array 
+     * @param {Array.<string>} property
+     * @param {number} n
+     * @returns {{array : Array.<object>, indices : Array.<number>}}
+     * @description this method finds the first n best (biggest) elements
+     * of an array of object elements by comparison the property values of
+     * every element of the array. If the array item does not contains any 
+     * property (into the last level), then the method will omit this element.
+     * If the array parameter is not object array, an error message will be thrown.
+     * If the property is not a string or string array, also an error message will be thrown.
+     * If the n parameter is integer then the first n elements will be returned.
+     * If the n parameter is a floating point number, then the first 100 * n% best elements
+     * will be returned.
+     */
+    static find_best_for_object_array_by_property(array, property, n) {
+        new validator(array).not().is_array()
+            .on(true, () => errors.IncorrectArrayParameterInFindBestInObjectArray())
+        new validator(property).not().is_string()
+            .and().not().is_string_array().on(true, () => {
+                errors.IncorrectPropertyParameterInFindBestInObjectArray()
+            })
+        new validator(n).is_float().and().is_in_range(0, 1)
+            .on(true, () => {
+                n = (array.length * n) >> 0
+            })
+        new validator(n).is_integer().and().is_in_closed_range(1, n)
+            .on(false, () => n = array.length)
+        return sort_algorithms.find_best_for_object_array_by_property(array, property, n)
+    }
+    /**
+     * 
+     * @param {Array.<object>} array
+     * @param {string | Array.<string>} 
+     * @param {number} n
+     * @returns {{array : Array.<object>, indices : Array.<number>}}
+     * @description this method finds out the n most worst elements of an
+     * array, each element of which is an object by given property or set of
+     * properties. If the array is not contained from object elements then the
+     * method throws an error for incorrect array parameter. If the property is
+     * not string or string array then the method throws the corresponding error
+     * message.Finally if some level of the property array is not object, then the
+     * method throws error for incorrect property parameter. 
+     */
+    static find_worst_for_object_array_by_property(array, property, n) {
+        new validator(array).not().is_array()
+            .on(true, () => errors.IncorrectArrayParameterInFindWorstInObjectArray())
+        new validator(property).not().is_string().and().not().is_string_array()
+            .on(true, () => errors.IncorrectPropertyParameterInFindWorstInObjectArray())
+        new validator(n).not().is_integer().and().not().is_in_closed_range(1, array.length)
+            .and().not().is_float().and().not().is_in_range(0, 1)
+            .on(true, () => errors.IncorrectCountParameterInFindWorstInObjectArray())
+        return sort_algorithms.find_worst_for_object_array_by_property(array, property, n)
     }
     get algorithm() {
         return this.__algorithm__
@@ -390,6 +567,7 @@ class SortLib {
             else {
                 infos.UnknownSortingMethod(this.algorithm)
                 infos.AutomaticallySetToDefault({ algorithm: "merge sort" })
+                this.algorithm = "merge sort"
                 output = sort_algorithms.merge_sort(this.array, this["sort mode"])
             }
             this.array = output.array
@@ -399,5 +577,6 @@ class SortLib {
         return this
     }
 }
-SortLib.version = '1.0.3'
+SortLib.version = package_file.version
+SortLib.author = package_file.author
 module.exports = SortLib
