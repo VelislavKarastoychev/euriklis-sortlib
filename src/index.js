@@ -416,6 +416,13 @@ class SortLib {
         new validator(n).not().is_integer().and().not().is_in_closed_range(1, array.length)
             .and().not().is_float().and().not().is_in_range(0, 1)
             .on(true, () => errors.IncorrectCountParameterInFindWorstInObjectArray())
+        new validator(n).is_float().and().is_in_range(0, 1)
+        .on(true, () => {
+            n = (array.length * n) << 0
+        })
+        new validator(n).is_same(array.length).on(true, () => {
+            return sort_algorithms.sort_object_array_by_property(array, property, true, 'quick sort')
+        })
         return sort_algorithms.find_worst_for_object_array_by_property(array, property, n)
     }
     get algorithm() {
