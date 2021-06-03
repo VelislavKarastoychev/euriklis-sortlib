@@ -1,7 +1,7 @@
 'use strict'
 const message = require('@euriklis/message')
 function ComparisonSortLibAndSort() {
-    let answer = false, elements = 1000000, iterations = 100,
+    let answer = false, elements = 100, iterations = 1,
         dt1, dt2, qs_time = 0, ms_time = 0, hs_time = 0, bs_time = 0,
         bub_time = 0, convent_time = 0, cs_time = 0, is_time = 0,
         sels_time = 0
