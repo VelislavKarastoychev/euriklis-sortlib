@@ -16,16 +16,18 @@ npm install @euriklis/sortlib --save
  npm install @euriklis/sortlib@x.x.x --save-exact
  ```
 where with the "x.x.x" we denote the current version of the sortlib library
+
+We recommend you to use the version 1.1.0 or greater versions (for more details see the technical characteristics bellow).
  
 # Usage and examples:
  To declare the SortLib library/package you have to write after the installing procedure the following text into the main file:
  ```js
  const sortlib = require('@euriklis/sortlib')
- console.log(sortlib.version) // 1.0.0
+ console.log(sortlib.version) // 1.1.0
  ```
  To create a SortLib instance you have to inside an object parameter into the SortLib constructor. This parameter has to contain the following properties:
- - *array* - an number or string array that has to be sorted from the algorithm
- - *algorithm* - the sorting algorithm. The possible values for this property are *"merge sort"* (if the algorithm is not set, then this value is assumed by default from the constructor), *"quick sort"*, *"heap sort"*, *"insertion sort"*, *"selection sort"* and *"bubble sort"*. The first three are fast sorting algorithms (complexity of order O(nlogn)) and the second three have complexity > O(n<sup>2</sup>).
+ - *array* - a number or string array that has to be sorted from the algorithm
+ - *algorithm* - the sorting algorithm. The possible values for this property are *"merge sort"* (if the algorithm is not set, then this value is assumed by default from the constructor), *"quick sort"*, *"heap sort"*, *"insertion sort"*, *"selection sort"*, *"bubble sort"*, *"bucket sort"* and "cocktail sort". The first three are fast sorting algorithms (complexity of order O(nlogn)) and the rest of the algorithms have complexity > O(n<sup>2</sup>).
  - *sort mode* - if the user would like to sort the array in ascending order, then he/she has to set the ***sort mode*** property to *'increase'* or *true*. The constructor assumes by default that this property is set to true if is missed. If on the other hand we want to sort the array property in descending order then the value of the ***sort mode*** property has to be set to 'decrease' or false.
  - status - if the user wants to declare that the array property which is inserted is sorted then he/she can set the status property to 'sorted'. The constructor set by default this property to 'unsorted'. When the user uses the *sort()* method then the value of this property changes automatically to 'sorted'.
  ```js
@@ -43,14 +45,14 @@ where with the "x.x.x" we denote the current version of the sortlib library
  The constructor creates automatically the property indices that is an array that shows the order or the index of every element of the array. When the element position changes by the sorting procedure, then the indices property changes the position of this element. In fact we need to create just the array parameter and all other parameters can be set automatically from the constructor of the SortLib class. 
  If we want to use just the sorting algorithms without creating of any instance, then we may use the static methods of the package.
  The SortLib static methods are the following:
- - *SortLib.addElementInSortedArray(array, element)* - this method ***assumes*** that the array is number or string array that is already sorted and put an arbitrary element (number of string value) to the existed array. The method computes automatically the mode of the ordering of the array (ascending of descending). Note that the returned result is an SortLib object.For example:
+ - *SortLib.addElementInSortedArray(array, element)* - this method ***assumes*** that the array is number or string array that is already sorted and put an arbitrary element (number or string value) to the existed array. The method computes automatically the mode of the ordering of the array (ascending of descending). Note that the returned result is an SortLib object.For example:
  ```js
  const sortlib = require('@euriklis/sortlib')
  const array = [1, 2, 3, 4,  5, 6]
  const extended_array = sortlib.addElementInSortedArray(array, 7)
  console.log(extended_array.array) // [1, 2, 3, 4, 5, 6, 7]
  ```
- - *SortLib.merge_sort(array, mode)* - the method assumes that the array is an number or string value array and the mode is set to true ("increase") if is not declared. The method implements the merge sort algorithms. Note that the returned result is an object with properties "array" that is the sorted array and "indices" that is an array with the index positions of the sorted elements in the initial array. The algorithm does not uses recursion and copies the elements of the initial array two times. This copy procedure is the reason for the delaying of the algorithm in comparison with the quick sort. 
+ - *SortLib.merge_sort(array, mode)* - the method assumes that the array is a number or string value array and the mode is set to true ("increase") if is not declared. The method implements the merge sort algorithm. Note that the returned result is an object with properties "array" that is the sorted array and "indices" that is an array with the index positions of the sorted elements in the initial array. The algorithm does not uses recursion and copies the elements of the initial array two times. This copy procedure is the reason for the delaying of the algorithm in comparison with the quick sort. However, for large scale arrays this method is efficient because of the intrinsic stability.
 ```js
 const sortlib = require('@euriklis/sortlib')
 const array = [19, 3, 38, 2, 14, 6, 48, 32, 12, 5]
@@ -71,7 +73,7 @@ console.log(inverse_sorted_array)
  * } 
  **/
 ```
-- *SortLib.quick_sort(array, mode)* - this method implements the quick sort algorithm. Note that this algorithm is fast (complexity O(nlogn)) and is implemented without using of recursion. The array parameter has to be a number of string array and the mode is a boolean or string variable with possible values "decrease" and "increase". By default the method assumes that the mode is set to "increase"/true. Note that the method returns an object with properties "array" and "indices" that represents the sorted array and the index position of the elements in the initial array. For example:
+- *SortLib.quick_sort(array, mode)* - this method implements the quick sort algorithm. Note that this algorithm is fast (complexity O(nlogn)) and is implemented without using of recursion. The array parameter has to be a number or string array and the mode is a boolean or string variable with possible values "decrease" and "increase". By default the method assumes that the mode is set to "increase"/true. Note that the method returns an object with properties "array" and "indices" that represents the sorted array and the index position of the elements in the initial array. For example:
 ```js
 const sortlib = require('@euriklis/sortlib')
 const array = [3, 61, 23, 13, 87, 19, 185, 2, 26, 5]
@@ -123,7 +125,7 @@ console.log(reversed_output)
     indices: [ 6, 8, 4, 2, 3, 7, 5, 0, 1 ] 
 }
 ```
-- *SortLib.bubble_sort(array, mode)* - this algorithm implements the bubble sort algorithm. The method does not uses recursion. The "array" and "mode" parameters represent the same values as in the strict methods above.
+- *SortLib.bubble_sort(array, mode)* - this method implements the bubble sort algorithm. The method does not uses recursion. The "array" and "mode" parameters represent the same values as in the strict methods above.
 ```js
 const SortLib = require('@euriklis/sortlib')
 const array = [2, 18, 3, 84, 24, 13, 1, 42, 21, 11]
@@ -188,7 +190,7 @@ new validator(output.array).is_same(sorted_array)
     .on(true, () => console.log(true) )
     .on(false, () => console.log(false))
 ```   
-- *SortLib.bucket_sort(array, buckets, sort_mode)* - this method implements the bucket sort algorithm. Note that this method is not fast and has worst complexity O(n<sup>2</sup>) and average time complexity O(2 * n + n<sup>2</sup> / k + k), where the k is the number of the buckets. The buckets are lists in which the elements of the array have to be passed. Note that the number of the buckets can not be higher than the length of the array. In the case that the buckets are not declared the method automatically sets this parameter to floor (array.length / 2). In the case in which the number of the buckets is bugger than the length of the array, then the buckets will be set to the length of the array. It is important that this method can be executed only for number arrays. The method is available form version 1.0.3 and higher versions.
+- *SortLib.bucket_sort(array, buckets, sort_mode)* - this method implements the bucket sort algorithm. Note that this method theoretically is not fast and has worst complexity O(n<sup>2</sup>) and average time complexity O(2 * n + n<sup>2</sup> / k + k), where the k is the number of the buckets. The buckets are lists in which the elements of the array have to be passed. Note that the number of the buckets can not be higher than the length of the array. In the case that the buckets are not declared the method automatically sets this parameter to floor (array.length / 2). In the case in which the number of the buckets is bugger than the length of the array, then the buckets will be set to the length of the array. It is important that this method can be executed only for number arrays. The method is available form version 1.0.3 and higher versions.
 ```js
 const validator = require('@euriklis/validator')
 const SortLib = require('@euriklis/sortlib')
@@ -203,7 +205,56 @@ new validator(output.array).is_same(sorted_array)
     .on(true, () => console.log('Correctly sorted array with bucket sort static method bucket_sort()'))
     .on(false, () => console.error('Error in the execution of the bucket sort algorithm from the static method bucket_sort().'))
 ```
-- *SortLib.generate_random_array(length, seed)* - this method creates an array of uniform random values from 0 to 1 with length the first parameter of the package and use optionally seed parameter. We use the idea of the John Burkardt Fortran routine used in complex constrained optimization method of M.J.Box. The method is available from version 1.1.0 of the package.  
+- *SortLib.generate_random_array(length, seed)* - this is an utility method, which creates an array of uniform distributed random values from 0 to 1 with length the first parameter of the method and use optionally seed parameter. We use the idea of the John Burkardt Fortran routine used in complex constrained optimization method of M.J.Box. The method is available from version 1.1.0 of the package.  
+
+- *SortLib.find_best_elements(array, n)* - this method is available from the version 1.1.0 or higher version of the package. The array may be a number value array as well as a string value array. The method is fast and uses the heap_sort() method to detect the highest elements of the array. The n parameter has to be an integer form 1 to the length of the array or a floating point number in the interval (0, 1). When the n is float type number, then the method returns the first 100 * n% best elements of the array. This method is created/oriented for using in evolutionary/genetic based algorithms, where is needed to be chosen a set of values that ensure the best/highest value of an objective function. An example that shows how to use this method is:
+```js
+const SortLib = require('@euriklis/sortlib')
+const random_array = SortLib.generate_random_array(50)
+const bestTen = SortLib.find_best_elements(random_array, 10)
+```
+- *SortLib.find_worst_elements(array, n)* - this method is the inverse method of the previous method. The method uses the same algorithm (heap sort) and returns the n smallest values, where as above the array can be a number of string array and the n can be an integer number from 1 to the length of the array or a float number from 0 to 1. For example:
+
+```js
+const SortLib = require('@euriklis/sortlib')
+const random_array = SortLib.generate_random_array(50)
+const bestTen = SortLib.find_worst_elements(random_array, 10)
+```
+- *SortLib.sort_object_array_by_property(array, property, mode, algorithm)* - this method is available from version 1.1.0 or a higher version of the package. The method assumes that the array is an array with all elements to be of object type. If this condition is not fulfilled, then an error message for incorrect array will be thrown. The property can be a string value or an array of string elements that have to be keys of each array element of the array parameter. If this condition is not fulfilled, then an error message for incorrect property parameter will be thrown from the method. The method sorts the elements of the array (objects) by the value of the property key (if the property is an array then the value of the last depth of the object element). For example let us assume a graph object. It is well known that every graph has nodes and edges and every edge has weight. To sort the edges we have to execute the following code:
+```js
+const SortLib = require('@euriklis/sortlib')
+const Graph = {
+    attributes : {},
+    nodes : Array.from({length : 100}).map((el, i) => {
+        return {
+            name : `v${i + 1}`,
+            value : Math.random()
+        }
+    }),
+    edges : Array.from({length : 10000}).map((w, i) => {
+        return {
+            source : `v${((i + 1) / 100) | 0}`,
+            target : `v${((i + 1) % 100)}`,
+            attributes : {
+                weight : Math.random(),
+                color : `rgb(${Math.random() * 255 | 0},${Math.random() * 255 | 0},${Math.random() * 255 | 0})`
+            }
+        }
+    })
+}
+// set the edges by the weight value
+Graph.edges = SortLib.sort_object_array_by_property(Graph.edges, ['attributes', 'weight']).array // the method returns the array and the indices of the initial array.
+// set the nodes by the their value
+Graph.nodes = SortLib.sort_object_array_by_property(Graph.nodes, 'value', 'quick sort').array // if we want to declare the sorting algorithm
+```
+The possible values for the algorithm parameter are all fast algorithms and the bucket sort. 
+
+- *SortLib.find_best_for_object_array_by_property(array, property, n)* and *SortLib.find_worst_for_object_array_by_property(array, property, n)* - these methods are available from version 1.1.0 and higher versions of the package. The methods sorts an array of objects by given property of the object that has to be number of string (in the last level of the object, when the property is string array of the keys of the object element). If we have the same Graph which was created above, we may extract the ten weights with higher values:
+```js
+const topTenWeights = SortLib.find_best_for_object_array_by_property(Graph.edges, ['attributes', 'weight'], 10).array
+```
+
+
 The SortLib package can run any of these methods shown above when the array parameter of the current instance is declared. This can be done with the using of the sort() method of the SortLib package/library. 
 ```js
 const SortLib = require('@euriklis/sortlib')
