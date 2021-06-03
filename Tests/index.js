@@ -13,6 +13,11 @@ const testSortMethod = require('./TestSortMethod')
 const testCocktailSort = require('./TestCocktailSort')
 const testBucketSort = require('./TestBucketSort')
 const testComparison = require('./ComparisonSortlibAndSort')
+const testFindBestElements = require('./TestFindBestElements')
+const testFindWorstElements = require('./TestFindWorstElements')
+const testSortObjectArray = require('./TestSortObjectArray')
+const testFindBestForObjectArray = require('./TestFindBestForObjectArray')
+const testFindWorstForObjectArray = require('./TestFindWorstForObjectArray')
 const tested_method = (name) => {
     return new message().bold().italic().underline()
         .set_color_yellow().append("Euriklis testing message:\n")
@@ -36,6 +41,11 @@ async function testing() {
         const cocktailSort = await testCocktailSort()
         const bucketSort = await testBucketSort()
         const comparison = await testComparison()
+        const findBestElements = await testFindBestElements()
+        const findWorstElements = await testFindWorstElements()
+        const sortObjectArray = await testSortObjectArray()
+        const findBestForObjectArray = await testFindBestForObjectArray()
+        const findWorstForObjectArray = await testFindWorstForObjectArray()
         tested_method('Constructor')
         tested_method(addElementInSortedArray)
         tested_method(mergeSort)
@@ -48,8 +58,13 @@ async function testing() {
         tested_method(cocktailSort)
         tested_method(bucketSort)
         tested_method(comparison)
+        tested_method(findBestElements)
+        tested_method(findWorstElements)
+        tested_method(sortObjectArray)
+        tested_method(findBestForObjectArray)
+        tested_method(findWorstForObjectArray)
     } catch (err) {
-        new message().append(err).log()
+        throw new Error(err)
     }
 }
 // call the tests
