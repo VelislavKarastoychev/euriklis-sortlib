@@ -1,4 +1,6 @@
 'use strict'
+const validator = require('@euriklis/validator')
+const errors = require('../Errors')
 /**
  * 
  * @param {number} n 
@@ -107,7 +109,7 @@ function mergeSort(array, mode) {
     if (typeof mode === 'undefined') mode = true
     if (mode === 'decrease') mode = false
     const n = array.length
-    let condition, i, j, k, l, p, s, t, w, v,x,
+    let condition, i, j, k, l, p, s, t, w, v, x,
         sorted_array = [], sorted_indices = [],
         copied_array = [], copied_indices = []
     // copy the array
@@ -136,7 +138,7 @@ function mergeSort(array, mode) {
     k = 1
     while (k < n) {
         p = (((n / k) >> 0) + ((n % k) ? 1 : 0))
-        for (s = 0;s < p >> 1;s++) {
+        for (s = 0; s < p >> 1; s++) {
             w = (s << 1) * k
             v = ((s << 1) + 1) * k
             t = ((s + 1) << 1) * k >= n ? n : ((s + 1) << 1) * k
@@ -158,24 +160,24 @@ function mergeSort(array, mode) {
                 ++l
             }
             if (i >= v) {
-                for (x = j;x < t;x++) {
+                for (x = j; x < t; x++) {
                     sorted_array[l + x - j] = copied_array[x]
                     sorted_indices[l + x - j] = copied_indices[x]
                 }
             }
-            if(j >= t) {
-                for (x = i;x < v;x++) {
+            if (j >= t) {
+                for (x = i; x < v; x++) {
                     sorted_array[l + x - i] = copied_array[x]
                     sorted_indices[l + x - i] = copied_indices[x]
                 }
             }
         }
         if (k === 1 && (n & 1)) {
-          sorted_array[n - 1] = copied_array[n - 1]
-          sorted_indices[n - 1] = copied_indices[n - 1]
+            sorted_array[n - 1] = copied_array[n - 1]
+            sorted_indices[n - 1] = copied_indices[n - 1]
         }
         // copy the sort_indices into the copied indices...
-        for (i = 0;i < n >> 2;i++) {
+        for (i = 0; i < n >> 2; i++) {
             copied_array[i << 2] = sorted_array[i << 2]
             copied_indices[i << 2] = sorted_indices[i << 2]
             copied_array[(i << 2) + 1] = sorted_array[(i << 2) + 1]
@@ -197,9 +199,9 @@ function mergeSort(array, mode) {
             copied_array[n - 3] = sorted_array[n - 3]
             copied_indices[n - 3] = sorted_indices[n - 3]
         }
-        k <<= 1 
+        k <<= 1
     }
-    return {array : sorted_array, indices : sorted_indices}
+    return { array: sorted_array, indices: sorted_indices }
 }
 
 /**
@@ -260,70 +262,70 @@ function mergeSort(array, mode) {
  */
 function quickSort(array, mode) {
     let i, j, p, sorted_array = [], temp,
-      tail = [], condition, first, last, sorted_indices = []
+        tail = [], condition, first, last, sorted_indices = []
     const n = array.length
     for (i = 0; i < n >> 2; i++) {
-      sorted_array[i << 2] = array[i << 2]
-      sorted_indices[i << 2] = i << 2
-      sorted_array[(i << 2) + 1] = array[(i << 2) + 1]
-      sorted_indices[(i << 2) + 1] = (i << 2) + 1
-      sorted_array[(i << 2) + 2] = array[(i << 2) + 2]
-      sorted_indices[(i << 2) + 2] = (i << 2) + 2
-      sorted_array[(i << 2) + 3] = array[(i << 2) + 3]
-      sorted_indices[(i << 2) + 3] = (i << 2) + 3 
+        sorted_array[i << 2] = array[i << 2]
+        sorted_indices[i << 2] = i << 2
+        sorted_array[(i << 2) + 1] = array[(i << 2) + 1]
+        sorted_indices[(i << 2) + 1] = (i << 2) + 1
+        sorted_array[(i << 2) + 2] = array[(i << 2) + 2]
+        sorted_indices[(i << 2) + 2] = (i << 2) + 2
+        sorted_array[(i << 2) + 3] = array[(i << 2) + 3]
+        sorted_indices[(i << 2) + 3] = (i << 2) + 3
     }
     if (n % 4 >= 1) {
-      sorted_array[n - 1] = array[n - 1]
-      sorted_indices[n - 1] = n - 1
+        sorted_array[n - 1] = array[n - 1]
+        sorted_indices[n - 1] = n - 1
     }
     if (n % 4 >= 2) {
-      sorted_array[n - 2] = array[n - 2]
-      sorted_indices[n - 2] = n - 2
+        sorted_array[n - 2] = array[n - 2]
+        sorted_indices[n - 2] = n - 2
     }
     if (n % 4 >= 3) {
-      sorted_array[n - 3] = array[n - 3]
-      sorted_indices[n - 3] = n - 3
+        sorted_array[n - 3] = array[n - 3]
+        sorted_indices[n - 3] = n - 3
     }
     if (mode === 'decrease') mode = false
     if (typeof mode === 'undefined') mode = true
     tail.push([0, n - 1])
     while (1) {
-      if (!tail.length) break
-      [first, last] = tail.pop()
-      i = first
-      j = last
-      p = sorted_array[first]
-      while (1) {
-        if (i === j || i >= j) break
-        condition = mode ? p > sorted_array[j] : p < sorted_array[j]
-        if (condition) {
-          temp = sorted_array[i]
-          sorted_array[i] = sorted_array[j]
-          sorted_array[j] = temp
-          temp = sorted_indices[i]
-          sorted_indices[i] = sorted_indices[j]
-          sorted_indices[j] = temp
-          while (1) {
+        if (!tail.length) break
+        [first, last] = tail.pop()
+        i = first
+        j = last
+        p = sorted_array[first]
+        while (1) {
             if (i === j || i >= j) break
-            ++i // note that p = sorted_array[j]
-            condition = mode ? sorted_array[i] > p : sorted_array[i] < p
+            condition = mode ? p > sorted_array[j] : p < sorted_array[j]
             if (condition) {
-              temp = sorted_array[i]
-              sorted_array[i] = sorted_array[j]
-              sorted_array[j] = temp
-              temp = sorted_indices[i]
-              sorted_indices[i] = sorted_indices[j]
-              sorted_indices[j] = temp
-              break
-            } else continue
-          }
-        } else --j
-      }
-      if (j - first > 1) tail.push([first, j - 1])
-      if (last - j > 1) tail.push([j + 1, last])
+                temp = sorted_array[i]
+                sorted_array[i] = sorted_array[j]
+                sorted_array[j] = temp
+                temp = sorted_indices[i]
+                sorted_indices[i] = sorted_indices[j]
+                sorted_indices[j] = temp
+                while (1) {
+                    if (i === j || i >= j) break
+                    ++i // note that p = sorted_array[j]
+                    condition = mode ? sorted_array[i] > p : sorted_array[i] < p
+                    if (condition) {
+                        temp = sorted_array[i]
+                        sorted_array[i] = sorted_array[j]
+                        sorted_array[j] = temp
+                        temp = sorted_indices[i]
+                        sorted_indices[i] = sorted_indices[j]
+                        sorted_indices[j] = temp
+                        break
+                    } else continue
+                }
+            } else --j
+        }
+        if (j - first > 1) tail.push([first, j - 1])
+        if (last - j > 1) tail.push([j + 1, last])
     }
     return { array: sorted_array, indices: sorted_indices }
-  }
+}
 /**
  * 
  * @method bubble_sort
@@ -452,19 +454,19 @@ function heap_sort(array, mode) {
 /**
  * @param {Array.<string | number>} array
  * @param {number} count
- * @returns {array : Array.<string | number>, indices : Array.<number>}
+ * @returns {{array : Array.<string | number>, indices : Array.<number>}}
  * @description this function finds out the first best n elements of
  * an unsorted array. To make this the function uses the heap sort
  * algorithm and stop when the count of n elements is reached. 
  */
-function find_best_elements (array, count) {
+function find_best_elements(array, count) {
     const n = array.length
-    let i, j, k, m, t, sorted_array = [], 
-    sorted_indices = [], detected_items = [], 
-    detected_indices = [],condition
+    let i, j, k, m, t, sorted_array = [],
+        sorted_indices = [], detected_items = [],
+        detected_indices = [], condition
     i = 0
-    if (count === 0) return {array : [], indices : []}
-    if (count === n) return heap_sort(array, true) 
+    if (count === 0) return { array: [], indices: [] }
+    if (count === n) return heap_sort(array, true)
     while (i < (n >> 2)) {
         sorted_array[i << 2] = array[i << 2]
         sorted_indices[i << 2] = i << 2
@@ -514,16 +516,16 @@ function find_best_elements (array, count) {
     }
     // sort the array with the heap sort...
     k = n - 1
-    while (k > n - count) {
+    while (k > n - count - 1) {
         // swap the k and the 0 elements
         t = sorted_array[0]
         sorted_array[0] = sorted_array[k]
         sorted_array[k] = t
+        detected_items[n - k - 1] = t
         t = sorted_indices[0]
         sorted_indices[0] = sorted_indices[k]
         sorted_indices[k] = t
-        detected_items[n - k - 1] = t
-        detected_indices[n - k - 1] = sorted_indices[k]
+        detected_indices[n - k - 1] = t
         --k
         // shift down the subarray sorted_array[0:k]
         i = 0
@@ -546,7 +548,105 @@ function find_best_elements (array, count) {
         }
     }
 
-    return {array : detected_items, indices : detected_indices}
+    return { array: detected_items, indices: detected_indices }
+}
+/**
+ * 
+ * @param {Array.<number | string>} array 
+ * @param {number} count - an integer number
+ * @returns {{array : Array.<number | string>, indices : Array.<number>}}
+ * @description this algorithm finds out the first count worts elements
+ * of an array which is contained from number or string elements. The
+ * method uses the heap sort algorithm and fast copy of the arrays.
+ *   
+ */
+function find_worst_elements(array, count) {
+    const n = array.length
+    let i, j, k, m, t, sorted_array = [],
+        sorted_indices = [], condition, detected_items = [],
+        detected_indices = []
+    i = 0
+    while (i < (n >> 2)) {
+        sorted_array[i << 2] = array[i << 2]
+        sorted_indices[i << 2] = i << 2
+        sorted_array[(i << 2) + 1] = array[(i << 2) + 1]
+        sorted_indices[(i << 2) + 1] = (i << 2) + 1
+        sorted_array[(i << 2) + 2] = array[(i << 2) + 2]
+        sorted_indices[(i << 2) + 2] = (i << 2) + 2
+        sorted_array[(i << 2) + 3] = array[(i << 2) + 3]
+        sorted_indices[(i << 2) + 3] = (i << 2) + 3
+        ++i
+    }
+    if (n % 4 >= 1) {
+        sorted_array[n - 1] = array[n - 1]
+        sorted_indices[n - 1] = n - 1
+    }
+    if (n % 4 >= 2) {
+        sorted_array[n - 2] = array[n - 2]
+        sorted_indices[n - 2] = n - 2
+    }
+    if (n % 4 >= 3) {
+        sorted_array[n - 3] = array[n - 3]
+        sorted_indices[n - 3] = n - 3
+    }
+    // transform the array into heap...
+    k = (n - 2) >> 1
+    while (k >= 0) {
+        // shift down
+        j = k
+        while ((j << 1) + 1 <= n - 1) {
+            m = j
+            condition = sorted_array[m] > sorted_array[(j << 1) + 1]
+            if (condition) m = (j << 1) + 1
+            condition = sorted_array[m] > sorted_array[(j + 1) << 1]
+            if ((j + 1) << 1 <= n - 1 && condition) m = (j + 1) << 1
+            if (m === j) break
+            else {
+                t = sorted_array[m]
+                sorted_array[m] = sorted_array[j]
+                sorted_array[j] = t
+                t = sorted_indices[m]
+                sorted_indices[m] = sorted_indices[j]
+                sorted_indices[j] = t
+                j = m
+            }
+        }
+        --k
+    }
+    // sort the array with the heap sort...
+    k = n - 1
+    while (k > n - count - 1) {
+        // swap the k and the 0 elements
+        t = sorted_array[0]
+        sorted_array[0] = sorted_array[k]
+        sorted_array[k] = t
+        detected_items[n - k - 1] = t
+        t = sorted_indices[0]
+        sorted_indices[0] = sorted_indices[k]
+        sorted_indices[k] = t
+        detected_indices[n - k - 1] = t
+        --k
+        // shift down the subarray sorted_array[0:k]
+        i = 0
+        while ((i << 1) + 1 <= k) {
+            m = i
+            condition = sorted_array[m] > sorted_array[(i << 1) + 1]
+            if (condition) m = (i << 1) + 1
+            condition = sorted_array[m] > sorted_array[(i + 1) << 1]
+            if (((i + 1) << 1) <= k && condition) m = (i + 1) << 1
+            if (i === m) break
+            else {
+                t = sorted_array[m]
+                sorted_array[m] = sorted_array[i]
+                sorted_array[i] = t
+                t = sorted_indices[m]
+                sorted_indices[m] = sorted_indices[i]
+                sorted_indices[i] = t
+                i = m
+            }
+        }
+    }
+    return { array: detected_items, indices: detected_indices }
 }
 function insertion_sort(array, ascending_order) {
     if (typeof ascending_order === 'undefined') ascending_order = true
@@ -703,6 +803,524 @@ function bucket_sort(array, buckets, mode) {
     }
     return { array: sorted_array, indices }
 }
+/**
+ * 
+ * @param {Array.<object>} array 
+ * @param {string | Array.<string>} property 
+ * @param {boolean | 'decrease' | 'increase'} mode 
+ * @param {'quick sort' | 'merge sort' | 'heap sort' | 'bucket sort'} algorithm
+ * @returns {{array : Array.<object>, indices : Array.<number>}}
+ * @description this utility function sorts an array of
+ * objects by given property of the object and algorithm.
+ * All the properties of the object that have to be sorted
+ * are needed to be numbers or strings. If this condition is not 
+ * satisfied, then an error message will be thrown. Only the
+ * fast algorithms can be used for sorting.If the property is an
+ * array then the algorithm gets the values that are in the last
+ * depth of the properties array. So if these properties are not
+ * defined, then they will be omitted.
+ * @example
+ * let obj_array = [
+ *     { attributes : { id : 13 } },
+ *     { attributes : { id : 1} },
+ *     { attributes : { id : 7} },
+ *     { attributes : { value : 1.245324} },
+ *     { attributes : { id : 2} },
+ *     { attributes : { id : 4} }
+ * ]
+ * let output = SortLib.sort_object_array_by_property(array).array
+ * let result = [
+ *     { attributes : { id : 1 } },
+ *     { attributes : { id : 2 } },
+ *     { attributes : { id : 4 } },
+ *     { attributes : { id : 7} },
+ *     { attributes : { id : 13 } }
+ * ]
+ * let is_same = new validator(output).is_same(result).answer
+ * console.log(is_same) // true (the forth element is omitted)
+*/
+function sort_object_array_by_property(array, property, mode, algorithm) {
+    let i, item, j, k, sorted_array = [],
+        sorted_indices = [], temp_array = [],
+        temp_indices = [], temp
+    if (typeof mode === 'undefined') mode = true
+    if (mode === 'decrease') mode = false
+    if (typeof algorithm === 'undefined') algorithm = 'quick sort'
+    if (typeof algorithm !== 'string') algorithm = 'quick sort'
+    // copy the property values into the temp array
+    const n = array.length
+    for (i = 0; i < n >> 2; i++) {
+        new validator(array[i << 2]).not().is_object()
+            .or().bind(
+                new validator(array[(i << 2) + 1]).not().is_object()
+            )
+            .or().bind(
+                new validator(array[(i << 2) + 2]).not().is_object()
+            )
+            .or().bind(
+                new validator(array[(i << 2) + 3]).not().is_object()
+            ).on(true, () =>
+                errors.IncorrectArrayParameterInSortObjectArray()
+            )
+        k = 0
+        while (k <= 3) {
+            item = array[(i << 2) + k]
+            if (typeof property === 'string') temp = item[property]
+            else {
+                for (j = 0; j < property.length; j++) {
+                    new validator(j).is_lesser_than(property.length - 1)
+                        .and().bind(
+                            new validator(item).not().is_object()
+                        ).on(true, () => {
+                            errors.IncorrectPropertyInSortObjectArray()
+                        })
+                    item = item[property[j]]
+                }
+                temp = item
+            }
+            new validator(temp).is_string().or().is_number()
+                .on(true, () => {
+                    temp = item
+                    temp_array.push(temp)
+                    temp_indices.push((i << 2) + k)
+                })
+            ++k
+        }
+    }
+    if (n % 4 >= 1) {
+        item = array[n - 1]
+        new validator(item).not().is_object()
+            .on(true, () => errors.IncorrectArrayParameterInSortObjectArray())
+        if (typeof property === 'string') {
+            temp = item[property]
+        } else {
+            for (j = 0; j < property.length; j++) {
+                new validator(j).is_lesser_than(property.length - 1)
+                    .and().bind(
+                        new validator(item).not().is_object()
+                    ).on(true, () => errors.IncorrectArrayParameterInSortObjectArray())
+                item = item[property[j]]
+            }
+            new validator(item).is_number().or().is_string()
+                .on(true, () => {
+                    temp = item
+                    temp_array.push(temp)
+                    temp_indices.push(n - 1)
+                })
+        }
+    }
+    if (n % 4 >= 2) {
+        item = array[n - 2]
+        new validator(item).not().is_object()
+            .on(true, () => errors.IncorrectArrayParameterInSortObjectArray())
+        if (typeof property === 'string') temp = item[property]
+        else {
+            for (j = 0; j < property.length; j++) {
+                new validator(j).is_lesser_than(property.length - 1)
+                    .and().bind(
+                        new validator(item).not().is_object()
+                    ).on(true, () => errors.IncorrectArrayParameterInSortObjectArray())
+                item = item[property[j]]
+            }
+            new validator(item).is_number().or().is_string()
+                .on(true, () => {
+                    temp = item
+                    temp_array.push(temp)
+                    temp_indices.push(n - 2)
+                })
+        }
+    }
+    if (n % 4 >= 3) {
+        item = array[n - 3]
+        new validator(item).not().is_object()
+            .on(true, () => errors.IncorrectArrayParameterInSortObjectArray())
+        if (typeof property === 'string') {
+            temp = item[property]
+        } else {
+            for (j = 0; j < property.length; j++) {
+                new validator(j).is_lesser_than(property.length - 1)
+                    .and().bind(
+                        new validator(item).not().is_object()
+                    ).on(true, () => errors.IncorrectArrayParameterInSortObjectArray())
+                item = item[property[j]]
+            }
+            new validator(item).is_number().or().is_string()
+                .on(true, () => {
+                    temp = item
+                    temp_array.push(temp)
+                    temp_indices.push(n - 3)
+                })
+        }
+    }
+    // sort the temp array element with the algorithm. 
+    if (algorithm === 'quick sort') temp = quickSort(temp_array, mode)
+    if (algorithm === 'merge sort') temp = mergeSort(temp_array, mode)
+    if (algorithm === 'heap sort') temp = heap_sort(temp_array, mode)
+    if (algorithm === 'bucket sort') temp = bucket_sort(temp_array, mode)
+    // put in the sorted indices the elements of the temp_indices
+    // which correspond to the temp.indices
+    for (i = 0; i < temp.indices.length >> 2; i++) {
+        j = temp.indices[i << 2]
+        sorted_indices[i << 2] = temp_indices[j]
+        sorted_array[i << 2] = array[sorted_indices[i << 2]]
+        j = temp.indices[(i << 2) + 1]
+        sorted_indices[(i << 2) + 1] = temp_indices[j]
+        sorted_array[(i << 2) + 1] = array[sorted_indices[(i << 2) + 1]]
+        j = temp.indices[(i << 2) + 2]
+        sorted_indices[(i << 2) + 2] = temp_indices[j]
+        sorted_array[(i << 2) + 2] = array[sorted_indices[(i << 2) + 2]]
+        j = temp.indices[(i << 2) + 3]
+        sorted_indices[(i << 2) + 3] = temp_indices[j]
+        sorted_array[(i << 2) + 3] = array[sorted_indices[(i << 2) + 3]]
+    }
+    k = temp.indices.length
+    if (k % 4 >= 1) {
+        j = temp.indices[k - 1]
+        sorted_indices[k - 1] = temp_indices[j]
+        sorted_array[k - 1] = array[sorted_indices[k - 1]]
+    }
+    if (k % 4 >= 2) {
+        j = temp.indices[k - 2]
+        sorted_indices[k - 2] = temp_indices[j]
+        sorted_array[k - 2] = array[sorted_indices[k - 2]]
+    }
+    if (k % 4 >= 3) {
+        j = temp.indices[k - 3]
+        sorted_indices[k - 3] = temp_indices[j]
+        sorted_array[k - 3] = array[sorted_indices[k - 3]]
+    }
+    return { array: sorted_array, indices: sorted_indices }
+}
+/**
+ * 
+ * @param {Array.<Object>} array 
+ * @param {string | Array.<string>} property
+ * @param {number} count - has to be integer
+ * @return {{array : Array.<Object>, indices : Array.<number>}}
+ * @description this function is used in the static method
+ * find_best_for_object_array_by_property to extract the first
+ * count element that have the hightest values. The property is the
+ * key value of the object or the keys that are nested into the object.
+ * If some element has undefined value for the last level of the object,
+ * then this element will be omitted, otherwise an error message will be
+ * thrown. 
+ */
+function find_best_for_object_array_by_property(array, property, count) {
+    const n = array.length
+    let i, j, k, sorted_array = [],
+        sorted_indices = [], item, temp,
+        temp_array = [], temp_indices = []
+    // copy the array values in the temporary array.
+    for (i = 0; i < n >> 2; i++) {
+        // if the array elements are not
+        // objects throw error.
+        new validator(array[i << 2]).not().is_object()
+            .or().bind(new validator(array[(i << 2) + 1]).not().is_object())
+            .or().bind(new validator(array[(i << 2) + 2]).not().is_object())
+            .or().bind(new validator(array[(i << 2) + 3]).not().is_object())
+            .on(true, () => errors.IncorrectArrayParameterInFindBestInObjectArray())
+        k = 0
+        while (k <= 3) {
+            item = array[(i << 2) + k]
+            if (typeof property === 'string') temp = item[property]
+            else {
+                // the property is a string array
+                for (j = 0; j < property.length; j++) {
+                    new validator(j).is_lesser_than(property.length - 1)
+                        .and().bind(new validator(item).not().is_object())
+                        .on(true, () => {
+                            errors.IncorrectPropertyParameterInFindBestInObjectArray()
+                        })
+                    item = item[property[j]]
+                }
+                temp = item
+            }
+            new validator(temp).is_string().and().is_number()
+                .on(false, () => {
+                    temp_array.push(temp)
+                    temp_indices.push((i << 2) + k)
+                })
+            ++k
+        }
+    }
+    if (n % 4 >= 1) {
+        item = array[n - 1]
+        new validator(item).not().is_object()
+            .on(true, () => errors.IncorrectArrayParameterInFindBestInObjectArray())
+        if (typeof property === 'string') temp = item[property]
+        else {
+            for (j = 0; j < property.length; j++) {
+                new validator(j).is_lesser_than(property.length - 1)
+                    .and().bind(new validator(item).not().is_object())
+                    .on(true, () => {
+                        errors.IncorrectPropertyParameterInFindBestInObjectArray()
+                    })
+                item = item[property[j]]
+            }
+            temp = item
+        }
+        new validator(temp).not().is_number().and()
+            .not().is_string()
+            .on(false, () => {
+                temp_array.push(temp)
+                temp_indices.push(n - 1)
+            })
+    }
+    if (n % 4 >= 2) {
+        item = array[n - 2]
+        new validator(item).not().is_object()
+            .on(true, () => errors.IncorrectArrayParameterInFindBestInObjectArray())
+        if (typeof property === 'string') {
+            temp = item[property]
+        } else {
+            for (j = 0; j < property.length; j++) {
+                new validator(j).is_lesser_than(property.length - 1)
+                    .and().bind(new validator(item).not().is_object())
+                    .on(true, () => {
+                        errors.IncorrectPropertyParameterInFindBestInObjectArray()
+                    }).on(false, () => {
+                        item = item[property[j]]
+                    })
+            }
+            temp = item
+        }
+        new validator(temp).is_string().or().is_number()
+            .on(true, () => {
+                temp_array.push(temp)
+                temp_indices.push(n - 2)
+            }).on(false, () => {
+                errors.IncorrectArrayParameterInFindBestInObjectArray()
+            })
+    }
+    if (n % 4 >= 3) {
+        item = array[n - 3]
+        new validator(item).not().is_object()
+            .on(true, () => errors.IncorrectArrayParameterInFindBestInObjectArray())
+        if (typeof property === 'string') temp = item[property]
+        else {
+            for (j = 0; j < property.length; j++) {
+                new validator(j).is_lesser_than(property.length)
+                    .and().bind(new validator(item).not().is_object())
+                    .on(true, () => {
+                        errors.IncorrectPropertyParameterInFindBestInObjectArray()
+                    })
+                item = item[property[j]]
+            }
+            temp = item
+        }
+        new validator(temp).is_string().or().is_number()
+            .on(true, () => {
+                temp_array.push(temp)
+                temp_indices.push(n - 3)
+            }).on(false, () => errors.IncorrectArrayParameterInFindBestInObjectArray())
+    }
+    // get the first best elements
+    temp = find_best_elements(temp_array, count)
+    // copy the result into the sorted_array and the
+    // sorted indices...
+    k = temp.indices.length
+    for (i = 0; i < k >> 2; i++) {
+        j = temp.indices[i << 2]
+        sorted_indices[i << 2] = temp_indices[j]
+        sorted_array[i << 2] = array[sorted_indices[i << 2]]
+        j = temp.indices[(i << 2) + 1]
+        sorted_indices[(i << 2) + 1] = temp_indices[j]
+        sorted_array[(i << 2) + 1] = array[sorted_indices[(i << 2) + 1]]
+        j = temp.indices[(i << 2) + 2]
+        sorted_indices[(i << 2) + 2] = temp_indices[j]
+        sorted_array[(i << 2) + 2] = array[sorted_indices[(i << 2) + 2]]
+        j = temp.indices[(i << 2) + 3]
+        sorted_indices[(i << 2) + 3] = temp_indices[j]
+        sorted_array[(i << 2) + 3] = array[sorted_indices[(i << 2) + 3]]
+    }
+    if (k % 4 >= 1) {
+        j = temp.indices[k - 1]
+        sorted_indices[k - 1] = temp_indices[j]
+        sorted_array[k - 1] = array[sorted_indices[k - 1]]
+    }
+    if (k % 4 >= 2) {
+        j = temp.indices[k - 2]
+        sorted_indices[k - 2] = temp_indices[j]
+        sorted_array[k - 2] = array[sorted_indices[k - 2]]
+    }
+    if (k % 4 >= 3) {
+        j = temp.indices[k - 3]
+        sorted_indices[k - 3] = temp_indices[j]
+        sorted_array[k - 3] = array[sorted_indices[k - 3]]
+    }
+    return { array: sorted_array, indices: sorted_indices }
+}
+/**
+ * 
+ * @param {Array.<object>} array 
+ * @param {string | Array.<string>} property 
+ * @param {number} count - an integer number
+ * @returns {{array : Array.<object>, indices : Array.<number>}}
+ * @description this utility function is used for the static
+ * method find_worst_for_object_array_by_property and computes
+ * the first worst count elements form an array each element
+ * of which is an object by given property(es) of the object.
+ * If the property is string array and the value of the array
+ * is not object for each property of the property, except the
+ * last level of the property array, then an error message will
+ * be thrown. Also if every element of the array is not object
+ * an error message will be thrown. If the last level property value
+ * is not string or number value, then this element will be omitted
+ * from the function and then output array will be all the elements that
+ * contains the corresponding property. 
+ */
+function find_worst_for_object_array_by_property(array, property, count) {
+    let i, item, j, k, n, sorted_array = [],
+        sorted_indices = [], temp, temp_array = [],
+        temp_indices = []
+    n = array.length
+    for (i = 0; i < n >> 2; i++) {
+        new validator(array[i << 2]).not().is_object()
+            .or().bind(
+                new validator(array[(i << 2) + 1]).not().is_object()
+            )
+            .or().bind(
+                new validator(array[(i << 2) + 2]).not().is_object()
+            )
+            .or().bind(
+                new validator(array[(i << 2) + 3]).not().is_object()
+            )
+            .on(true, () => errors.IncorrectArrayParameterInFindWorstInObjectArray())
+        k = 0
+        while (k <= 3) {
+            item = array[(i << 2) + k]
+            if (typeof property === 'string') temp = item[property]
+            else {
+                for (j = 0; j < property.length; j++) {
+                    new validator(j).is_lesser_than(property.length - 1)
+                        .and().bind(new validator(item).not().is_object())
+                        .on(true, () => {
+                            errors.IncorrectPropertyParameterInFindWorstInObjectArray()
+                        })
+                    item = item[property[j]]
+                }
+                temp = item
+            }
+            new validator(temp).is_string().or().is_number()
+                .on(true, () => {
+                    temp_array.push(temp)
+                    temp_indices.push((i << 2) + k)
+                })
+            ++k
+        }
+    }
+    if (n % 4 >= 1) {
+        item = array[n - 1]
+        new validator(item).not().is_object()
+            .on(true, () => {
+                errors.IncorrectArrayParameterInFindWorstInObjectArray()
+            })
+        if (typeof property === 'string') temp = item[property]
+        else {
+            for (j = 0; j < property.length; j++) {
+                new validator(j).is_lesser_than(property.length - 1)
+                    .and().bind(new validator(item).not().is_object())
+                    .on(true, () => {
+                        errors.IncorrectPropertyParameterInFindWorstInObjectArray()
+                    })
+                item = item[property[j]]
+            }
+            temp = item
+        }
+        new validator(temp).is_string().or().is_number()
+            .on(true, () => {
+                temp_array.push(temp)
+                temp_indices.push(n - 1)
+            })
+    }
+    if (n % 4 >= 2) {
+        item = array[n - 2]
+        new validator(item).not().is_object()
+            .on(true, () => {
+                errors.IncorrectArrayParameterInFindWorstInObjectArray()
+            })
+        if (typeof property === 'string') temp = item[property]
+        else {
+            for (j = 0; j < property.length; j++) {
+                new validator(j).is_lesser_than(property.length - 1)
+                    .and().bind(new validator(item).not().is_object())
+                    .on(true, () => {
+                        errors.IncorrectPropertyParameterInFindWorstInObjectArray()
+                    })
+                item = item[property[j]]
+            }
+            temp = item
+        }
+        new validator(item).is_string().or().is_number()
+            .on(true, () => {
+                temp_array.push(temp)
+                temp_indices.push(n - 2)
+            })
+    }
+    if (n % 4 >= 3) {
+        item = array[n - 3]
+        new validator(item).not().is_object()
+            .on(true, () => {
+                errors.IncorrectArrayParameterInFindWorstInObjectArray()
+            })
+        if (typeof property === 'string') temp = item[property]
+        else {
+            for (j = 0; j < property.length; j++) {
+                new validator(j).is_lesser_than(property.length - 1)
+                    .and().bind(new validator(item).not().is_object())
+                    .on(true, () => {
+                        errors.IncorrectPropertyParameterInFindWorstInObjectArray()
+                    })
+                item = item[property[j]]
+            }
+            temp = item
+        }
+        new validator(temp).is_string().or().is_number()
+            .on(true, () => {
+                temp_array.push(temp)
+                temp_indices.push(n - 3)
+            })
+    }
+    // find the worst elements of the temp_array...
+    temp = find_worst_elements(temp_array, count)
+    console.log(temp.array)
+    // copy the elements into the sorted_array
+    n = temp.indices.length
+    for (i = 0; i < n >> 2; i++) {
+        k = i << 2
+        j = temp.indices[k]
+        sorted_indices[k] = temp_indices[j]
+        sorted_array[k] = array[sorted_indices[k]]
+        ++k
+        j = temp.indices[k]
+        sorted_indices[k] = temp_indices[j]
+        sorted_array[k] = array[sorted_indices[k]]
+        ++k
+        j = temp.indices[k]
+        sorted_indices[k] = temp_indices[j]
+        sorted_array[k] = array[sorted_indices[k]]
+        ++k
+        j = temp.indices[k]
+        sorted_indices[k] = temp_indices[j]
+        sorted_array[k] = array[sorted_indices[k]]
+    }
+    if (n % 4 >= 1) {
+        j = temp.indices[n - 1]
+        sorted_indices[n - 1] = temp_indices[j]
+        sorted_array[n - 1] = array[sorted_indices[n - 1]]
+    }
+    if (n % 4 >= 2) {
+        j = temp.indices[n - 2]
+        sorted_indices[n - 2] = temp_indices[j]
+        sorted_array[n - 2] = array[sorted_indices[n - 2]]
+    }
+    if (n % 4 >= 3) {
+        j = temp.indices[n - 3]
+        sorted_indices[n - 3] = temp_indices[j]
+        sorted_array[n - 3] = array[sorted_indices[n - 3]]
+    }
+    return { array: sorted_array, indices: sorted_indices }
+}
 
 /**
  * 
@@ -718,7 +1336,7 @@ function bucket_sort(array, buckets, mode) {
  * selects the 'merge sort' method.
  */
 function SortArray(array, method, ascending_order = true) {
-    if (method === 'quick sort') sorted_array = quick_sort(array, ascending_order)
+    if (method === 'quick sort') sorted_array = quickSort(array, ascending_order)
     else if (method === 'bubble sort') sorted_array = bubble_sort(array, ascending_order)
     else if (method === 'heap sort') sorted_array = heap_sort(array, ascending_order)
     else if (method === 'insertion sort') sorted_array = insertion_sort(array, ascending_order)
@@ -756,7 +1374,15 @@ module.exports = {
     generate_random_array: random_array_generator,
     GenerateRandomArray: random_array_generator,
     Generate_random_array: random_array_generator,
-    find_best_elements : find_best_elements,
-    findBestElements : find_best_elements,
-    FindBestElements : find_best_elements
+    find_best_elements: find_best_elements,
+    findBestElements: find_best_elements,
+    FindBestElements: find_best_elements,
+    find_worst_elements: find_worst_elements,
+    findWorstElements: find_worst_elements,
+    FindWorstElements: find_worst_elements,
+    sort_object_array_by_property: sort_object_array_by_property,
+    find_best_for_object_array_by_property,
+    find_worst_for_object_array_by_property,
+
+
 }
