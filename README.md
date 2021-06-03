@@ -218,7 +218,7 @@ const bestTen = SortLib.find_best_elements(random_array, 10)
 ```js
 const SortLib = require('@euriklis/sortlib')
 const random_array = SortLib.generate_random_array(50)
-const bestTen = SortLib.find_worst_elements(random_array, 10)
+const worstTen = SortLib.find_worst_elements(random_array, 10)
 ```
 - *SortLib.sort_object_array_by_property(array, property, mode, algorithm)* - this method is available from version 1.1.0 or a higher version of the package. The method assumes that the array is an array with all elements to be of object type. If this condition is not fulfilled, then an error message for incorrect array will be thrown. The property can be a string value or an array of string elements that have to be keys of each array element of the array parameter. If this condition is not fulfilled, then an error message for incorrect property parameter will be thrown from the method. The method sorts the elements of the array (objects) by the value of the property key (if the property is an array then the value of the last depth of the object element). For example let us assume a graph object. It is well known that every graph has nodes and edges and every edge has weight. To sort the edges we have to execute the following code:
 ```js
