@@ -245,7 +245,7 @@ const Graph = {
 // set the edges by the weight value
 Graph.edges = SortLib.sort_object_array_by_property(Graph.edges, ['attributes', 'weight']).array // the method returns the array and the indices of the initial array.
 // set the nodes by the their value
-Graph.nodes = SortLib.sort_object_array_by_property(Graph.nodes, 'value', 'quick sort').array // if we want to declare the sorting algorithm
+Graph.nodes = SortLib.sort_object_array_by_property(Graph.nodes, 'value', true, 'quick sort').array // if we want to declare the sorting algorithm
 ```
 The possible values for the algorithm parameter are all fast algorithms and the bucket sort. 
 
