@@ -19,7 +19,7 @@ where with the "x.x.x" we denote the current version of the sortlib library
 
 We recommend you to use the version 1.1.0 or greater versions (for more details see the technical characteristics bellow).
 
-After a series of tests we found out that the versions of @euriklis/sortlib@1.0.x are very inefficient in time and memory aspects. For this reason we unpublished these versions and now only the versions ^1.1.x are available in the npm site. The versions 1.0.x can be found in the github account which corresponds to this library.  
+After series of tests we found out that the versions of @euriklis/sortlib@1.0.x are very inefficient in time and memory aspects. For this reason we unpublished these versions and now only the versions ^1.1.x are available in the npm site. The versions 1.0.x can be found in the github account which corresponds to this library.  
  
 # Usage and examples:
  To declare the SortLib library/package you have to write after the installing procedure the following text into the main file:
