@@ -18,6 +18,8 @@ npm install @euriklis/sortlib --save
 where with the "x.x.x" we denote the current version of the sortlib library
 
 We recommend you to use the version 1.1.0 or greater versions (for more details see the technical characteristics bellow).
+
+After a series of tests we found out that the versions of @euriklis/sortlib@1.0.x are very inefficient in time and memory aspects. For this reason we unpublished these versions and now only the versions ^1.1.x are available in the npm site. The versions 1.0.x can be found in the github account which corresponds to this library.  
  
 # Usage and examples:
  To declare the SortLib library/package you have to write after the installing procedure the following text into the main file:
@@ -25,11 +27,11 @@ We recommend you to use the version 1.1.0 or greater versions (for more details 
  const sortlib = require('@euriklis/sortlib')
  console.log(sortlib.version) // 1.1.0
  ```
- To create a SortLib instance you have to inside an object parameter into the SortLib constructor. This parameter has to contain the following properties:
- - *array* - a number or string array that has to be sorted from the algorithm
- - *algorithm* - the sorting algorithm. The possible values for this property are *"merge sort"* (if the algorithm is not set, then this value is assumed by default from the constructor), *"quick sort"*, *"heap sort"*, *"insertion sort"*, *"selection sort"*, *"bubble sort"*, *"bucket sort"* and "cocktail sort". The first three are fast sorting algorithms (complexity of order O(nlogn)) and the rest of the algorithms have complexity > O(n<sup>2</sup>).
+ To create a SortLib instance you have to inside an object parameter into the SortLib constructor. This parameter has to contains the following properties:
+ - *array* - a number or string array that will be sorted from the algorithm
+ - *algorithm* - the sorting algorithm. The possible values for this property are *"merge sort"* (if the algorithm is not set, then this value is assumed by default from the constructor), *"quick sort"*, *"heap sort"*, *"insertion sort"*, *"selection sort"*, *"bubble sort"*, *"bucket sort"* and "cocktail sort". The first three are fast sorting algorithms (complexity of order O(nlogn)) and the rest of the other algorithms have complexity > O(n<sup>2</sup>).
  - *sort mode* - if the user would like to sort the array in ascending order, then he/she has to set the ***sort mode*** property to *'increase'* or *true*. The constructor assumes by default that this property is set to true if is missed. If on the other hand we want to sort the array property in descending order then the value of the ***sort mode*** property has to be set to 'decrease' or false.
- - status - if the user wants to declare that the array property which is inserted is sorted then he/she can set the status property to 'sorted'. The constructor set by default this property to 'unsorted'. When the user uses the *sort()* method then the value of this property changes automatically to 'sorted'.
+ - status - if the user wants to declare that the array property which is inserted is sorted then he/she can set the status property to 'sorted'. The constructor sets by default this property to 'unsorted'. When the user uses the *sort()* method, then the value of this property changes automatically to 'sorted'.
  ```js
  const sortlib = require('@euriklis/sortlib')
  const sortlib_instance = new sortlib({
@@ -42,8 +44,8 @@ We recommend you to use the version 1.1.0 or greater versions (for more details 
      // descending order sorting of the array
  })
  ```
- The constructor creates automatically the property indices that is an array that shows the order or the index of every element of the array. When the element position changes by the sorting procedure, then the indices property changes the position of this element. In fact we need to create just the array parameter and all other parameters can be set automatically from the constructor of the SortLib class. 
- If we want to use just the sorting algorithms without creating of any instance, then we may use the static methods of the package.
+ The constructor creates automatically the property "indices" that is an array that shows the order or the index of every element of the array. When the element position changes by the sorting procedure, then the indices property changes the position of the index of this element. In fact we need to create just the array parameter and all other parameters can be set automatically from the constructor of the SortLib class. 
+ If we want to use just the sorting algorithms without creating of any instance, then we may use the static methods of the package. Note that when you creates a SortLib instance, then the constructor automatically checks the validity of each element (i.e. if the array is an array of number of value elements).
  The SortLib static methods are the following:
  - *SortLib.addElementInSortedArray(array, element)* - this method ***assumes*** that the array is number or string array that is already sorted and put an arbitrary element (number or string value) to the existed array. The method computes automatically the mode of the ordering of the array (ascending of descending). Note that the returned result is an SortLib object.For example:
  ```js
@@ -73,7 +75,7 @@ console.log(inverse_sorted_array)
  * } 
  **/
 ```
-- *SortLib.quick_sort(array, mode)* - this method implements the quick sort algorithm. Note that this algorithm is fast (complexity O(nlogn)) and is implemented without using of recursion. The array parameter has to be a number or string array and the mode is a boolean or string variable with possible values "decrease" and "increase". By default the method assumes that the mode is set to "increase"/true. Note that the method returns an object with properties "array" and "indices" that represents the sorted array and the index position of the elements in the initial array. For example:
+- *SortLib.quick_sort(array, mode)* - this method implements the quick sort algorithm. Note that this algorithm is fast (complexity O(nlogn)) and is implemented without using of recursion. The array parameter has to be a number or string array and the mode is a boolean or string variable with possible values "decrease" and "increase". By default the method assumes that the mode is set to "increase"/true. Note that the method returns an object with properties "array" and "indices" which represent the sorted array and the index position of the elements in the initial array. For example:
 ```js
 const sortlib = require('@euriklis/sortlib')
 const array = [3, 61, 23, 13, 87, 19, 185, 2, 26, 5]
@@ -205,7 +207,7 @@ new validator(output.array).is_same(sorted_array)
     .on(true, () => console.log('Correctly sorted array with bucket sort static method bucket_sort()'))
     .on(false, () => console.error('Error in the execution of the bucket sort algorithm from the static method bucket_sort().'))
 ```
-- *SortLib.generate_random_array(length, seed)* - this is an utility method, which creates an array of uniform distributed random values from 0 to 1 with length the first parameter of the method and use optionally seed parameter. We use the idea of the John Burkardt Fortran routine used in complex constrained optimization method of M.J.Box. The method is available from version 1.1.0 of the package.  
+- *SortLib.generate_random_array(length, seed)* - this is an utility method, which creates an array of uniform distributed random values from 0 to 1 with length the first parameter of the method and uses optionally seed parameter. We use the idea of the John Burkardt Fortran routine used in complex constrained optimization method of M.J.Box. The method is available from version 1.1.0 of the package.  
 
 - *SortLib.find_best_elements(array, n)* - this method is available from the version 1.1.0 or higher version of the package. The array may be a number value array as well as a string value array. The method is fast and uses the heap_sort() method to detect the highest elements of the array. The n parameter has to be an integer form 1 to the length of the array or a floating point number in the interval (0, 1). When the n is float type number, then the method returns the first 100 * n% best elements of the array. This method is created/oriented for using in evolutionary/genetic based algorithms, where is needed to be chosen a set of values that ensure the best/highest value of an objective function. An example that shows how to use this method is:
 ```js
@@ -213,14 +215,14 @@ const SortLib = require('@euriklis/sortlib')
 const random_array = SortLib.generate_random_array(50)
 const bestTen = SortLib.find_best_elements(random_array, 10)
 ```
-- *SortLib.find_worst_elements(array, n)* - this method is the inverse method of the previous method. The method uses the same algorithm (heap sort) and returns the n smallest values, where as above the array can be a number of string array and the n can be an integer number from 1 to the length of the array or a float number from 0 to 1. For example:
+- *SortLib.find_worst_elements(array, n)* - this method is the inverse method of the previous method. The method uses the same algorithm (heap sort) and returns the n smallest values, where as above the array can be a number or string array and the n can be an integer number from 1 to the length of the array or a float number from 0 to 1. For example:
 
 ```js
 const SortLib = require('@euriklis/sortlib')
 const random_array = SortLib.generate_random_array(50)
 const worstTen = SortLib.find_worst_elements(random_array, 10)
 ```
-- *SortLib.sort_object_array_by_property(array, property, mode, algorithm)* - this method is available from version 1.1.0 or a higher version of the package. The method assumes that the array is an array with all elements to be of object type. If this condition is not fulfilled, then an error message for incorrect array will be thrown. The property can be a string value or an array of string elements that have to be keys of each array element of the array parameter. If this condition is not fulfilled, then an error message for incorrect property parameter will be thrown from the method. The method sorts the elements of the array (objects) by the value of the property key (if the property is an array then the value of the last depth of the object element). For example let us assume a graph object. It is well known that every graph has nodes and edges and every edge has weight. To sort the edges we have to execute the following code:
+- *SortLib.sort_object_array_by_property(array, property, mode, algorithm)* - this method is available from version 1.1.0 or a higher version of the package. The method assumes that the array is an array with all elements to be of object type. If this condition is not fulfilled, then an error message for incorrect array will be thrown. The property can be a string value or an array of string elements that have to be keys of each array element of the array parameter. If this condition is not fulfilled, then an error message for incorrect property parameter will be thrown from the method. The method sorts the elements of the array (objects) by the value of the property key (if the property is an array then the value of the key of the last depth of the object element). For example let us assume a graph object. It is well known that every graph has nodes and edges and every edge has a weight. To sort the edges we have to execute the following code:
 ```js
 const SortLib = require('@euriklis/sortlib')
 const Graph = {
@@ -249,7 +251,7 @@ Graph.nodes = SortLib.sort_object_array_by_property(Graph.nodes, 'value', true, 
 ```
 The possible values for the algorithm parameter are all fast algorithms and the bucket sort. 
 
-- *SortLib.find_best_for_object_array_by_property(array, property, n)* and *SortLib.find_worst_for_object_array_by_property(array, property, n)* - these methods are available from version 1.1.0 and higher versions of the package. The methods sorts an array of objects by given property of the object that has to be number of string (in the last level of the object, when the property is string array of the keys of the object element). If we have the same Graph which was created above, we may extract the ten weights with higher values:
+- *SortLib.find_best_for_object_array_by_property(array, property, n)* and *SortLib.find_worst_for_object_array_by_property(array, property, n)* - these methods are available from version 1.1.0 and higher versions of the package. The methods sorts an array of objects by given property of the object that has to be number or string (in the last level of the object, when the property is string array of the keys of the object element). If we have the same Graph which was created above, we may extract the ten weights with higher values by this way:
 ```js
 const topTenWeights = SortLib.find_best_for_object_array_by_property(Graph.edges, ['attributes', 'weight'], 10).array
 ```
@@ -308,29 +310,36 @@ SortLib {
   __status__: 'sorted',
   __indices__: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ] }
 ```
-To get or set the identical properties of the SortLib instance you have to use the get and set methods *array* , *size* (only getting mode), *algorithm* (if you try to set the algorithm to not supported value for the library, then the algorithm will be set automatically to "merge sort"), *sort mode* (getter and setter methods), *status* (getter and setter methods. The only supported values are 'sorted' and 'unsorted') and *indices* (getter and setter methods).
+To get or set the identical properties of the SortLib instance you have to use the get and set methods *array* , *size* (only getting mode), *algorithm* (if you try to set the algorithm to not supported for the library value, then the algorithm will be set automatically to "merge sort"), *sort mode* (getter and setter methods), *status* (getter and setter methods. The only supported values are 'sorted' and 'unsorted') and *indices* (getter and setter methods).
 
 # Technical information and details
-For more time and memory efficiency we implement all fast sorting algorithms without internal functions and without recursions. Also in the copy  procedure of the arrays we avoid to use the javascript spread operator (...). The copy of the elements is made with bitwise operations and shifting techniques. For example we can realize the loop
+For more time and memory efficiency we implement all fast sorting algorithms without internal functions and without recursions. Also in the copy  procedure of the arrays we avoid to use the javascript spread operator (...). The copy of the elements is made with bitwise operations and shifting techniques. For example we can realize a copy of an arbitrary array with random number elements by following alternative methods:*
+1. *Very inefficient way:*
 ```js
-let i, n = 100, array = []
-for (i = 0;i < n;i++) array[i] = i
+let n = 100, array = Array.from({length : n}).map(Math.random), copied_array
+copied_array = [...array]
 ```
-with the following more time efficient form:
+2. *Inefficient way:*
 ```js
-let i, n = 100, array = []
+let i, n = 100, array = Array.from({length : n}).map(Math.random), copied_array = []
+for (i = 0;i < n;i++) copied_array[i] = array[i]
+```
+3. *Efficient form*:
+```js
+let i, n = 100, array = Array.from({length : n}).map(Math.random)
 for (i = 0;i < n >> 1;i++) {
-    array[i << 1] = i << 1
-    array[(i << 1) + 1] = (i << 1) + 1
+    copied_array[i << 1] = array[i << 1]
+    copied_array[(i << 1) + 1] = array[(i << 1) + 1]
 }
-if (n & 1) array[n - 1] = n - 1
+if (n & 1) copied_array[n - 1] = array[n - 1]
 ```
 In our library we use two bits shifting for the copy procedures and the loops which allows that technique.
 We also use the minimum count of variables and simulate the multiplication with bitwise techniques when this is possible.
+All algorithms and the theoretical basis for the implementation of the library are taken from the book of Manolis Loukakis "Data structures. Algorithms", Thessaloniki, 1998, Sofia press.  
 # Why to use this package?
-This package is constructed and designed for the needs of efficient sorting of number or string arrays/lists. It is well known that the javascript language provides a conventional way for sorting of arrays. But because of the generality of the nature of the arrays, the method ___sort()___ of javascript is very inefficient and unstable when we need fast sorting of number or character/string arrays. For that reason we created this library that implements the crucial sorting algorithms merge sort, quick sort, bucket sort and the conventional algorithms bubble sort, insertion sort, selection sort, cocktail sort and a dozen of other useful algorithms that may be used for the needs of the econometric or AI package construction or simply for experimental needs (testing of the efficiency of the sorting algorithms for small random arrays, medium random arrays, large random arrays and extremely large random arrays and etc). 
+This package is constructed and designed for the needs of efficient sorting of number or string arrays/lists. It is well known that the javascript language provides a conventional way for sorting of arrays. But because of the generality of the nature of the arrays, the method ___sort()___ of javascript is very inefficient and unstable when we need fast sorting of number or character/string arrays. For that reason we created this library in order to implements the crucial sorting algorithms merge sort, quick sort, heap sort, bucket sort and the conventional algorithms bubble sort, insertion sort, selection sort, cocktail sort and a dozen of other useful algorithms that may be used for the needs of the econometric or AI package construction or simply for experimental needs like testing of the efficiency of the sorting algorithms for small random arrays, medium random arrays, large random arrays and extremely large random arrays, extracting of sorted object patterns and etc. 
 
-To demonstrate the time efficiency of the SortLib library we present the results that was obtained from the comparison of the SortLib algorithms and the conventional javascript method ___sort()___. First of all for medium arrays (in our case a random array form 100000 number elements) we observe that the most efficient algorithm is the quick sort, then the merge sort, heap sort and the conventional javascript algorithm. Concretely for 1 experiment for an array of 100000 random number elements we obtain:
+To demonstrate the time efficiency of the SortLib library we present the results that was obtained from the comparison of the SortLib algorithms with the conventional javascript method ___sort()___. First of all for medium arrays (in our case a random array form 100000 number elements) we observe that the most efficient algorithm is the quick sort, followed from the heap sort and then the merge sort, the conventional javascript algorithm and finally the bucket sort. Concretely for 1 experiment for an array of 100000 random number elements we obtain:
 ```js
 'use strict'
 const message = require('@euriklis/message')
@@ -480,7 +489,7 @@ function ComparisonSortLibAndSort() {
 output:
 ![](./src/assets/SortingAlgorithmsSnapshot.png)
 
-The same paradigm is valid for the large arrays (1000000 elements). The mean results which was obtained for 100 sorting procedures shows that the quick sort and merge sort are the most efficient algorithms, followed from the heap sort and the traditional javascript sorting method. 
+The paradigm for the large scale arrays (1000000 elements) is a little bit different. The mean results which was obtained for 100 sorting procedures show that the quick sort and merge sort are the most efficient algorithms, followed from the heap sort, the traditional javascript sorting method and the bucket sort. 
 ```js
 'use strict'
 const message = require('@euriklis/message')
@@ -583,7 +592,7 @@ function ComparisonSortLibAndSort() {
 output:
 ![](./src/assets/FastAlgorithmsSnapshot.png)
 
-The obtained results was realized on Dell Latitude E654D machine.
+The obtained results was realized on Dell Latitude E654D machine. The only surprising thing of the experiments is the time efficiency of the bucket sort algorithm.
 # Bugs and tips
 If you have any well-meaning critique or have noticed any bug you may send me an email on exel_mmm@abv.bg or to euriklis@hotmail.bg
 # Donations
