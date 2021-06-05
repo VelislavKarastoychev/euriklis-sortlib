@@ -481,7 +481,7 @@ function ComparisonSortLibAndSort() {
         .and().bind(
             new validator(sorting_array_conventionally).is_same(sorted_array_hs)
         )
-        .on(true, () => console.log(answer))
+        .on(true, () => console.log(answer = true))
         .on(false, () => {
             throw new Error('Incorrect comparison or internal error into the sorting algorithms of SortLib.')
         })
@@ -584,7 +584,7 @@ function ComparisonSortLibAndSort() {
         .and().bind(
             new validator(sorting_array_conventionally).is_same(sorted_array_hs)
         )
-        .on(true, () => console.log(answer))
+        .on(true, () => console.log(answer = true))
         .on(false, () => {
             throw new Error('Incorrect comparison or internal error into the sorting algorithms of SortLib.')
         })
