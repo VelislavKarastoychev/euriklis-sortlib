@@ -15,26 +15,64 @@ const errors = require('../Errors')
  * array creating to be more efficient by using
  * of bitwise operations. 
  */
-function random_array_generator(n, seed) {
+function random_array_generator(n, seed, callback) {
     let i, k, rand = []
-    for (i = 0; i < n >> 1; i++) {
+    for (i = 0; i < n >> 2; i++) {
         seed <<= 0
         k = (seed / 127773) >> 0
         seed = (16807 * (seed - k * 127773) - k * 2836) >> 0
         if (seed < 0) seed += 2147483647
-        rand[i << 1] = seed * 4.656612875e-10
+        rand[i << 2] = seed * 4.656612875e-10
+        new validator(callback).is_function()
+            .on(true, () => rand[i << 2] = callback(rand[i << 2]))
         seed <<= 0
         k = (seed / 127773) >> 0
         seed = (16807 * (seed - k * 127773) - k * 2836) >> 0
         if (seed < 0) seed += 2147483647
-        rand[(i << 1) + 1] = seed * 4.656612875e-10
+        rand[(i << 2) + 1] = seed * 4.656612875e-10
+        new validator(callback).is_function()
+            .on(true, () => rand[(i << 2) + 1] = callback(rand[(i << 2) + 1]))
+        seed <<= 0
+        k = (seed / 127773) >> 0
+        seed = (16807 * (seed - k * 127773) - k * 2836) >> 0
+        if (seed < 0) seed += 2147483647
+        rand[(i << 2) + 2] = seed * 4.656612875e-10
+        new validator(callback).is_function()
+            .on(true, () => rand[(i << 2) + 2] = callback(rand[(i << 2) + 2]))
+        seed <<= 0
+        k = (seed / 127773) >> 0
+        seed = (16807 * (seed - k * 127773) - k * 2836) >> 0
+        if (seed < 0) seed += 2147483647
+        rand[(i << 2) + 3] = seed * 4.656612875e-10
+        new validator(callback).is_function()
+            .on(true, () => rand[(i << 2) + 3] = callback(rand[(i << 2) + 3]))
     }
-    if (n & 1) {
+    if (n % 4 >= 1) {
         seed <<= 0
         k = (seed / 127773) >> 0
         seed = (16807 * (seed - k * 127773) - k * 2836) >> 0
         if (seed < 0) seed += 2147483647
         rand[n - 1] = seed * 4.656612875e-10
+        new validator(callback).is_function()
+            .on(true, () => rand[n - 1] = callback(rand[n - 1]))
+    }
+    if (n % 4 >= 2) {
+        seed <<= 0
+        k = (seed / 127773) >> 0
+        seed = (16807 * (seed - k * 127773) - k * 2836) >> 0
+        if (seed < 0) seed += 2147483647
+        rand[n - 2] = seed * 4.656612875e-10
+        new validator(callback).is_function()
+            .on(true, () => rand[n - 2] = callback(rand[n - 2]))
+    }
+    if (n % 4 >= 3) {
+        seed <<= 0
+        k = (seed / 127773) >> 0
+        seed = (16807 * (seed - k * 127773) - k * 2836) >> 0
+        if (seed < 0) seed += 2147483647
+        rand[n - 3] = seed * 4.656612875e-10
+        new validator(callback).is_function()
+            .on(true, () => rand[n - 3] = callback(rand[n - 3]))
     }
     return rand
 }
