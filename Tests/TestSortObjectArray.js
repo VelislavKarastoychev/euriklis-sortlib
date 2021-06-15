@@ -64,7 +64,7 @@ function TestSortObjectArray() {
             }
         }
     ]
-    let output = SortLib.sort_object_array_by_property(obj_array, ['attributes', 'id'])
+    let output = SortLib.sort_object_array_by_property(obj_array, ['attributes', 'id'], true, 'quick sort')
     new validator(output.array).is_same(result).on(true, () => answer = true)
     return new Promise((resolve, reject) => {
         if (answer) resolve(method)
