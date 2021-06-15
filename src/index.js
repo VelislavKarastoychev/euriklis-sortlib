@@ -236,10 +236,11 @@ class SortLib {
      * by default to 123456. If the n parameter is not defined correctly,then
      * it will be a fatal error.
      **/
-    static generate_random_array(n, seed = 123456) {
+    static generate_random_array(n, seed = 123456, callback) {
         new validator(seed).not().is_number().on(true, () => seed = 123456)
         new validator(n).is_integer().on(false, () => errors.IncorrectParameterInGRA())
-        return sort_algorithms.generate_random_array(n, seed)
+        new validator(callback).is_function().on(false, () => callback = null)
+        return sort_algorithms.generate_random_array(n, seed, callback)
     }
     /**
      * 
@@ -352,7 +353,7 @@ class SortLib {
             })
         new validator(mode).is_undefined().or().not().is_same_with_any([true, false, 'decrease', 'increase'])
             .on(true, () => {
-                warnings.IncorrectOrUndefinedModePropertyInSortObjectArray()
+                warnings.IncorrectOrUndefinedModeParameterInSortObjectArray()
                 mode = true
             })
         new validator(algorithm).is_undefined()
