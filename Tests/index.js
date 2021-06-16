@@ -18,6 +18,7 @@ const testFindWorstElements = require('./TestFindWorstElements')
 const testSortObjectArray = require('./TestSortObjectArray')
 const testFindBestForObjectArray = require('./TestFindBestForObjectArray')
 const testFindWorstForObjectArray = require('./TestFindWorstForObjectArray')
+const testGenerateRandomArray = require('./TestGenerateRandomArray')
 const tested_method = (name) => {
     return new message().bold().italic().underline()
         .set_color_yellow().append("Euriklis testing message:\n")
@@ -46,6 +47,7 @@ async function testing() {
         const sortObjectArray = await testSortObjectArray()
         const findBestForObjectArray = await testFindBestForObjectArray()
         const findWorstForObjectArray = await testFindWorstForObjectArray()
+        const generateRandomArray = await testGenerateRandomArray()
         tested_method('Constructor')
         tested_method(addElementInSortedArray)
         tested_method(mergeSort)
@@ -63,6 +65,7 @@ async function testing() {
         tested_method(sortObjectArray)
         tested_method(findBestForObjectArray)
         tested_method(findWorstForObjectArray)
+        tested_method(generateRandomArray)
     } catch (err) {
         throw new Error(err)
     }
