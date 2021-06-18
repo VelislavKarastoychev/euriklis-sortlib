@@ -222,7 +222,8 @@ class SortLib {
      * 
      * @param {number} n 
      * @param {number | 123456} seed
-     * @returns {Array.<number>}
+     * @param {Function(number)} callback
+     * @returns {Array.<number | {}>}
      * @description this is an utility static method,
      * that creates/generates an array with elements
      * that are randomly distributed between 0 and 1.
@@ -235,6 +236,15 @@ class SortLib {
      * If the seed parameter is not defined, then it will be set 
      * by default to 123456. If the n parameter is not defined correctly,then
      * it will be a fatal error.
+     * If callback function is executed, then the method returns an
+     * array of elements that was produced from random numbers.
+     * @example
+     * // create random array of numbers in the open interval (0, 1)
+     * const arr = SortLib.generate_random_array(100)
+     * // generate a random array with different seed
+     * const arr = SortLib.generate_random_array(100, 32394373)
+     * // generate a random array from integers between 0 and 100:
+     * const arr = SortLib.generate_random_array(100, null, el => (el * 100) << 0)
      **/
     static generate_random_array(n, seed = 123456, callback) {
         new validator(seed).not().is_number().on(true, () => seed = 123456)
@@ -348,7 +358,6 @@ class SortLib {
             })
         new validator(property).not().is_string().and().not().is_string_array()
             .on(true, () => {
-                console.log('now the error is here...')
                 errors.IncorrectPropertyInSortObjectArray()
             })
         new validator(mode).is_undefined().or().not().is_same_with_any([true, false, 'decrease', 'increase'])
