@@ -1,5 +1,5 @@
 'use strict'
-import { sort_algorithms } from './Models';
+import {sort_algorithms} from './Models';
 import { sort_algorithms_list } from './Models';
 import validator from '@euriklis/validator';
 import infos from './Infos';
