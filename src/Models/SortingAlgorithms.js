@@ -1,6 +1,6 @@
 'use strict'
-const validator = require('@euriklis/validator')
-const errors = require('../Errors')
+import validator from '@euriklis/validator';
+import * as errors from '../Errors';
 /**
  * 
  * @param {number} n 
@@ -1369,7 +1369,7 @@ function SortArray(array, method, ascending_order = true) {
     return sorted_array
 }
 
-module.exports = {
+export default {
     SortArray,
     PutInSortedArray,
     merge_sort: mergeSort,
@@ -1408,6 +1408,4 @@ module.exports = {
     sort_object_array_by_property: sort_object_array_by_property,
     find_best_for_object_array_by_property,
     find_worst_for_object_array_by_property,
-
-
 }
