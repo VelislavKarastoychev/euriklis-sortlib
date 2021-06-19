@@ -20,13 +20,18 @@ where with the "x.x.x" we denote the current version of the sortlib library
 We recommend you to use the version 1.1.0 or greater versions (for more details see the technical characteristics bellow).
 
 After series of tests we found out that the versions of @euriklis/sortlib@1.0.x are very inefficient in time and memory aspects. For this reason we unpublished these versions and now only the versions ^1.1.x are available in the npm site. The versions 1.0.x can be found in the github account which corresponds to this library.  
- 
+
 # Usage and examples:
  To declare the SortLib library/package you have to write after the installing procedure the following text into the main file:
  ```js
  const sortlib = require('@euriklis/sortlib')
  console.log(sortlib.version) // 1.1.0
  ```
+From ***version 1.2.0*** the @euriklis/sortlib was written in esm pattern. So you may declare the library by the following way:
+```js
+import SortLib from '@euriklis/sortlib';
+``` 
+
  To create a SortLib instance you have to inside an object parameter into the SortLib constructor. This parameter has to contains the following properties:
  - *array* - a number or string array that will be sorted from the algorithm
  - *algorithm* - the sorting algorithm. The possible values for this property are *"merge sort"* (if the algorithm is not set, then this value is assumed by default from the constructor), *"quick sort"*, *"heap sort"*, *"insertion sort"*, *"selection sort"*, *"bubble sort"*, *"bucket sort"* and "cocktail sort". The first three are fast sorting algorithms (complexity of order O(nlogn)) and the rest of the other algorithms have complexity > O(n<sup>2</sup>).
@@ -610,8 +615,18 @@ MIT License. This package will be provided for free to any user that use it for 
 # Dependencies
 The project has two dependencies that are the @euriklis/validator and the @euriklis/message libraries that are used for the testing and the setting of the methods of the SortLib class.
 # Tests
-Some tests of the library are available in the Tests folder of the package. You can run these tests with the trivial way by running of the command:
+Some tests of the library for versions 1.1.x are available in the Tests folder of the package. You can run these tests with the trivial way by running of the command:
 ```sh
 node node_nodules/@euriklis/sortlib/Tests
+```
+For the versions 1.2.x the tests can be downloaded from the github account of the package. So to get the tests of the library you have to write the following command in the terminal (in ubuntu or git bash).
+```sh
+git clone https://github.com/VelislavKarastoychev/tests-for-sortlib
+cd tests-for-sortlib && npm install && npm t
+```
+or with nodemon
+```sh
+git clone https://github.com/VelislavKarastoychev/tests-for-sortlib
+cd tests-for-sortlib && npm install && npm start
 ```
 or to move the Tests folder to wished form you directory in which are all your tests and to run it from there.
