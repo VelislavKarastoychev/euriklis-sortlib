@@ -1369,7 +1369,7 @@ function SortArray(array, method, ascending_order = true) {
     return sorted_array
 }
 
-export default {
+const sorting_algorithms = {
     SortArray,
     PutInSortedArray,
     merge_sort: mergeSort,
@@ -1409,3 +1409,4 @@ export default {
     find_best_for_object_array_by_property,
     find_worst_for_object_array_by_property,
 }
+export default sorting_algorithms;
