@@ -27,10 +27,7 @@ After series of tests we found out that the versions of @euriklis/sortlib@1.0.x 
  const sortlib = require('@euriklis/sortlib')
  console.log(sortlib.version) // 1.1.0
  ```
-From ***version 1.2.0*** the @euriklis/sortlib was written in esm pattern. So you may declare the library by the following way:
-```js
-import SortLib from '@euriklis/sortlib';
-``` 
+Be mindful that version 1.2.0 is in so called esm mode and is not stable. The next version, i.e., 1.2.1 is a turn back to the commonjs mode (cjs). We recommend you to use version 1.2.1.
 
  To create a SortLib instance you have to inside an object parameter into the SortLib constructor. This parameter has to contains the following properties:
  - *array* - a number or string array that will be sorted from the algorithm
@@ -344,7 +341,7 @@ All algorithms and the theoretical basis for the implementation of the library a
 In version 1.1.5 the following changes was done:
 - Correction of the Warnings message of the method sort_object_array_by_property - the warning function warnings.IncorrectOrUndefinedModePropertyInSortObjectArray was changed with its correct form, namely, "warnings.IncorrectOrUndefinedModeParameterInSortObjectArray"
 - Extending of the generate_random_array method with the possibility of using callback function that operates on the random numbers of the array and the method returns the output of the result of this operation. So in this case the output of the method may be not only number array, but also an arbitrary typed array. The time efficiency of the method was increased for large arrays.
-- In version 1.1.6 optimization techniques was applied to the method find_worst_for_object_array_by_property. Correction if the method find_worst_elements method for the warnings messages. Also correction of the warnings messages in the find_best_elements was executed.    
+- In version 1.1.6 (1.2.1) optimization techniques was applied to the method find_worst_for_object_array_by_property. Corrections in the method find_worst_elements for the warnings messages. Also correction in the warning messages in the find_best_elements was done. 
 # Why to use this package?
 This package is constructed and designed for the needs of efficient sorting of number or string arrays/lists. It is well known that the javascript language provides a conventional way for sorting of arrays. But because of the generality of the nature of the arrays, the method ___sort()___ of javascript is very inefficient and unstable when we need fast sorting of number or character/string arrays. For that reason we created this library in order to implements the crucial sorting algorithms merge sort, quick sort, heap sort, bucket sort and the conventional algorithms bubble sort, insertion sort, selection sort, cocktail sort and a dozen of other useful algorithms that may be used for the needs of the econometric or AI package construction or simply for experimental needs like testing of the efficiency of the sorting algorithms for small random arrays, medium random arrays, large random arrays and extremely large random arrays, extracting of sorted object patterns and etc. 
 
