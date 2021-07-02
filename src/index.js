@@ -1,6 +1,6 @@
 'use strict'
-const sort_algorithms =  require('./Models');
-const sort_algorithms_list  = require('./Models');
+const sort_algorithms =  require('./Models').sort_algorithms;
+const sort_algorithms_list  = require('./Models').sort_algorithms_list;
 const validator = require('@euriklis/validator');
 const infos = require('./Infos');
 const warnings = require('./Warnings');
