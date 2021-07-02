@@ -1,11 +1,11 @@
 'use strict'
-import {sort_algorithms} from './Models';
-import { sort_algorithms_list } from './Models';
-import validator from '@euriklis/validator';
-import infos from './Infos';
-import warnings from './Warnings';
-import errors from './Errors';
-import package_file from '../package.json';
+const sort_algorithms =  require('./Models');
+const sort_algorithms_list  = require('./Models');
+const validator = require('@euriklis/validator');
+const infos = require('./Infos');
+const warnings = require('./Warnings');
+const errors = require('./Errors');
+const package_file  = require('../package.json');
 class SortLib {
     /**
      * 
@@ -596,4 +596,4 @@ class SortLib {
 }
 SortLib.version = package_file.version;
 SortLib.author = package_file.author;
-export default SortLib;
+module.exports =  SortLib;
