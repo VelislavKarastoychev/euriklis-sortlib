@@ -1,6 +1,6 @@
 'use strict'
-import validator from '@euriklis/validator';
-import * as errors from '../Errors';
+const validator = require('@euriklis/validator');
+const errors = require('../Errors');
 /**
  * 
  * @param {number} n 
@@ -1409,4 +1409,4 @@ const sorting_algorithms = {
     find_best_for_object_array_by_property,
     find_worst_for_object_array_by_property,
 }
-export default sorting_algorithms;
+module.exports =  sorting_algorithms;
