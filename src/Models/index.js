@@ -1,7 +1,7 @@
 'use strict'
-import sort_algorithms from './SortingAlgorithms';
-import sort_algorithms_list from './SortAlgorithmList';
-export {
+const sort_algorithms = require('./SortingAlgorithms');
+const sort_algorithms_list = require('./SortAlgorithmList');
+module.exports =  {
     sort_algorithms,
     sort_algorithms_list
 };
