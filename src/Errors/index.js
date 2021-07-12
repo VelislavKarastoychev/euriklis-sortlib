@@ -16,6 +16,6 @@ module.exports = {
     IncorrectArrayParameterInFindWorstInObjectArray : require('./IncorrectArrayParameterInFindWorstInObjectArray'),
     IncorrectPropertyParameterInFindWorstInObjectArray : require('./IncorrectPropertyParameterInFindWorstInObjectArray'),
     IncorrectCountParameterInFindWorstInObjectArray : require('./IncorrectCountParameterInFindWorstInObjectArray'),
-    
+    IncorrectArrayParameterInBucketSort : require('./IncorrectArrayParameterInBucketSort'),   
 
 }
