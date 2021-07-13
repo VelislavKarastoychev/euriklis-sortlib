@@ -17,10 +17,10 @@ const IncorrectArrayParameterInFindWorstInObjectArray = 'Incorrect array paramet
 const IncorrectPropertyParameterInFindWorstInObjectArray = 'Incorrect property parameter in find_worst_for_object_array_by_property static method. Note that this parameter has to be an array, each of the elements of which is a string or a string array.';
 const IncorrectCountParameterInFindWorstInObjectArray = 'Incorrect count parameter in find_worst_for_object_array_by_property static method. Note that this parameter has to be an integer number of a floating point number in the open range (0, 1).';
 const IncorrectElementInFindElementInSortedArray = 'Incorrect element in find_element_in_sorted_array() static method of the library. Note that the element (the second parameter of the method) has to be a number of string.';
-const IncorrectArrayInFIndElementInSortedArray = 'Incorrect array in find_element_in_sorted_array() static method of the library. Note that this parameter (the first parameter of the method) has to be a number or string array.';
+const IncorrectArrayInFindElementInSortedArray = 'Incorrect array in find_element_in_sorted_array() static method of the library. Note that this parameter (the first parameter of the method) has to be a number or string array.';
 const IncorrectArrayParameterInAddElementInSortedObjectArrayByProperty = 'Incorrect array parameter in the add_element_sorted_object_array_by_property() static method. The array has to be an object array and to contains only string or number values in the leafs.';
 const IncorrectPropertyParameterInAddElementInSortedObjectArrayByProperty = 'Incorrect property parameter in the add_element_in_sorted_object_array_by_property() static method. Note that this parameter has to be a string array or a string.';
-const IncorrectElementInAddElementInSortedAObjectArrayByProperty = 'Incorrect element in the add_element_in_sorted_object_array_by_property() static method. Note that this parameter has to be a string or a number and nothing else.';
+const IncorrectElementInAddElementInSortedObjectArrayByProperty = 'Incorrect element in the add_element_in_sorted_object_array_by_property() static method. Note that this parameter has to be a string or a number and nothing else.';
 module.exports = {
     ErrorText,
     IncorrectArrayDeclarationInSortLibConstructor,
