@@ -112,6 +112,67 @@ class SortLib {
         return new SortLib({ array: _array, 'sort mode': ascending_order, status: 'sorted' });
     }
     /**
+     * 
+     * @method add_element_in_sorted_array
+     * @param {Array.<number | string>} array 
+     * @param {number | string} element
+     * @return {SortLib}
+     * @description this method is copy of the addElementInSortedArray
+     * static method. 
+     */
+    static add_element_in_sorted_array (array, element) {
+        return SortLib.addElementInSortedArray(array, element);
+    }
+    /**
+     * 
+     * @param {{Array.<object>}} array 
+     * @param {Array.<string> | string} property 
+     * @param {number | string} element
+     * @returns {SortLib}
+     * @description this method is an analogue of the
+     * add_element_in_sorted_array static method for
+     * number and string array. The method gets three
+     * parameters which are namely the array, the
+     * property and the element that have to be added.
+     * The property may be both string array or string
+     * and represents the keys of the object which have to
+     * be observed from the sorted array. The array is sorted
+     * only in the observed property.  
+     */
+    static add_element_in_sorted_object_array_by_property (array, property, element) {
+        new validator(array).not().is_array()
+           .on(true, () => {
+            errors.IncorrectArrayParameterInAddElementInSortedObjectArrayByProperty();
+           });
+        new validator(property).not().is_string_array().and().not().is_string()
+           .on(true, () => errors.IncorrectPropertyParameterInAddElementInSortedObjectArrayByProperty());
+        new validator(element).not().is_string().and().not().is_number()
+           .on(true, () => errors.IncorrectElementInAddElementInSortedObjectArrayByProperty());
+        return sort_algorithms.AddElementInSortedObjectArrayByProperty(array, property, element);
+        
+    }
+    /**
+     * 
+     * @method find_element_in_sorted_array
+     * @param {Array.<number | string>} array 
+     * @param {number | string} element
+     * @returns {{element : number | string, index : number}}
+     * @description this function uses the bisection method to
+     * locate (find) an element in an ordered array which is
+     * definitely string or number array. The method assumes that
+     * the array is already sorted and does not checks if the array
+     * parameter is ordered. Also the method checks if the mode of
+     * ascendence of the array is increasing or decreasing.
+     * @example
+     * SortLib.find_element_in_sorted_array(array, 59); 
+     */
+    static find_element_in_sorted_array (array, element) {
+        new validator(element).not().is_number().or().not()
+           .is_string().on(true, () => errors.IncorrectElementInFindElementInSortedArray());
+        new validator(array).not().is_string_array().or().not().is_number_array()
+           .on(true, () => errors.IncorrectArrayParameterInFindElementInSortedArray())
+    }
+    /**
      * @method merge_sort
      * @param {Array.<number | string>} array 
      * @param {'increase' | 'decrease' | boolean} sort_mode
