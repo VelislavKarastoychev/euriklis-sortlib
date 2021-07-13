@@ -1034,7 +1034,7 @@ function sort_object_array_by_property(array, property, mode, algorithm) {
     if (algorithm === 'quick sort') temp = quickSort(temp_array, mode)
     if (algorithm === 'merge sort') temp = mergeSort(temp_array, mode)
     if (algorithm === 'heap sort') temp = heap_sort(temp_array, mode)
-    if (algorithm === 'bucket sort') temp = bucket_sort(temp_array, mode)
+    if (algorithm === 'bucket sort') temp = bucket_sort(temp_array, temp_array.length >> 1, mode)
     // put in the sorted indices the elements of the temp_indices
     // which correspond to the temp.indices
     for (i = 0; i < temp.indices.length >> 2; i++) {
