@@ -17,5 +17,10 @@ module.exports = {
     IncorrectPropertyParameterInFindWorstInObjectArray : require('./IncorrectPropertyParameterInFindWorstInObjectArray'),
     IncorrectCountParameterInFindWorstInObjectArray : require('./IncorrectCountParameterInFindWorstInObjectArray'),
     IncorrectArrayParameterInBucketSort : require('./IncorrectArrayParameterInBucketSort'),   
-
+    IncorrectElementInFindElementInSortedArray : require('./IncorrectElementInFindElementInSortedArray'),
+    IncorrectArrayParameterInFindElementInSortedArray : require('./IncorrectArrayParameterInFindElementInSortedArray'),
+    IncorrectArrayParameterInAddElementInSortedObjectArrayByProperty : require('./IncorrectArrayParameterInAddElementInSortedObjectArrayByProperty'),
+    IncorrectPropertyParameterInAddElementInSortedObjectArrayByProperty : require('./IncorrectPropertyParameterInAddElementInSortedObjectArrayByProperty'),
+    IncorrectElementInAddElementInSortedObjectArrayByProperty : require('./IncorrectElementInAddElementInSortedObjectArrayByProperty'),
+    
 }
