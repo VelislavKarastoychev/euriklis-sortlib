@@ -96,27 +96,79 @@ function PutInSortedArray(array, element, ascending_order) {
         if (condition) first = middle + 1
         else last = middle
     }
-    if (ascending_order) {
-        if (array[middle] > element) {
-            for (first = 0; first < middle; first++) {
-                expanded_array[first] = array[first]
-            }
-            expanded_array[middle] = element
-            for (last = 0; last < array.length - middle; last++) {
-                expanded_array.push(array[last + middle])
-            }
-        } else {
-            for (first = 0; first < middle + 1; first++) {
-                expanded_array[first] = array[first]
-            }
-            expanded_array.push(element)
-            for (last = 0; last < array.length - middle - 1; last++) {
-                expanded_array.push(array[last + middle + 1])
-            }
-        }
+    // in this phase we have located the right
+    // position  of the new element which is in the
+    // middle point. To put the element we make the
+    // assign of the elements of the array with the
+    // new element added in the position middle. 
+    for (first = 0;first <= array.length;first++) {
+        if (first < middle) expanded_array[first] = array[first];
+        else if (first === middle) expanded_array[first] = element;
+        else expanded_array[first] = array[first - 1]; 
     }
     return expanded_array
 }
+/**
+ * 
+ * @param {Array.<object>} array 
+ * @param {Array.<string> | string} property 
+ * @param {number | string} element
+ * @returns {SortLib}
+ * @description this utility function adds a
+ * string or a number element in it correct
+ * place in an object array by property ordering.
+ * We use the so called bisection method to locate the
+ * correct place of the method.
+ * Note that the property may be a string array as well as
+ * a string type. When the property is string, then the function
+ * searches for key of the object with this name, and if any of the
+ * objects contains a non string or a non number value then the
+ * function throws an error message for incorrect property of the
+ * method.
+ * If the property is an array of strings, then the function checks all the
+ * levels of these properties and if the final value is not string or number,
+ * then the same message is thrown.
+ * If any of the elements of the array parameter is not an object, then an
+ * error message for incorrect array parameter will be thrown.
+ * The element parameter is checked for type accuracy before be inserted to the function.
+ * 
+ */
+function addElementInSortedObjectArrayByProperty (array, property, element) {
+    const n = array.length;
+    let arr_el_i, condition, end, expanded_array = [], middle, mode, p, start;
+    start = 0, end = n - 1, middle;
+    if (array[start] <= array[end]) mode = true;
+    else mode = false;
+    while (1) {
+        middle = (start + end) >> 1;
+        new validator(property).is_string().on(true, () => property = [property]);
+        for (p = 0;p < property.length;p++) {
+            new validator(array[middle][property[p]]).not().is_object()
+               .and().bind(
+                   new validator(p).is_lesser_than(property.length - 1)
+               ).on(true, () => errors.IncorrectPropertyParameterInAddElementInSortedObjectArrayByProperty())
+            new validator(p).is_same(property.length - 1)
+               .and().bind(
+                   new validator(array[middle][property[p]]).not().is_string().and().not().is_number()
+               ).on(true, () => errors.IncorrectArrayParameterInAddElementInSortedObjectArrayByProperty());
+            arr_el_i = array[middle][property[p]];
+        }
+        condition = mode ? arr_el_i < element : arr_el_i > element;
+        if (start === end && middle === end) break; 
+        if (condition) start = middle + 1;
+        else end = middle;
+    }
+    // in this phase we have located the position
+    // of the element, which is the middle. The other
+    // elements after the middle will be putted after the new element
+    for (start = 0;start <= n;start++) {
+        if (start < middle) expanded_array[start] = array[start];
+        else if (start === middle) expanded_array[start] = element;
+        else expanded_array[start] = array[start - 1];
+    }
+    return expanded_array;
+}
+
 /**
  * 
  * @param {Array} array 
@@ -1370,6 +1422,7 @@ function SortArray(array, method, ascending_order = true) {
 }
 
 const sorting_algorithms = {
+    addElementInSortedObjectArrayByProperty,
     SortArray,
     PutInSortedArray,
     merge_sort: mergeSort,
