@@ -1,11 +1,11 @@
 'use strict'
-const sort_algorithms =  require('./Models').sort_algorithms;
-const sort_algorithms_list  = require('./Models').sort_algorithms_list;
+const sort_algorithms = require('./Models').sort_algorithms;
+const sort_algorithms_list = require('./Models').sort_algorithms_list;
 const validator = require('@euriklis/validator');
 const infos = require('./Infos');
 const warnings = require('./Warnings');
 const errors = require('./Errors');
-const package_file  = require('../package.json');
+const package_file = require('../package.json');
 class SortLib {
     /**
      * 
@@ -88,26 +88,55 @@ class SortLib {
      * instance.
      */
     static addElementInSortedArray(array, element) {
-        let i, _array, ascending_order;
-        new validator(array).is_string_array().or().is_number_array()
-            .on(true, () => {
-                // check if the array is in increasing or decreasing order
-                // not that we assume that the array is sorted!
-                i = 0;
-                while (1) {
+        let i, _array, ascending_order = true, element_is_string = new validator(element).is_string(),
+            element_is_array = new validator(element).is_number(),
+            item_is_number = (item) => {
+                return new validator(item).is_number();
+            },
+            item_is_string = (item) => {
+                return new validator(item).is_string();
+            }, array_type, its = 0;
+        new validator(array[0])
+            .is_number().on(true, () => array_type = 'number');
+        new validator(array[0]).is_string().on(true, () => array_type = 'string');
+        new validator(array[0]).not().is_string().and().not().is_number()
+            .on(true, () => array_type = 'error');
+        // the array has to be sorted and either number or string array.
+        for (i = 0; i < array.length - 1; i++) {
+            if (array_type === 'error') break;
+            item_is_string(array[i]).and().bind(item_is_string(array[i + 1]))
+                .and().bind(element_is_string).and().bind(new validator(array_type).is_same('string'))
+                .on(true, () => {
+                    if (array[i].toLowerCase() > array[i + 1].toLowerCase()) {
+                        ascending_order = false;
+                        ++its;
+                    }
+                    if (array[i].toLowerCase() < array[i + 1].toLowerCase()) {
+                        ascending_order = true;
+                        ++its;
+                    }
+                })
+            item_is_number(array[i]).and().bind(item_is_number(array[i + 1]))
+                .and().bind(new validator(array_type).is_same('number'))
+                .on(true, () => {
+                    if (array[i] > array[i + 1]) {
+                        ascending_order = false;
+                        ++its;
+                    }
                     if (array[i] < array[i + 1]) {
                         ascending_order = true;
-                        break;
-                    } else if (array[i] > array[i + 1]) {
-                        ascending_order = false;
-                        break;
-                    } else ++i;
-                    if (i === array.length) {
-                        ascending_order = true;
-                        break;
+                        ++its;
                     }
-                }
-            }).on(false, () => errors.IncorrectArrayInAddElementInSortedArray());
+                })
+            item_is_number(array[i]).and().bind(item_is_string(array[i + 1]))
+                .or().bind(item_is_string(array[i]).and().bind(item_is_number(array[i + 1])))
+                .on(true, () => {
+                    array_type = 'error';
+                    ++its;
+                })
+            if (its) break;
+        }
+        if (array_type === 'error') errors.IncorrectArrayInAddElementInSortedArray();
         _array = sort_algorithms.PutInSortedArray(array, element, ascending_order);
         return new SortLib({ array: _array, 'sort mode': ascending_order, status: 'sorted' });
     }
@@ -120,7 +149,7 @@ class SortLib {
      * @description this method is copy of the addElementInSortedArray
      * static method. 
      */
-    static add_element_in_sorted_array (array, element) {
+    static add_element_in_sorted_array(array, element) {
         return SortLib.addElementInSortedArray(array, element);
     }
     /**
@@ -139,17 +168,17 @@ class SortLib {
      * be observed from the sorted array. The array is sorted
      * only in the observed property.  
      */
-    static add_element_in_sorted_object_array_by_property (array, property, element) {
+    static add_element_in_sorted_object_array_by_property(array, property, element) {
         new validator(array).not().is_array()
-           .on(true, () => {
-            errors.IncorrectArrayParameterInAddElementInSortedObjectArrayByProperty();
-           });
+            .on(true, () => {
+                errors.IncorrectArrayParameterInAddElementInSortedObjectArrayByProperty();
+            });
         new validator(property).not().is_string_array().and().not().is_string()
-           .on(true, () => errors.IncorrectPropertyParameterInAddElementInSortedObjectArrayByProperty());
+            .on(true, () => errors.IncorrectPropertyParameterInAddElementInSortedObjectArrayByProperty());
         new validator(element).not().is_string().and().not().is_number()
-           .on(true, () => errors.IncorrectElementInAddElementInSortedObjectArrayByProperty());
+            .on(true, () => errors.IncorrectElementInAddElementInSortedObjectArrayByProperty());
         return sort_algorithms.AddElementInSortedObjectArrayByProperty(array, property, element);
-        
+
     }
     /**
      * 
@@ -166,11 +195,11 @@ class SortLib {
      * @example
      * SortLib.find_element_in_sorted_array(array, 59); 
      */
-    static find_element_in_sorted_array (array, element) {
+    static find_element_in_sorted_array(array, element) {
         new validator(element).not().is_number().or().not()
-           .is_string().on(true, () => errors.IncorrectElementInFindElementInSortedArray());
+            .is_string().on(true, () => errors.IncorrectElementInFindElementInSortedArray());
         new validator(array).not().is_string_array().or().not().is_number_array()
-           .on(true, () => errors.IncorrectArrayParameterInFindElementInSortedArray())
+            .on(true, () => errors.IncorrectArrayParameterInFindElementInSortedArray())
     }
     /**
      * @method merge_sort
@@ -488,9 +517,9 @@ class SortLib {
             .and().not().is_float().and().not().is_in_range(0, 1)
             .on(true, () => errors.IncorrectCountParameterInFindWorstInObjectArray());
         new validator(n).is_float().and().is_in_range(0, 1)
-        .on(true, () => {
-            n = (array.length * n) << 0;
-        });
+            .on(true, () => {
+                n = (array.length * n) << 0;
+            });
         new validator(n).is_same(array.length).on(true, () => {
             return sort_algorithms.sort_object_array_by_property(array, property, true, 'quick sort');
         });
@@ -657,4 +686,4 @@ class SortLib {
 }
 SortLib.version = package_file.version;
 SortLib.author = package_file.author;
-module.exports =  SortLib;
+module.exports = SortLib;
