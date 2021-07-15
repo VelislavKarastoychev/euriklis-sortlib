@@ -85,13 +85,37 @@ function random_array_generator(n, seed, callback) {
  * The array is copied for more security. 
  */
 function PutInSortedArray(array, element, ascending_order) {
-    let expanded_array = [], first, last, middle, condition
+    let expanded_array = [], first, last, middle, condition,
+        element_is_number = new validator(element).is_number(),
+        element_is_string = new validator(element).is_string(), item_is_number = (item) => {
+            return new validator(item).is_number();
+        },
+        item_is_string = (item) => {
+            return new validator(item).is_string();
+        };
     if (typeof ascending_order === 'undefined') ascending_order = true // "increase"
     if (ascending_order === "decrease") ascending_order = false
     first = 0, last = array.length - 1
     while (true) {
         middle = (first + last) >> 1
-        condition = ascending_order ? element > array[middle] : element < array[middle]
+        item_is_string(array[middle])
+            .and().bind(element_is_string)
+            .on(true, () => {
+                condition = ascending_order ?
+                    array[middle].toLowerCase() < element.toLowerCase()
+                    : array[middle].toLowerCase() > element.toLowerCase();
+            });
+        item_is_number(array[middle]).and().bind(element_is_number)
+            .on(true, () => {
+                condition = ascending_order ? array[middle] < element : array[middle] > element;
+            })
+        item_is_number(array[middle]).and().bind(element_is_string)
+            .or().bind(item_is_string(array[middle]).and().bind(element_is_number))
+            .on(true, () => {
+                condition = ascending_order ?
+                    array[middle].toString().toLowerCase() < element.toString().toLowerCase()
+                    : array[middle].toString().toLowerCase() > element.toString().toLowerCase();
+            });
         if (first === last && last === middle) break
         if (condition) first = middle + 1
         else last = middle
@@ -101,10 +125,10 @@ function PutInSortedArray(array, element, ascending_order) {
     // middle point. To put the element we make the
     // assign of the elements of the array with the
     // new element added in the position middle. 
-    for (first = 0;first <= array.length;first++) {
+    for (first = 0; first <= array.length; first++) {
         if (first < middle) expanded_array[first] = array[first];
         else if (first === middle) expanded_array[first] = element;
-        else expanded_array[first] = array[first - 1]; 
+        else expanded_array[first] = array[first - 1];
     }
     return expanded_array
 }
@@ -133,7 +157,7 @@ function PutInSortedArray(array, element, ascending_order) {
  * The element parameter is checked for type accuracy before be inserted to the function.
  * 
  */
-function addElementInSortedObjectArrayByProperty (array, property, element) {
+function addElementInSortedObjectArrayByProperty(array, property, element) {
     const n = array.length;
     let arr_el_i, condition, end, expanded_array = [], middle, mode, p, start;
     start = 0, end = n - 1, middle;
@@ -142,26 +166,26 @@ function addElementInSortedObjectArrayByProperty (array, property, element) {
     while (1) {
         middle = (start + end) >> 1;
         new validator(property).is_string().on(true, () => property = [property]);
-        for (p = 0;p < property.length;p++) {
+        for (p = 0; p < property.length; p++) {
             new validator(array[middle][property[p]]).not().is_object()
-               .and().bind(
-                   new validator(p).is_lesser_than(property.length - 1)
-               ).on(true, () => errors.IncorrectPropertyParameterInAddElementInSortedObjectArrayByProperty())
+                .and().bind(
+                    new validator(p).is_lesser_than(property.length - 1)
+                ).on(true, () => errors.IncorrectPropertyParameterInAddElementInSortedObjectArrayByProperty())
             new validator(p).is_same(property.length - 1)
-               .and().bind(
-                   new validator(array[middle][property[p]]).not().is_string().and().not().is_number()
-               ).on(true, () => errors.IncorrectArrayParameterInAddElementInSortedObjectArrayByProperty());
+                .and().bind(
+                    new validator(array[middle][property[p]]).not().is_string().and().not().is_number()
+                ).on(true, () => errors.IncorrectArrayParameterInAddElementInSortedObjectArrayByProperty());
             arr_el_i = array[middle][property[p]];
         }
         condition = mode ? arr_el_i < element : arr_el_i > element;
-        if (start === end && middle === end) break; 
+        if (start === end && middle === end) break;
         if (condition) start = middle + 1;
         else end = middle;
     }
     // in this phase we have located the position
     // of the element, which is the middle. The other
     // elements after the middle will be putted after the new element
-    for (start = 0;start <= n;start++) {
+    for (start = 0; start <= n; start++) {
         if (start < middle) expanded_array[start] = array[start];
         else if (start === middle) expanded_array[start] = element;
         else expanded_array[start] = array[start - 1];
@@ -1462,4 +1486,4 @@ const sorting_algorithms = {
     find_best_for_object_array_by_property,
     find_worst_for_object_array_by_property,
 }
-module.exports =  sorting_algorithms;
+module.exports = sorting_algorithms;
