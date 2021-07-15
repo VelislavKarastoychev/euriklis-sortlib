@@ -22,5 +22,8 @@ module.exports = {
     IncorrectArrayParameterInAddElementInSortedObjectArrayByProperty : require('./IncorrectArrayParameterInAddElementInSortedObjectArrayByProperty'),
     IncorrectPropertyParameterInAddElementInSortedObjectArrayByProperty : require('./IncorrectPropertyParameterInAddElementInSortedObjectArrayByProperty'),
     IncorrectElementInAddElementInSortedObjectArrayByProperty : require('./IncorrectElementInAddElementInSortedObjectArrayByProperty'),
+    IncorrectLengthInGRSA : require('./IncorrectLengthInGRSA'),
+    IncorrectWordSizeInGRSA : require('./IncorrectWordSizeInGRSA'),
+    
     
 }
