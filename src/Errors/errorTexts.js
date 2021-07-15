@@ -21,6 +21,8 @@ const IncorrectArrayInFindElementInSortedArray = 'Incorrect array in find_elemen
 const IncorrectArrayParameterInAddElementInSortedObjectArrayByProperty = 'Incorrect array parameter in the add_element_sorted_object_array_by_property() static method. The array has to be an object array and to contains only string or number values in the leafs.';
 const IncorrectPropertyParameterInAddElementInSortedObjectArrayByProperty = 'Incorrect property parameter in the add_element_in_sorted_object_array_by_property() static method. Note that this parameter has to be a string array or a string.';
 const IncorrectElementInAddElementInSortedObjectArrayByProperty = 'Incorrect element in the add_element_in_sorted_object_array_by_property() static method. Note that this parameter has to be a string or a number and nothing else.';
+const IncorrectLengthInGRSA = 'Incorrect length argument in the generate random string array static method. This is the first parameter in the method and represents the length of the array of random strings which have to be created, so this parameter has to be strictly positive integer.';
+const IncorrectWordSizeInGRSA = 'Incorrect word size argument in the generate random string array static method. This is the second parameter in the method and represents the word size (count of symbols or characters of each element) of the array of random strings which have to be created, so this parameter has to be strictly positive integer.';
 module.exports = {
     ErrorText,
     IncorrectArrayDeclarationInSortLibConstructor,
@@ -44,5 +46,6 @@ module.exports = {
     IncorrectArrayParameterInAddElementInSortedObjectArrayByProperty,
     IncorrectPropertyParameterInAddElementInSortedObjectArrayByProperty,
     IncorrectElementInAddElementInSortedObjectArrayByProperty,
-       
+    IncorrectLengthInGRSA, 
+    IncorrectWordSizeInGRSA,
 }
