@@ -24,6 +24,11 @@ module.exports = {
     IncorrectElementInAddElementInSortedObjectArrayByProperty : require('./IncorrectElementInAddElementInSortedObjectArrayByProperty'),
     IncorrectLengthInGRSA : require('./IncorrectLengthInGRSA'),
     IncorrectWordSizeInGRSA : require('./IncorrectWordSizeInGRSA'),
-    
+    IncorrectArrayInFindElementsInSortedObjectArray : require('./IncorrectArrayInFindElementsInSortedObjectArray'),
+    IncorrectPropertyParameterInFindElementsInSortedObjectArray : require('./IncorrectPropertyParameterInFindElementsInSortedObjectArray'),
+    IncorrectElementParameterInFindElementsInSortedObjectArray : require('./IncorrectElementParameterInFindElementsInSortedObjectArray'),
+    IncorrectArrayInFilterWithValidator: require('./IncorrectArrayInFilterWithValidator'),
+    IncorrectArgumentOfCallbackInFilterWithValidator: require('./IncorrectArgumentOfCallbackInFilterWithValidator'),
+        
     
 }
