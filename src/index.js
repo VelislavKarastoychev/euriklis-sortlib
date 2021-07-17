@@ -137,7 +137,7 @@ class SortLib {
             if (its) break;
         }
         if (array_type === 'error') errors.IncorrectArrayInAddElementInSortedArray();
-        _array = sort_algorithms.PutInSortedArray(array, element, ascending_order);
+        _array = sort_algorithms.addElementInSortedArray(array, element, ascending_order);
         return new SortLib({ array: _array, 'sort mode': ascending_order, status: 'sorted' });
     }
     /**
@@ -154,10 +154,11 @@ class SortLib {
     }
     /**
      * 
-     * @param {{Array.<object>}} array 
+     * @param {Array.<object>} array 
      * @param {Array.<string> | string} property 
-     * @param {number | string} element
-     * @returns {SortLib}
+     * @param {object} element
+     * @param {boolean | 'increase' | 'decrease'} [mode]
+     * @returns {Array.<object>}
      * @description this method is an analogue of the
      * add_element_in_sorted_array static method for
      * number and string array. The method gets three
@@ -166,41 +167,112 @@ class SortLib {
      * The property may be both string array or string
      * and represents the keys of the object which have to
      * be observed from the sorted array. The array is sorted
-     * only in the observed property.  
+     * only for the observed property.  
      */
-    static add_element_in_sorted_object_array_by_property(array, property, element) {
+    static add_element_in_sorted_object_array_by_property(array, property, element, mode) {
         new validator(array).not().is_array()
             .on(true, () => {
                 errors.IncorrectArrayParameterInAddElementInSortedObjectArrayByProperty();
             });
         new validator(property).not().is_string_array().and().not().is_string()
-            .on(true, () => errors.IncorrectPropertyParameterInAddElementInSortedObjectArrayByProperty());
-        new validator(element).not().is_string().and().not().is_number()
+            .on(true, () => {
+                errors.IncorrectPropertyParameterInAddElementInSortedObjectArrayByProperty()
+            });
+        new validator(element).not().is_object()
             .on(true, () => errors.IncorrectElementInAddElementInSortedObjectArrayByProperty());
-        return sort_algorithms.AddElementInSortedObjectArrayByProperty(array, property, element);
-
+        return sort_algorithms.addElementInSortedObjectArrayByProperty(array, property, element, mode);
     }
     /**
      * 
-     * @method find_element_in_sorted_array
+     * @param {Array.<any>} array 
+     * @param {function(validator, number)} callback
+     * @returns {{array: Array, indices: Array.<number>}}
+     * @description this function localize all array elements
+     * which satisfy the callback validator condition. This method
+     * may perform searching in non sorted array efficiently.
+     * @example
+     * const array = [{id: 1}, {id: 2, {id: 3}, {id: 4}, {id: 5}];
+     * const filter = SortLib.filter_with_validator(array, (el, iter) => {
+     *    return el.interface2({id: id => id.is_lesser_than(4)});
+     * });
+     */
+    filter_with_validator(array, callback) {
+        new validator(array).is_array().on(false, () => {
+            errors.IncorrectArrayInFilterWithValidator();
+        });
+        new validator(callback).not().is_function()
+        .on(true, () => {
+            errors.IncorrectCallbackParameterInFilterkWithValidator();
+        })
+        .on(false, () => {
+            new validator(callback.arguments[0] instanceof validator)
+            .is_same(true).on(false, () => {
+                errors.IncorrectArgumentOfCallbackInFilterWithValidator();
+            });
+        });
+        return sort_algorithms.filterWithValidator(array, callback);
+    }
+
+    /**
+     *
+     * @method find_elements_in_sorted_array
      * @param {Array.<number | string>} array 
      * @param {number | string} element
-     * @returns {{element : number | string, index : number}}
+     * @returns {{array : Array.<number | string>, index : Array.<number>}}
      * @description this function uses the bisection method to
      * locate (find) an element in an ordered array which is
      * definitely string or number array. The method assumes that
      * the array is already sorted and does not checks if the array
      * parameter is ordered. Also the method checks if the mode of
      * ascendence of the array is increasing or decreasing.
+     * Note that this method does not tests the array for orderliness.
+     * So be watchful for that if the array is sorted or not, because
+     * this method works correct only if the array is sorted.
      * @example
      * SortLib.find_element_in_sorted_array(array, 59); 
      */
-    static find_element_in_sorted_array(array, element) {
-        new validator(element).not().is_number().or().not()
+    static find_elements_in_sorted_array(array, element) {
+        let mode = true;
+        new validator(element).not().is_number().and().not()
             .is_string().on(true, () => errors.IncorrectElementInFindElementInSortedArray());
-        new validator(array).not().is_string_array().or().not().is_number_array()
-            .on(true, () => errors.IncorrectArrayParameterInFindElementInSortedArray())
+        new validator(array).not().is_array()
+            .on(true, () => errors.IncorrectArrayParameterInFindElementInSortedArray());
+        // define the mode:
+        for (let i = 0; i < array.length - 1; i++) {
+            if (array[i] > array[i + 1]) {
+                mode = false;
+                break;
+            } else if (array[i] !== array[i + 1]) {
+                mode = true;
+                break;
+            } else continue;
+        }
+        return sort_algorithms.findElementsInSortedArray(array, element, mode);
     }
+
+    /**
+     * 
+     * @param {Array.<object>} array 
+     * @param {Array.<string>} property 
+     * @param {object} element 
+     * @param {boolean | 'increase' | 'decrease'} [mode]
+     * @returns {{array : Array.<object>, indices : Array.<number>}}
+     * @description this method finds all the object elements that
+     * are equals to the object type element parameter.
+     */
+    static find_elements_in_sorted_object_array_by_property(array, property, element, mode) {
+        new validator(array)
+            .not().is_array()
+            .on(true, () => errors.IncorrectArrayInFindElementsInObjectArray());
+        new validator(property).is_string_array().on(false, () => {
+            errors.IncorrectPropertyParameterInFindElementsInSortedObjectArray();
+        });
+        new validator(element).is_object().on(false, () => {
+            errors.IncorrectElementParameterInFindElementsInSortedObjectArray();
+        });
+        return sort_algorithms.findElementsInSortedObjectArray(array, property, element, mode);
+    }
+
     /**
      * @method merge_sort
      * @param {Array.<number | string>} array 
@@ -217,6 +289,7 @@ class SortLib {
      * @method insertion_sort
      * @param {Array.<number | string>} array 
      * @param {boolean | 'increase' | 'decrease'} sort_mode
+     * @returns {{array: Array.<number | string>, indices: Array.<number>}}
      * @description This static method implements
      * the insertion sort algorithm. If the sort_mode is
      * true or has the value "increase", then the method
@@ -312,7 +385,7 @@ class SortLib {
      * 
      * @param {number} n 
      * @param {number | 123456} seed
-     * @param {Function(number)} callback
+     * @param {function(number, number)} callback
      * @returns {Array.<number | {}>}
      * @description this is an utility static method,
      * that creates/generates an array with elements
@@ -344,8 +417,37 @@ class SortLib {
     }
     /**
      * 
+     * @param {number} length 
+     * @param {number} word_size 
+     * @param {number} seed 
+     * @param {function(number, number)} callback
+     * @returns {Array.<string>} - this is the output when the
+     * callback function is not used.
+     * @description this method is used to generate an array of random
+     * strings. If the user wants to transform the random string with
+     * some procedure, a callback function has to be used. The callback
+     * function has to be a function with two parameters that represents
+     * the element (the current intermediate output) and the index of the
+     * element of the array.
+     * @example
+     * // create an array of 100 random strings that begin with
+     * // the description random string, then show the number of
+     * // the random string and then follows the random string.  
+     * const rand_strings_list = SortLib.generate_random_string_array(100, 5, (el, ind) => {
+     *    return el = `random element № ${ind + 1} : ${el}`
+     * });
+     */
+    static generate_random_string_array(length, word_size, seed, callback) {
+        new validator(length).not().is_integer().on(true, () => errors.IncorrectLengthInGRSA());
+        new validator(word_size).not().is_integer().and().not().is_bigger_than(0)
+            .on(true, () => errors.IncorrectWordSizeInGRSA());
+        new validator(seed).not().is_integer().on(true, () => seed = 123456);
+        return sort_algorithms.generate_random_string_array(length, word_size, seed, callback);
+    }
+    /**
+     * 
      * @param {Array.<number | string>} array 
-     * @param {number} p
+     * @param {number} n
      * @returns {{array : Array.<number | string>, indices : Array.<number>}}
      * @description this method finds out the p best elements of an array of
      * number or string elements. The p has to be either integer which is
