@@ -23,6 +23,11 @@ const IncorrectPropertyParameterInAddElementInSortedObjectArrayByProperty = 'Inc
 const IncorrectElementInAddElementInSortedObjectArrayByProperty = 'Incorrect element in the add_element_in_sorted_object_array_by_property() static method. Note that this parameter has to be a string or a number and nothing else.';
 const IncorrectLengthInGRSA = 'Incorrect length argument in the generate random string array static method. This is the first parameter in the method and represents the length of the array of random strings which have to be created, so this parameter has to be strictly positive integer.';
 const IncorrectWordSizeInGRSA = 'Incorrect word size argument in the generate random string array static method. This is the second parameter in the method and represents the word size (count of symbols or characters of each element) of the array of random strings which have to be created, so this parameter has to be strictly positive integer.';
+const IncorrectArrayInFindElementsInSortedObjectArray = 'Incorrect array parameter in find elements in sorted object array method of the @euriklis/sortlib package. Note that this parameter has to be an object array with arbitrary properties.';
+const IncorrectPropertyParameterInFindElementsInSortedObjectArray = 'Incorrect property parameter in find elements in sorted object array by property method. Note that this property has to be a string array with the strings to represent the nested object structure of each element.';
+const IncorrectElementParameterInFindElementsInSortedObjectArray = 'Incorrect element parameter in the find elements in sorted object array. Note that this property has to be an object with keys, which are identical to the elements of the property array.';
+const IncorrectArrayInFilterWithValidator = 'Incorrect array argument in the filter with validator static method. The argument/parameter has to be an arbitrary array.';
+const IncorrectArgumentOfCallbackInFilterWithValidator = 'Incorrect first argument in the callback function parameter in the static method filter with validator. Note that the argument of the callback function has to be a validator instance variable.';
 module.exports = {
     ErrorText,
     IncorrectArrayDeclarationInSortLibConstructor,
@@ -48,4 +53,11 @@ module.exports = {
     IncorrectElementInAddElementInSortedObjectArrayByProperty,
     IncorrectLengthInGRSA, 
     IncorrectWordSizeInGRSA,
+    IncorrectArrayInFindElementsInSortedObjectArray,
+    IncorrectPropertyParameterInFindElementsInSortedObjectArray,
+    IncorrectElementParameterInFindElementsInSortedObjectArray,
+    IncorrectArrayInFilterWithValidator,
+    IncorrectArgumentOfCallbackInFilterWithValidator,
+
+    
 }
