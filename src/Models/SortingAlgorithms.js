@@ -1,74 +1,7 @@
 'use strict'
 const validator = require('@euriklis/validator');
 const errors = require('../Errors');
-/**
- * 
- * @param {number} n 
- * @param {number} seed
- * @returns {Array.<number>}
- * @description this function creates a
- * random array that has the same elements
- * for given n. We use the John Burkardt routine
- * written in Fortran for the usage of the
- * algorithm 451 (M.Box complex optimization method).
- * We only utilize the code in such a manner that the
- * array creating to be more efficient by using
- * of bitwise operations. 
- */
-function random_array_generator(n, seed, callback) {
-    let i, k, rand = []
-    for (i = 0; i < n >> 2; i++) {
-        seed <<= 0
-        k = (seed / 127773) >> 0
-        seed = (16807 * (seed - k * 127773) - k * 2836) >> 0
-        if (seed < 0) seed += 2147483647
-        rand[i << 2] = seed * 4.656612875e-10
-        if (typeof callback === 'function') rand[i << 2] = callback(rand[i << 2])
-        seed <<= 0
-        k = (seed / 127773) >> 0
-        seed = (16807 * (seed - k * 127773) - k * 2836) >> 0
-        if (seed < 0) seed += 2147483647
-        rand[(i << 2) + 1] = seed * 4.656612875e-10
-        if (typeof callback === 'function') rand[(i << 2) + 1] = callback(rand[(i << 2) + 1])
-        seed <<= 0
-        k = (seed / 127773) >> 0
-        seed = (16807 * (seed - k * 127773) - k * 2836) >> 0
-        if (seed < 0) seed += 2147483647
-        rand[(i << 2) + 2] = seed * 4.656612875e-10
-        if (typeof callback === 'function') rand[(i << 2) + 2] = callback(rand[(i << 2) + 2])
-        seed <<= 0
-        k = (seed / 127773) >> 0
-        seed = (16807 * (seed - k * 127773) - k * 2836) >> 0
-        if (seed < 0) seed += 2147483647
-        rand[(i << 2) + 3] = seed * 4.656612875e-10
-        if (typeof callback === 'function') rand[(i << 2) + 3] = callback(rand[(i << 2) + 3])
-    }
-    if (n % 4 >= 1) {
-        seed <<= 0
-        k = (seed / 127773) >> 0
-        seed = (16807 * (seed - k * 127773) - k * 2836) >> 0
-        if (seed < 0) seed += 2147483647
-        rand[n - 1] = seed * 4.656612875e-10
-        if (typeof callback === 'function') rand[n - 1] = callback(rand[n - 1])
-    }
-    if (n % 4 >= 2) {
-        seed <<= 0
-        k = (seed / 127773) >> 0
-        seed = (16807 * (seed - k * 127773) - k * 2836) >> 0
-        if (seed < 0) seed += 2147483647
-        rand[n - 2] = seed * 4.656612875e-10
-        if (typeof callback === 'function') rand[n - 2] = callback(rand[n - 2])
-    }
-    if (n % 4 >= 3) {
-        seed <<= 0
-        k = (seed / 127773) >> 0
-        seed = (16807 * (seed - k * 127773) - k * 2836) >> 0
-        if (seed < 0) seed += 2147483647
-        rand[n - 3] = seed * 4.656612875e-10
-        if (typeof callback === 'function') rand[n - 3] = callback(rand[n - 3])
-    }
-    return rand
-}
+
 /**
  * 
  * @param {Array} array 
@@ -84,7 +17,7 @@ function random_array_generator(n, seed, callback) {
  * shifted because of the new size of the array.
  * The array is copied for more security. 
  */
-function PutInSortedArray(array, element, ascending_order) {
+function addElementInSortedArray(array, element, ascending_order) {
     let expanded_array = [], first, last, middle, condition,
         element_is_number = new validator(element).is_number(),
         element_is_string = new validator(element).is_string(), item_is_number = (item) => {
@@ -132,12 +65,13 @@ function PutInSortedArray(array, element, ascending_order) {
     }
     return expanded_array
 }
+
 /**
  * 
  * @param {Array.<object>} array 
  * @param {Array.<string> | string} property 
- * @param {number | string} element
- * @returns {SortLib}
+ * @param {object} element
+ * @returns {Array.<object>}
  * @description this utility function adds a
  * string or a number element in it correct
  * place in an object array by property ordering.
@@ -157,27 +91,53 @@ function PutInSortedArray(array, element, ascending_order) {
  * The element parameter is checked for type accuracy before be inserted to the function.
  * 
  */
-function addElementInSortedObjectArrayByProperty(array, property, element) {
+function addElementInSortedObjectArrayByProperty(array, property, element, mode) {
     const n = array.length;
-    let arr_el_i, condition, end, expanded_array = [], middle, mode, p, start;
+    let arr_el_i, el_p, condition, end, expanded_array = [], middle, p, start;
     start = 0, end = n - 1, middle;
-    if (array[start] <= array[end]) mode = true;
-    else mode = false;
+    if (typeof mode === 'undefined') mode = true;
     while (1) {
         middle = (start + end) >> 1;
+        arr_el_i = array[middle];
+        el_p = Object.assign({}, element);
+        new validator(arr_el_i).not().is_object()
+            .on(true, () => {
+                errors.IncorrectArrayParameterInAddElementInSortedObjectArrayByProperty()
+            });
         new validator(property).is_string().on(true, () => property = [property]);
         for (p = 0; p < property.length; p++) {
-            new validator(array[middle][property[p]]).not().is_object()
+            new validator(arr_el_i[property[p]]).is_object()
+                .and().bind(
+                    new validator(el_p[property[p]]).is_object()
+                )
                 .and().bind(
                     new validator(p).is_lesser_than(property.length - 1)
-                ).on(true, () => errors.IncorrectPropertyParameterInAddElementInSortedObjectArrayByProperty())
+                ).on(true, () => {
+                    arr_el_i = arr_el_i[property[p]];
+                    el_p = el_p[property[p]];
+                })
+                .on(false, () => {
+                    if (p < property.length - 1) {
+                        errors.IncorrectPropertyParameterInAddElementInSortedObjectArrayByProperty()
+                    }
+                })
             new validator(p).is_same(property.length - 1)
                 .and().bind(
-                    new validator(array[middle][property[p]]).not().is_string().and().not().is_number()
-                ).on(true, () => errors.IncorrectArrayParameterInAddElementInSortedObjectArrayByProperty());
-            arr_el_i = array[middle][property[p]];
+                    new validator(arr_el_i[property[p]]).is_string().or().is_number()
+                ).and().bind(
+                    new validator(el_p[property[p]]).is_string().or().is_number()
+                )
+                .on(true, () => {
+                    arr_el_i = arr_el_i[property[p]];
+                    el_p = el_p[property[p]];
+                })
+                .on(false, () => {
+                    if (p === property.length) {
+                        errors.IncorrectArrayParameterInAddElementInSortedObjectArrayByProperty();
+                    }
+                });
         }
-        condition = mode ? arr_el_i < element : arr_el_i > element;
+        condition = mode ? arr_el_i < el_p : arr_el_i > el_p;
         if (start === end && middle === end) break;
         if (condition) start = middle + 1;
         else end = middle;
@@ -191,6 +151,830 @@ function addElementInSortedObjectArrayByProperty(array, property, element) {
         else expanded_array[start] = array[start - 1];
     }
     return expanded_array;
+}
+
+/**
+ * 
+ * @method bubble_sort
+ * @param {Array} array 
+ * @param {boolean | 'decrease' | 'increase'} ascending_order
+ * @description this utility function function
+ * implements the bubble sort algorithm for the
+ * sorting of an array.  
+ */
+function bubble_sort(array, ascending_order) {
+    let sorted_array = [...array], condition,
+        i, j, sorted_indices = array.map((e, i) => i),
+        n = array.length, temp
+    if (typeof ascending_order === 'undefined') ascending_order = true
+    if (ascending_order === 'decrease') ascending_order = false
+    for (i = 0; i < n; i++) {
+        for (j = 0; j < n - 1; j++) {
+            if (ascending_order) condition = sorted_array[j + 1] > sorted_array[j]
+            else condition = sorted_array[j + 1] < sorted_array[j]
+            if (!condition) {
+                temp = sorted_array[j]
+                sorted_array[j] = sorted_array[j + 1]
+                sorted_array[j + 1] = temp
+                temp = sorted_indices[j]
+                sorted_indices[j] = sorted_indices[j + 1]
+                sorted_indices[j + 1] = temp
+            }
+        }
+    }
+    return { array: sorted_array, indices: sorted_indices }
+}
+
+/**
+ * 
+ * @param {Array.<number>} array 
+ * @param {boolean | 'increase' | 'decrease'} mode
+ * @returns {{array : Array.<number>, indices: Array.<number>}}
+ * @description this utility function implements
+ * the bucket sort algorithm. Note that this
+ * algorithm is not fast sorting algorithm and
+ * has worst complexity of O(n^2) and average
+ * time complexity of O(n + n^2 / k + k), where
+ * the k is the count of the buckets.
+ *  
+ */
+function bucket_sort(array, buckets, mode) {
+    if (typeof mode === 'undefined') mode = true
+    if (mode === 'decrease') mode = false
+    let sorted_array = [], i, j, temp, min, indices = [],
+        temp_array = [], temp_indices = [], n, max
+    for (i = 0; i < buckets; i++) {
+        temp_array.push([])
+        temp_indices.push([])
+    }
+    // find the biggest element of the array.
+    max = array[0]
+    n = array.length
+    for (i = 0; i < n; i++) if (array[i] > max) max = array[i]
+    // find the min element:
+    min = array[0]
+    for (i = 0; i < n; i++) if (array[i] < min) min = array[i]
+    // push the arrays into the right sub-array of the temp_array
+    for (i = 0; i < n; i++) {
+        j = (((array[i] - min) / (max - min)) * (buckets - 1)) | 0
+        temp_array[j].push(array[i])
+        temp_indices[j].push(i)
+    }
+    // sort all the subarrays of the temp and concatenate then to
+    // the sorted_array
+    for (j = mode ? 0 : buckets - 1; mode ? j < buckets : j >= 0; mode ? j++ : j--) {
+        temp = insertion_sort(temp_array[j], mode)
+        sorted_array.push(...temp.array)
+        indices.push(...temp.indices.map(el => {
+            return temp_indices[j][el]
+        }))
+    }
+    return { array: sorted_array, indices }
+}
+
+/**
+ * 
+ * @param {Array.<number | string>} array 
+ * @param {boolean | 'increase' | 'decrease'} mode
+ * @returns {{array : Array.<number | string>, indices : Array.<number>}}
+ * @description this utility function implements
+ * the cocktail sorting algorithm that is a variant
+ * of the bubble sort algorithm. Note that this algorithm
+ * is not fast (has complexity proportional to O(n^2)).
+ */
+function cocktail_sort(array, mode) {
+    let n = array.length, sorted_array = [...array],
+        indices = Array.from({ length: n }).map((e, i) => e = i)
+    let i, start, end, condition, temp, swapped = true
+
+    if (typeof mode === 'undefined') mode = true
+    if (mode === 'decrease') mode = false
+    start = 0
+    end = n - 1
+    while (swapped) {
+        swapped = false
+        for (i = start; i < end; i++) {
+            condition = mode ? sorted_array[i] > sorted_array[i + 1] : sorted_array[i] < sorted_array[i + 1]
+            if (condition) {
+                temp = sorted_array[i]
+                sorted_array[i] = sorted_array[i + 1]
+                sorted_array[i + 1] = temp
+                temp = indices[i]
+                indices[i] = indices[i + 1]
+                indices[i + 1] = temp
+                swapped = true
+            }
+        }
+        if (!swapped) break
+        swapped = false
+        --end
+        for (i = end - 1; i > start - 1; i--) {
+            condition = mode ? sorted_array[i] > sorted_array[i + 1] : sorted_array[i] < sorted_array[i + 1]
+            if (condition) {
+                temp = sorted_array[i]
+                sorted_array[i] = sorted_array[i + 1]
+                sorted_array[i + 1] = temp
+                temp = indices[i]
+                indices[i] = indices[i + 1]
+                indices[i + 1] = temp
+                swapped = true
+            }
+        }
+        ++start
+    }
+    return { array: sorted_array, indices }
+}
+
+/**
+ * @param {Array.<string | number>} array
+ * @param {number} count
+ * @returns {{array : Array.<string | number>, indices : Array.<number>}}
+ * @description this function finds out the first best n elements of
+ * an unsorted array. To make this the function uses the heap sort
+ * algorithm and stop when the count of n elements is reached. 
+ */
+function find_best_elements(array, count) {
+    const n = array.length
+    let i, j, k, m, t, sorted_array = [],
+        sorted_indices = [], detected_items = [],
+        detected_indices = [], condition
+    i = 0
+    if (count === 0) return { array: [], indices: [] }
+    if (count === n) return heap_sort(array, true)
+    while (i < (n >> 2)) {
+        sorted_array[i << 2] = array[i << 2]
+        sorted_indices[i << 2] = i << 2
+        sorted_array[(i << 2) + 1] = array[(i << 2) + 1]
+        sorted_indices[(i << 2) + 1] = (i << 2) + 1
+        sorted_array[(i << 2) + 2] = array[(i << 2) + 2]
+        sorted_indices[(i << 2) + 2] = (i << 2) + 2
+        sorted_array[(i << 2) + 3] = array[(i << 2) + 3]
+        sorted_indices[(i << 2) + 3] = (i << 2) + 3
+        ++i
+    }
+    if (n % 4 >= 1) {
+        sorted_array[n - 1] = array[n - 1]
+        sorted_indices[n - 1] = n - 1
+    }
+    if (n % 4 >= 2) {
+        sorted_array[n - 2] = array[n - 2]
+        sorted_indices[n - 2] = n - 2
+    }
+    if (n % 4 >= 3) {
+        sorted_array[n - 3] = array[n - 3]
+        sorted_indices[n - 3] = n - 3
+    }
+    // transform the array into heap...
+    k = (n - 2) >> 1
+    while (k >= 0) {
+        // shift down
+        j = k
+        while ((j << 1) + 1 <= n - 1) {
+            m = j
+            condition = sorted_array[m] < sorted_array[(j << 1) + 1]
+            if (condition) m = (j << 1) + 1
+            condition = sorted_array[m] < sorted_array[(j + 1) << 1]
+            if ((j + 1) << 1 <= n - 1 && condition) m = (j + 1) << 1
+            if (m === j) break
+            else {
+                t = sorted_array[m]
+                sorted_array[m] = sorted_array[j]
+                sorted_array[j] = t
+                t = sorted_indices[m]
+                sorted_indices[m] = sorted_indices[j]
+                sorted_indices[j] = t
+                j = m
+            }
+        }
+        --k
+    }
+    // sort the array with the heap sort...
+    k = n - 1
+    while (k > n - count - 1) {
+        // swap the k and the 0 elements
+        t = sorted_array[0]
+        sorted_array[0] = sorted_array[k]
+        sorted_array[k] = t
+        detected_items[n - k - 1] = t
+        t = sorted_indices[0]
+        sorted_indices[0] = sorted_indices[k]
+        sorted_indices[k] = t
+        detected_indices[n - k - 1] = t
+        --k
+        // shift down the subarray sorted_array[0:k]
+        i = 0
+        while ((i << 1) + 1 <= k) {
+            m = i
+            condition = sorted_array[m] < sorted_array[(i << 1) + 1]
+            if (condition) m = (i << 1) + 1
+            condition = sorted_array[m] < sorted_array[(i + 1) << 1]
+            if (((i + 1) << 1) <= k && condition) m = (i + 1) << 1
+            if (i === m) break
+            else {
+                t = sorted_array[m]
+                sorted_array[m] = sorted_array[i]
+                sorted_array[i] = t
+                t = sorted_indices[m]
+                sorted_indices[m] = sorted_indices[i]
+                sorted_indices[i] = t
+                i = m
+            }
+        }
+    }
+
+    return { array: detected_items, indices: detected_indices }
+}
+/**
+ * 
+ * @param {Array.<any>} array 
+ * @param {function(validator, number)} callback
+ * @returns {{array: Array, indices: Array.<number>}}
+ * @description this function localize all array elements
+ * which satisfy the callback validator condition.
+ * @example
+ * const array = [{id: 1}, {id: 2, {id: 3}, {id: 4}, {id: 5}];
+ * const filter = SortLib.filter_with_validator(array, (el, iter) => {
+ *    return el.interface2({id: id => id.is_lesser_than(4)});
+ * });
+ */
+function filterWithValidator(array, callback) {
+    let arr_v, v;
+    const n = array.length, output = { array: [], indices: [] };
+    for (let i = 0; i < n >> 2; i++) {
+        v = i << 2;
+        arr_v = new validator(array[v]);
+        new validator(callback(arr_v, v).answer).is_same(true)
+            .on(true, () => {
+                output.array.push(array[v]);
+                output.indices.push(v);
+            });
+        v = (i << 2) + 1;
+        arr_v = new validator(array[v]);
+        new validator(callback(arr_v, v).answer).is_same(true)
+            .on(true, () => {
+                output.array.push(array[v]);
+                output.indices.push(v);
+            });
+        v = (i << 2) + 2;
+        arr_v = new validator(array[v]);
+        new validator(callback(arr_v, v).answer).is_same(true)
+            .on(true, () => {
+                output.array.push(array[v]);
+                output.indices.push(v);
+            });
+        v = (i << 2) + 3;
+        arr_v = new validator(array[v]);
+        new validator(callback(arr_v, v).answer).is_same(true)
+            .on(true, () => {
+                output.array.push(array[v]);
+                output.indices.push(v);
+            });
+    }
+    if (n % 4 >= 1) {
+        arr_v = new validator(array[n - 1]);
+        new validator(callback(arr_v, n - 1).answer).is_same(true)
+        .on(true, () => {
+            output.array.push(array[n - 1]);
+            output.indices.push(n - 1);
+        });
+    }
+    if (n % 4 >= 2) {
+        arr_v = new validator(array[n - 2]);
+        new validator(callback(arr_v, n - 2).answer).is_same(true)
+        .on(true, () => {
+            output.array.push(array[n - 2]);
+            output.indices.push(n - 2);
+        });
+    }
+    if (n % 4 >= 3) {
+        arr_v = new validator(array[n - 3]);
+        new validator(callback(arr_v, n - 3).answer).is_same(true)
+        .on(true, () => {
+            output.array.push(array[n - 3]);
+            output.indices.push(n - 3);
+        });
+    }
+    return output;
+}
+
+/**
+ * 
+ * @param {Array.<number | string>} array 
+ * @param {number | string} element
+ * @param {boolean | 'increase' | 'decrease'} mode
+ * @returns {{array: Array.<number | string>, indices: Array.<number>}}
+ * @description this is an utility function which implements the
+ * binary searching algorithm for sorted array. Note that
+ * in this function we assume that the array is already sorted
+ * and do not make checking of the sorting condition.
+ */
+function findElementsInSortedArray(array, element, mode) {
+    const n = array.length;
+    let start = 0, end = n - 1, middle, condition, output = { array: [], indices: [] };
+    if (typeof mode === 'undefined') {
+        if (array[0] > array[n - 1]) mode = false; // decrease
+        else mode = true;
+    }
+    // find the initial index of the
+    // array which is possible to
+    // satisfy the condition of the equality.
+    while (true) {
+        middle = (start + end) >> 1;
+        if (start === end && end == middle) break;
+        condition = mode ? array[middle] >= element : array[middle] <= element;
+        if (condition) end = middle;
+        else start = middle + 1;
+    }
+    // in this phase we have the index middle
+    // which is the index that is the first element
+    // for which is fulfilled that is at least equal
+    // or bigger than the element. If the array[middle]
+    // is not equal to the element, then return empty
+    // array and indices, an array with the value -1.
+    new validator(array[middle])
+        .not().is_same(element).on(true, () => {
+            output.indices[0] = -1;
+        }).on(false, () => {
+            let index = 0
+            while (new validator(array[middle]).is_same(element).answer) {
+                output.array[index] = array[middle];
+                output.indices[index] = middle;
+                ++index;
+                ++middle;
+            }
+        })
+    return output;
+}
+
+/**
+ * 
+ * @param {Array.<object>} array 
+ * @param {Array.<string>} property 
+ * @param {object} element 
+ * @param {boolean | 'increase' | 'decrease'} mode 
+ * @returns {{array: Array.<object>, indices: Array.<number>}}
+ */
+function findElementsInSortedObjectArray(array, property, element, mode) {
+    const output = { array: [], indices: [] }, n = array.length;
+    let arr_el, condition, start = 0, end = n - 1, middle, p, m, el_p, i = 0;
+    if (typeof mode === 'undefined') mode = true;
+    if (typeof property === 'string') property = [property];
+    m = property.length;
+    // define the el_p once:
+    el_p = Object.assign({}, element);
+    for (p = 0; p < m; p++) {
+        new validator(p).is_lesser_than(m - 1)
+            .and().bind(
+                new validator(el_p[property[p]]).is_object()
+            ).on(true, () => el_p = el_p[property[p]])
+            .on(false, () => {
+                if (p < (m - 1)) {
+                    errors.IncorrectPropertyParameterInFindElementsInSortedObjectArray();
+                }
+            });
+        new validator(p).is_same(m - 1)
+            .and().bind(
+                new validator(el_p[property[p]]).is_string().or().is_number()
+            ).on(true, () => el_p = el_p[property[p]])
+            .on(false, () => {
+                if (p === (m - 1)) {
+                    errors.IncorrectPropertyParameterInFindElementsInSortedObjectArray();
+                }
+            });
+    }
+    while (true) {
+        middle = (start + end) >> 1;
+        arr_el = array[middle];
+        for (p = 0; p < m; p++) {
+            new validator(p).is_lesser_than(m - 1)
+                .and().bind(
+                    new validator(arr_el[property[p]]).is_object()
+                ).on(true, () => {
+                    arr_el = arr_el[property[p]];
+                }).on(false, () => {
+                    if (p !== (m - 1)) {
+                        errors.IncorrectArrayInFindElementsInSortedObjectArray();
+                    }
+                });
+            new validator(p).is_same(m - 1)
+                .and().bind(
+                    new validator(arr_el[property[p]]).is_string().or().is_number()
+                ).on(true, () => {
+                    arr_el = arr_el[property[p]];
+                }).on(false, () => {
+                    if (p === (m - 1)) {
+                        errors.IncorrectArrayInFindElementsInSortedObjectArray();
+                    }
+                });
+        }
+        if (start === end && middle === end) break;
+        condition = mode ? arr_el >= el_p : arr_el <= el_p;
+        if (condition) end = middle;
+        else start = middle + 1;
+    }
+    // in this phase we have find the element which is
+    // at least equal to the el_p.
+    // if no elements which are equals to the el_p,
+    // then return empty array and indices with the only
+    // element the -1.
+    if (new validator(arr_el).not().is_same(el_p).answer) {
+        output.indices = [-1];
+        return output;
+    }
+    while (new validator(el_p).is_same(arr_el).answer) {
+        output.array[i] = array[middle];
+        output.indices[i] = middle;
+        ++middle;
+        ++i;
+        // update the arr_el variables:
+        arr_el = array[middle];
+        for (p = 0; p < m; p++) {
+            new validator(p).is_lesser_than(m - 1)
+                .and().bind(
+                    new validator(arr_el[property[p]]).is_object()
+                ).on(true, () => {
+                    arr_el = arr_el[property[p]];
+                }).on(false, () => {
+                    if (p !== m - 1) {
+                        errors.IncorrectPropertyParameterInFindElementsInSortedObjectArray();
+                    }
+                });
+            new validator(p).is_same(m - 1)
+                .and().bind(
+                    new validator(arr_el[property[p]]).is_string().or().is_number()
+                ).on(true, () => arr_el = arr_el[property[p]])
+                .on(false, () => {
+                    if (p === m - 1) {
+                        errors.IncorrectArrayInFindElementsInSortedObjectArray();
+                    }
+                });
+        }
+    }
+    return output;
+}
+
+/**
+ * 
+ * @param {Array.<number | string>} array 
+ * @param {number} count - an integer number
+ * @returns {{array : Array.<number | string>, indices : Array.<number>}}
+ * @description this algorithm finds out the first count worts elements
+ * of an array which is contained from number or string elements. The
+ * method uses the heap sort algorithm and fast copy of the arrays.
+ *   
+ */
+function find_worst_elements(array, count) {
+    const n = array.length
+    let i, j, k, m, t, sorted_array = [],
+        sorted_indices = [], condition, detected_items = [],
+        detected_indices = []
+    i = 0
+    while (i < (n >> 2)) {
+        sorted_array[i << 2] = array[i << 2]
+        sorted_indices[i << 2] = i << 2
+        sorted_array[(i << 2) + 1] = array[(i << 2) + 1]
+        sorted_indices[(i << 2) + 1] = (i << 2) + 1
+        sorted_array[(i << 2) + 2] = array[(i << 2) + 2]
+        sorted_indices[(i << 2) + 2] = (i << 2) + 2
+        sorted_array[(i << 2) + 3] = array[(i << 2) + 3]
+        sorted_indices[(i << 2) + 3] = (i << 2) + 3
+        ++i
+    }
+    if (n % 4 >= 1) {
+        sorted_array[n - 1] = array[n - 1]
+        sorted_indices[n - 1] = n - 1
+    }
+    if (n % 4 >= 2) {
+        sorted_array[n - 2] = array[n - 2]
+        sorted_indices[n - 2] = n - 2
+    }
+    if (n % 4 >= 3) {
+        sorted_array[n - 3] = array[n - 3]
+        sorted_indices[n - 3] = n - 3
+    }
+    // transform the array into heap...
+    k = (n - 2) >> 1
+    while (k >= 0) {
+        // shift down
+        j = k
+        while ((j << 1) + 1 <= n - 1) {
+            m = j
+            condition = sorted_array[m] > sorted_array[(j << 1) + 1]
+            if (condition) m = (j << 1) + 1
+            condition = sorted_array[m] > sorted_array[(j + 1) << 1]
+            if ((j + 1) << 1 <= n - 1 && condition) m = (j + 1) << 1
+            if (m === j) break
+            else {
+                t = sorted_array[m]
+                sorted_array[m] = sorted_array[j]
+                sorted_array[j] = t
+                t = sorted_indices[m]
+                sorted_indices[m] = sorted_indices[j]
+                sorted_indices[j] = t
+                j = m
+            }
+        }
+        --k
+    }
+    // sort the array with the heap sort...
+    k = n - 1
+    while (k > n - count - 1) {
+        // swap the k and the 0 elements
+        t = sorted_array[0]
+        sorted_array[0] = sorted_array[k]
+        sorted_array[k] = t
+        detected_items[n - k - 1] = t
+        t = sorted_indices[0]
+        sorted_indices[0] = sorted_indices[k]
+        sorted_indices[k] = t
+        detected_indices[n - k - 1] = t
+        --k
+        // shift down the subarray sorted_array[0:k]
+        i = 0
+        while ((i << 1) + 1 <= k) {
+            m = i
+            condition = sorted_array[m] > sorted_array[(i << 1) + 1]
+            if (condition) m = (i << 1) + 1
+            condition = sorted_array[m] > sorted_array[(i + 1) << 1]
+            if (((i + 1) << 1) <= k && condition) m = (i + 1) << 1
+            if (i === m) break
+            else {
+                t = sorted_array[m]
+                sorted_array[m] = sorted_array[i]
+                sorted_array[i] = t
+                t = sorted_indices[m]
+                sorted_indices[m] = sorted_indices[i]
+                sorted_indices[i] = t
+                i = m
+            }
+        }
+    }
+    return { array: detected_items, indices: detected_indices }
+}
+
+/**
+ * 
+ * @param {number} n 
+ * @param {number} seed
+ * @returns {Array.<number>}
+ * @description this function creates a
+ * random array that has the same elements
+ * for given n. We use the John Burkardt routine
+ * written in Fortran for the usage of the
+ * algorithm 451 (M.Box complex optimization method).
+ * We only utilize the code in such a manner that the
+ * array creating to be more efficient by using
+ * of bitwise operations. 
+ */
+function generate_random_array(n, seed, callback) {
+    let i, k, rand = []
+    for (i = 0; i < n >> 2; i++) {
+        seed <<= 0
+        k = (seed / 127773) >> 0
+        seed = (16807 * (seed - k * 127773) - k * 2836) >> 0
+        if (seed < 0) seed += 2147483647
+        rand[i << 2] = seed * 4.656612875e-10
+        if (typeof callback === 'function') rand[i << 2] = callback(rand[i << 2], i << 2)
+        seed <<= 0
+        k = (seed / 127773) >> 0
+        seed = (16807 * (seed - k * 127773) - k * 2836) >> 0
+        if (seed < 0) seed += 2147483647
+        rand[(i << 2) + 1] = seed * 4.656612875e-10
+        if (typeof callback === 'function') rand[(i << 2) + 1] = callback(rand[(i << 2) + 1], (i << 2) + 1)
+        seed <<= 0
+        k = (seed / 127773) >> 0
+        seed = (16807 * (seed - k * 127773) - k * 2836) >> 0
+        if (seed < 0) seed += 2147483647
+        rand[(i << 2) + 2] = seed * 4.656612875e-10
+        if (typeof callback === 'function') rand[(i << 2) + 2] = callback(rand[(i << 2) + 2], (i << 2) + 2)
+        seed <<= 0
+        k = (seed / 127773) >> 0
+        seed = (16807 * (seed - k * 127773) - k * 2836) >> 0
+        if (seed < 0) seed += 2147483647
+        rand[(i << 2) + 3] = seed * 4.656612875e-10
+        if (typeof callback === 'function') rand[(i << 2) + 3] = callback(rand[(i << 2) + 3], (i << 2) + 3)
+    }
+    if (n % 4 >= 1) {
+        seed <<= 0
+        k = (seed / 127773) >> 0
+        seed = (16807 * (seed - k * 127773) - k * 2836) >> 0
+        if (seed < 0) seed += 2147483647
+        rand[n - 1] = seed * 4.656612875e-10
+        if (typeof callback === 'function') rand[n - 1] = callback(rand[n - 1], n - 1)
+    }
+    if (n % 4 >= 2) {
+        seed <<= 0
+        k = (seed / 127773) >> 0
+        seed = (16807 * (seed - k * 127773) - k * 2836) >> 0
+        if (seed < 0) seed += 2147483647
+        rand[n - 2] = seed * 4.656612875e-10
+        if (typeof callback === 'function') rand[n - 2] = callback(rand[n - 2], n - 2)
+    }
+    if (n % 4 >= 3) {
+        seed <<= 0
+        k = (seed / 127773) >> 0
+        seed = (16807 * (seed - k * 127773) - k * 2836) >> 0
+        if (seed < 0) seed += 2147483647
+        rand[n - 3] = seed * 4.656612875e-10
+        if (typeof callback === 'function') rand[n - 3] = callback(rand[n - 3], n - 3)
+    }
+    return rand
+}
+/**
+ * 
+ * @param {number} n 
+ * @param {number} k 
+ * @param {number} seed 
+ * @param {function(element, index)} callback
+ * @returns {Array.<string>}
+ * @description this function creates an array of n random strings
+ * with width of the symbols equals to the k. If the seed is not 
+ * defined, then the variable will be set to the default value
+ * for the random_array_function, namely to the 123456. Finally, 
+ * if the callback function is used the output of the function
+ * will be an array with arbitrary (set from the user) output.
+ */
+function generate_random_string_array(n, k, seed, callback) {
+    const alphabet = 'ABCDEFGHIJKLMNOPQSTUVWXWZabcdefghijklmnopqrstuvwxyz0123456789';
+    const symbols = alphabet.length;
+    const random_symbols_generator = generate_random_array(n * k, seed);
+    let i, j, random_string_array = [];
+    for (i = 0; i < n >> 2; i++) {
+        random_string_array[i << 2] = '';
+        for (j = 0; j < k; j++) {
+            random_string_array[i << 2] += alphabet.charAt((symbols * random_symbols_generator[(i << 2) * k + j]) << 0);
+        }
+        if (typeof callback === 'function') {
+            random_string_array[i << 2] = callback(random_string_array[i << 2], i << 2);
+        }
+        random_string_array[(i << 2) + 1] = '';
+        for (j = 0; j < k; j++) {
+            random_string_array[(i << 2) + 1] += alphabet.charAt((symbols * random_symbols_generator[((i << 2) + 1) * k + j]) << 0);
+        }
+        if (typeof callback === 'function') {
+            random_string_array[(i << 2) + 1] = callback(random_string_array[(i << 2) + 1], (i << 2) + 1);
+        }
+        random_string_array[(i << 2) + 2] = '';
+        for (j = 0; j < k; j++) {
+            random_string_array[(i << 2) + 2] += alphabet.charAt((symbols * random_symbols_generator[((i << 2) + 2) * k + j]) << 0);
+        }
+        if (typeof callback == 'function') {
+            random_string_array[(i << 2) + 2] = callback(random_string_array[(i << 2) + 2], (i << 2) + 2);
+        }
+        random_string_array[(i << 2) + 3] = '';
+        for (j = 0; j < k; j++) {
+            random_string_array[(i << 2) + 3] += alphabet.charAt((symbols * random_symbols_generator[((i << 2) + 3) * k + j]) << 0);
+        }
+        if (typeof callback == 'function') {
+            random_string_array[(i << 2) + 3] = callback(random_string_array[(i << 2) + 3], (i << 2) + 3);
+        }
+    }
+    if (n % 4 >= 1) {
+        random_string_array[n - 1] = '';
+        for (j = 0; j < k; j++) {
+            random_string_array[n - 1] += alphabet.charAt((symbols * random_symbols_generator[(n - 1) * k + j]) << 0);
+        }
+        if (typeof callback === 'function') {
+            random_string_array[n - 1] = callback(random_string_array[n - 1], n - 1);
+        }
+    }
+    if (n % 4 >= 2) {
+        random_string_array[n - 2] = '';
+        for (j = 0; j < k; j++) {
+            random_string_array[n - 2] += alphabet.charAt((symbols * random_symbols_generator[(n - 2) * k + j]) << 0);
+        }
+        if (typeof callback === 'function') {
+            random_string_array[n - 2] = callback(random_string_array[n - 2], n - 2);
+        }
+    }
+    if (n % 4 >= 3) {
+        random_string_array[n - 3] = '';
+        for (j = 0; j < k; j++) {
+            random_string_array[n - 1] += alphabet.charAt((symbols * random_symbols_generator[(n - 3) * k + j]) << 0);
+        }
+        if (typeof callback === 'function') {
+            random_string_array[n - 3] = callback(random_string_array[n - 3], n - 3);
+        }
+    }
+    return random_string_array;
+}
+
+/**
+ * 
+ * @param {Array} array 
+ * @param {boolean | 'decrease' | 'increase'} mode
+ * @description this utility function implements the
+ * Heap sort algorithm. The function uses the two
+ * sub-functions shift_down and heap_shift_down... 
+ */
+function heap_sort(array, mode) {
+    if (typeof mode === 'undefined') mode = true
+    if (mode === 'decrease') mode = false
+    const n = array.length
+    let i, j, k, m, t, sorted_array = [], sorted_indices = [], condition
+    i = 0
+    while (i < (n >> 2)) {
+        sorted_array[i << 2] = array[i << 2]
+        sorted_indices[i << 2] = i << 2
+        sorted_array[(i << 2) + 1] = array[(i << 2) + 1]
+        sorted_indices[(i << 2) + 1] = (i << 2) + 1
+        sorted_array[(i << 2) + 2] = array[(i << 2) + 2]
+        sorted_indices[(i << 2) + 2] = (i << 2) + 2
+        sorted_array[(i << 2) + 3] = array[(i << 2) + 3]
+        sorted_indices[(i << 2) + 3] = (i << 2) + 3
+        ++i
+    }
+    if (n % 4 >= 1) {
+        sorted_array[n - 1] = array[n - 1]
+        sorted_indices[n - 1] = n - 1
+    }
+    if (n % 4 >= 2) {
+        sorted_array[n - 2] = array[n - 2]
+        sorted_indices[n - 2] = n - 2
+    }
+    if (n % 4 >= 3) {
+        sorted_array[n - 3] = array[n - 3]
+        sorted_indices[n - 3] = n - 3
+    }
+    // transform the array into heap...
+    k = (n - 2) >> 1
+    while (k >= 0) {
+        // shift down
+        j = k
+        while ((j << 1) + 1 <= n - 1) {
+            m = j
+            condition = mode ? sorted_array[m] < sorted_array[(j << 1) + 1] : sorted_array[m] > sorted_array[(j << 1) + 1]
+            if (condition) m = (j << 1) + 1
+            condition = mode ? sorted_array[m] < sorted_array[(j + 1) << 1] : sorted_array[m] > sorted_array[(j + 1) << 1]
+            if ((j + 1) << 1 <= n - 1 && condition) m = (j + 1) << 1
+            if (m === j) break
+            else {
+                t = sorted_array[m]
+                sorted_array[m] = sorted_array[j]
+                sorted_array[j] = t
+                t = sorted_indices[m]
+                sorted_indices[m] = sorted_indices[j]
+                sorted_indices[j] = t
+                j = m
+            }
+        }
+        --k
+    }
+    // sort the array with the heap sort...
+    k = n - 1
+    while (k > 0) {
+        // swap the k and the 0 elements
+        t = sorted_array[0]
+        sorted_array[0] = sorted_array[k]
+        sorted_array[k] = t
+        t = sorted_indices[0]
+        sorted_indices[0] = sorted_indices[k]
+        sorted_indices[k] = t
+        --k
+        // shift down the subarray sorted_array[0:k]
+        i = 0
+        while ((i << 1) + 1 <= k) {
+            m = i
+            condition = mode ? sorted_array[m] < sorted_array[(i << 1) + 1] : sorted_array[m] > sorted_array[(i << 1) + 1]
+            if (condition) m = (i << 1) + 1
+            condition = mode ? sorted_array[m] < sorted_array[(i + 1) << 1] : sorted_array[m] > sorted_array[(i + 1) << 1]
+            if (((i + 1) << 1) <= k && condition) m = (i + 1) << 1
+            if (i === m) break
+            else {
+                t = sorted_array[m]
+                sorted_array[m] = sorted_array[i]
+                sorted_array[i] = t
+                t = sorted_indices[m]
+                sorted_indices[m] = sorted_indices[i]
+                sorted_indices[i] = t
+                i = m
+            }
+        }
+    }
+    return { array: sorted_array, indices: sorted_indices }
+}
+
+function insertion_sort(array, ascending_order) {
+    if (typeof ascending_order === 'undefined') ascending_order = true
+    if (ascending_order === 'decrease') ascending_order = false
+    const n = array.length
+    let i, j, sorted_array = [...array], p, k, condition,
+        sorted_indices = sorted_array.map((e, i) => e = i)
+    for (i = 1; i < n; i++) {
+        p = sorted_array[i]
+        k = sorted_indices[i]
+        j = i - 1
+        while (1) {
+            condition = ascending_order ? sorted_array[j] <= p : sorted_array[j] >= p
+            if (j < 0 || condition) break
+            sorted_array[j + 1] = sorted_array[j]
+            sorted_indices[j + 1] = sorted_indices[j]
+            --j
+        }
+        sorted_array[j + 1] = p
+        sorted_indices[j + 1] = k
+    }
+    return { array: sorted_array, indices: sorted_indices }
 }
 
 /**
@@ -211,7 +995,6 @@ function addElementInSortedObjectArrayByProperty(array, property, element) {
  * improve the speed and the time efficiency of the algorithm
  * more than two times according to our metrics.
  */
-
 function mergeSort(array, mode) {
     if (typeof mode === 'undefined') mode = true
     if (mode === 'decrease') mode = false
@@ -433,350 +1216,7 @@ function quickSort(array, mode) {
     }
     return { array: sorted_array, indices: sorted_indices }
 }
-/**
- * 
- * @method bubble_sort
- * @param {Array} array 
- * @param {boolean | 'decrease' | 'increase'} ascending_order
- * @description this utility function function
- * implements the bubble sort algorithm for the
- * sorting of an array.  
- */
-function bubble_sort(array, ascending_order) {
-    let sorted_array = [...array], condition,
-        i, j, sorted_indices = array.map((e, i) => i),
-        n = array.length, temp
-    if (typeof ascending_order === 'undefined') ascending_order = true
-    if (ascending_order === 'decrease') ascending_order = false
-    for (i = 0; i < n; i++) {
-        for (j = 0; j < n - 1; j++) {
-            if (ascending_order) condition = sorted_array[j + 1] > sorted_array[j]
-            else condition = sorted_array[j + 1] < sorted_array[j]
-            if (!condition) {
-                temp = sorted_array[j]
-                sorted_array[j] = sorted_array[j + 1]
-                sorted_array[j + 1] = temp
-                temp = sorted_indices[j]
-                sorted_indices[j] = sorted_indices[j + 1]
-                sorted_indices[j + 1] = temp
-            }
-        }
-    }
-    return { array: sorted_array, indices: sorted_indices }
-}
-/**
- * 
- * @param {Array} array 
- * @param {boolean | 'decrease' | 'increase'} mode
- * @description this utility function implements the
- * Heap sort algorithm. The function uses the two
- * sub-functions shift_down and heap_shift_down... 
- */
-function heap_sort(array, mode) {
-    if (typeof mode === 'undefined') mode = true
-    if (mode === 'decrease') mode = false
-    const n = array.length
-    let i, j, k, m, t, sorted_array = [], sorted_indices = [], condition
-    i = 0
-    while (i < (n >> 2)) {
-        sorted_array[i << 2] = array[i << 2]
-        sorted_indices[i << 2] = i << 2
-        sorted_array[(i << 2) + 1] = array[(i << 2) + 1]
-        sorted_indices[(i << 2) + 1] = (i << 2) + 1
-        sorted_array[(i << 2) + 2] = array[(i << 2) + 2]
-        sorted_indices[(i << 2) + 2] = (i << 2) + 2
-        sorted_array[(i << 2) + 3] = array[(i << 2) + 3]
-        sorted_indices[(i << 2) + 3] = (i << 2) + 3
-        ++i
-    }
-    if (n % 4 >= 1) {
-        sorted_array[n - 1] = array[n - 1]
-        sorted_indices[n - 1] = n - 1
-    }
-    if (n % 4 >= 2) {
-        sorted_array[n - 2] = array[n - 2]
-        sorted_indices[n - 2] = n - 2
-    }
-    if (n % 4 >= 3) {
-        sorted_array[n - 3] = array[n - 3]
-        sorted_indices[n - 3] = n - 3
-    }
-    // transform the array into heap...
-    k = (n - 2) >> 1
-    while (k >= 0) {
-        // shift down
-        j = k
-        while ((j << 1) + 1 <= n - 1) {
-            m = j
-            condition = mode ? sorted_array[m] < sorted_array[(j << 1) + 1] : sorted_array[m] > sorted_array[(j << 1) + 1]
-            if (condition) m = (j << 1) + 1
-            condition = mode ? sorted_array[m] < sorted_array[(j + 1) << 1] : sorted_array[m] > sorted_array[(j + 1) << 1]
-            if ((j + 1) << 1 <= n - 1 && condition) m = (j + 1) << 1
-            if (m === j) break
-            else {
-                t = sorted_array[m]
-                sorted_array[m] = sorted_array[j]
-                sorted_array[j] = t
-                t = sorted_indices[m]
-                sorted_indices[m] = sorted_indices[j]
-                sorted_indices[j] = t
-                j = m
-            }
-        }
-        --k
-    }
-    // sort the array with the heap sort...
-    k = n - 1
-    while (k > 0) {
-        // swap the k and the 0 elements
-        t = sorted_array[0]
-        sorted_array[0] = sorted_array[k]
-        sorted_array[k] = t
-        t = sorted_indices[0]
-        sorted_indices[0] = sorted_indices[k]
-        sorted_indices[k] = t
-        --k
-        // shift down the subarray sorted_array[0:k]
-        i = 0
-        while ((i << 1) + 1 <= k) {
-            m = i
-            condition = mode ? sorted_array[m] < sorted_array[(i << 1) + 1] : sorted_array[m] > sorted_array[(i << 1) + 1]
-            if (condition) m = (i << 1) + 1
-            condition = mode ? sorted_array[m] < sorted_array[(i + 1) << 1] : sorted_array[m] > sorted_array[(i + 1) << 1]
-            if (((i + 1) << 1) <= k && condition) m = (i + 1) << 1
-            if (i === m) break
-            else {
-                t = sorted_array[m]
-                sorted_array[m] = sorted_array[i]
-                sorted_array[i] = t
-                t = sorted_indices[m]
-                sorted_indices[m] = sorted_indices[i]
-                sorted_indices[i] = t
-                i = m
-            }
-        }
-    }
-    return { array: sorted_array, indices: sorted_indices }
-}
-/**
- * @param {Array.<string | number>} array
- * @param {number} count
- * @returns {{array : Array.<string | number>, indices : Array.<number>}}
- * @description this function finds out the first best n elements of
- * an unsorted array. To make this the function uses the heap sort
- * algorithm and stop when the count of n elements is reached. 
- */
-function find_best_elements(array, count) {
-    const n = array.length
-    let i, j, k, m, t, sorted_array = [],
-        sorted_indices = [], detected_items = [],
-        detected_indices = [], condition
-    i = 0
-    if (count === 0) return { array: [], indices: [] }
-    if (count === n) return heap_sort(array, true)
-    while (i < (n >> 2)) {
-        sorted_array[i << 2] = array[i << 2]
-        sorted_indices[i << 2] = i << 2
-        sorted_array[(i << 2) + 1] = array[(i << 2) + 1]
-        sorted_indices[(i << 2) + 1] = (i << 2) + 1
-        sorted_array[(i << 2) + 2] = array[(i << 2) + 2]
-        sorted_indices[(i << 2) + 2] = (i << 2) + 2
-        sorted_array[(i << 2) + 3] = array[(i << 2) + 3]
-        sorted_indices[(i << 2) + 3] = (i << 2) + 3
-        ++i
-    }
-    if (n % 4 >= 1) {
-        sorted_array[n - 1] = array[n - 1]
-        sorted_indices[n - 1] = n - 1
-    }
-    if (n % 4 >= 2) {
-        sorted_array[n - 2] = array[n - 2]
-        sorted_indices[n - 2] = n - 2
-    }
-    if (n % 4 >= 3) {
-        sorted_array[n - 3] = array[n - 3]
-        sorted_indices[n - 3] = n - 3
-    }
-    // transform the array into heap...
-    k = (n - 2) >> 1
-    while (k >= 0) {
-        // shift down
-        j = k
-        while ((j << 1) + 1 <= n - 1) {
-            m = j
-            condition = sorted_array[m] < sorted_array[(j << 1) + 1]
-            if (condition) m = (j << 1) + 1
-            condition = sorted_array[m] < sorted_array[(j + 1) << 1]
-            if ((j + 1) << 1 <= n - 1 && condition) m = (j + 1) << 1
-            if (m === j) break
-            else {
-                t = sorted_array[m]
-                sorted_array[m] = sorted_array[j]
-                sorted_array[j] = t
-                t = sorted_indices[m]
-                sorted_indices[m] = sorted_indices[j]
-                sorted_indices[j] = t
-                j = m
-            }
-        }
-        --k
-    }
-    // sort the array with the heap sort...
-    k = n - 1
-    while (k > n - count - 1) {
-        // swap the k and the 0 elements
-        t = sorted_array[0]
-        sorted_array[0] = sorted_array[k]
-        sorted_array[k] = t
-        detected_items[n - k - 1] = t
-        t = sorted_indices[0]
-        sorted_indices[0] = sorted_indices[k]
-        sorted_indices[k] = t
-        detected_indices[n - k - 1] = t
-        --k
-        // shift down the subarray sorted_array[0:k]
-        i = 0
-        while ((i << 1) + 1 <= k) {
-            m = i
-            condition = sorted_array[m] < sorted_array[(i << 1) + 1]
-            if (condition) m = (i << 1) + 1
-            condition = sorted_array[m] < sorted_array[(i + 1) << 1]
-            if (((i + 1) << 1) <= k && condition) m = (i + 1) << 1
-            if (i === m) break
-            else {
-                t = sorted_array[m]
-                sorted_array[m] = sorted_array[i]
-                sorted_array[i] = t
-                t = sorted_indices[m]
-                sorted_indices[m] = sorted_indices[i]
-                sorted_indices[i] = t
-                i = m
-            }
-        }
-    }
 
-    return { array: detected_items, indices: detected_indices }
-}
-/**
- * 
- * @param {Array.<number | string>} array 
- * @param {number} count - an integer number
- * @returns {{array : Array.<number | string>, indices : Array.<number>}}
- * @description this algorithm finds out the first count worts elements
- * of an array which is contained from number or string elements. The
- * method uses the heap sort algorithm and fast copy of the arrays.
- *   
- */
-function find_worst_elements(array, count) {
-    const n = array.length
-    let i, j, k, m, t, sorted_array = [],
-        sorted_indices = [], condition, detected_items = [],
-        detected_indices = []
-    i = 0
-    while (i < (n >> 2)) {
-        sorted_array[i << 2] = array[i << 2]
-        sorted_indices[i << 2] = i << 2
-        sorted_array[(i << 2) + 1] = array[(i << 2) + 1]
-        sorted_indices[(i << 2) + 1] = (i << 2) + 1
-        sorted_array[(i << 2) + 2] = array[(i << 2) + 2]
-        sorted_indices[(i << 2) + 2] = (i << 2) + 2
-        sorted_array[(i << 2) + 3] = array[(i << 2) + 3]
-        sorted_indices[(i << 2) + 3] = (i << 2) + 3
-        ++i
-    }
-    if (n % 4 >= 1) {
-        sorted_array[n - 1] = array[n - 1]
-        sorted_indices[n - 1] = n - 1
-    }
-    if (n % 4 >= 2) {
-        sorted_array[n - 2] = array[n - 2]
-        sorted_indices[n - 2] = n - 2
-    }
-    if (n % 4 >= 3) {
-        sorted_array[n - 3] = array[n - 3]
-        sorted_indices[n - 3] = n - 3
-    }
-    // transform the array into heap...
-    k = (n - 2) >> 1
-    while (k >= 0) {
-        // shift down
-        j = k
-        while ((j << 1) + 1 <= n - 1) {
-            m = j
-            condition = sorted_array[m] > sorted_array[(j << 1) + 1]
-            if (condition) m = (j << 1) + 1
-            condition = sorted_array[m] > sorted_array[(j + 1) << 1]
-            if ((j + 1) << 1 <= n - 1 && condition) m = (j + 1) << 1
-            if (m === j) break
-            else {
-                t = sorted_array[m]
-                sorted_array[m] = sorted_array[j]
-                sorted_array[j] = t
-                t = sorted_indices[m]
-                sorted_indices[m] = sorted_indices[j]
-                sorted_indices[j] = t
-                j = m
-            }
-        }
-        --k
-    }
-    // sort the array with the heap sort...
-    k = n - 1
-    while (k > n - count - 1) {
-        // swap the k and the 0 elements
-        t = sorted_array[0]
-        sorted_array[0] = sorted_array[k]
-        sorted_array[k] = t
-        detected_items[n - k - 1] = t
-        t = sorted_indices[0]
-        sorted_indices[0] = sorted_indices[k]
-        sorted_indices[k] = t
-        detected_indices[n - k - 1] = t
-        --k
-        // shift down the subarray sorted_array[0:k]
-        i = 0
-        while ((i << 1) + 1 <= k) {
-            m = i
-            condition = sorted_array[m] > sorted_array[(i << 1) + 1]
-            if (condition) m = (i << 1) + 1
-            condition = sorted_array[m] > sorted_array[(i + 1) << 1]
-            if (((i + 1) << 1) <= k && condition) m = (i + 1) << 1
-            if (i === m) break
-            else {
-                t = sorted_array[m]
-                sorted_array[m] = sorted_array[i]
-                sorted_array[i] = t
-                t = sorted_indices[m]
-                sorted_indices[m] = sorted_indices[i]
-                sorted_indices[i] = t
-                i = m
-            }
-        }
-    }
-    return { array: detected_items, indices: detected_indices }
-}
-function insertion_sort(array, ascending_order) {
-    if (typeof ascending_order === 'undefined') ascending_order = true
-    if (ascending_order === 'decrease') ascending_order = false
-    const n = array.length
-    let i, j, sorted_array = [...array], p, k, condition,
-        sorted_indices = sorted_array.map((e, i) => e = i)
-    for (i = 1; i < n; i++) {
-        p = sorted_array[i]
-        k = sorted_indices[i]
-        j = i - 1
-        while (1) {
-            condition = ascending_order ? sorted_array[j] <= p : sorted_array[j] >= p
-            if (j < 0 || condition) break
-            sorted_array[j + 1] = sorted_array[j]
-            sorted_indices[j + 1] = sorted_indices[j]
-            --j
-        }
-        sorted_array[j + 1] = p
-        sorted_indices[j + 1] = k
-    }
-    return { array: sorted_array, indices: sorted_indices }
-}
 
 /**
  * 
@@ -811,105 +1251,7 @@ function selection_sort(array, mode) {
     return { array: sorted_array, indices: sorted_indices }
 }
 
-/**
- * 
- * @param {Array.<number | string>} array 
- * @param {boolean | 'increase' | 'decrease'} mode
- * @returns {{array : Array.<number | string>, indices : Array.<number>}}
- * @description this utility function implements
- * the cocktail sorting algorithm that is a variant
- * of the bubble sort algorithm. Note that this algorithm
- * is not fast (has complexity proportional to O(n^2)).
- */
-function cocktail_sort(array, mode) {
-    let n = array.length, sorted_array = [...array],
-        indices = Array.from({ length: n }).map((e, i) => e = i)
-    let i, start, end, condition, temp, swapped = true
 
-    if (typeof mode === 'undefined') mode = true
-    if (mode === 'decrease') mode = false
-    start = 0
-    end = n - 1
-    while (swapped) {
-        swapped = false
-        for (i = start; i < end; i++) {
-            condition = mode ? sorted_array[i] > sorted_array[i + 1] : sorted_array[i] < sorted_array[i + 1]
-            if (condition) {
-                temp = sorted_array[i]
-                sorted_array[i] = sorted_array[i + 1]
-                sorted_array[i + 1] = temp
-                temp = indices[i]
-                indices[i] = indices[i + 1]
-                indices[i + 1] = temp
-                swapped = true
-            }
-        }
-        if (!swapped) break
-        swapped = false
-        --end
-        for (i = end - 1; i > start - 1; i--) {
-            condition = mode ? sorted_array[i] > sorted_array[i + 1] : sorted_array[i] < sorted_array[i + 1]
-            if (condition) {
-                temp = sorted_array[i]
-                sorted_array[i] = sorted_array[i + 1]
-                sorted_array[i + 1] = temp
-                temp = indices[i]
-                indices[i] = indices[i + 1]
-                indices[i + 1] = temp
-                swapped = true
-            }
-        }
-        ++start
-    }
-    return { array: sorted_array, indices }
-}
-
-/**
- * 
- * @param {Array.<number>} array 
- * @param {boolean | 'increase' | 'decrease'} mode
- * @returns {{array : Array.<number>, indices: Array.<number>}}
- * @description this utility function implements
- * the bucket sort algorithm. Note that this
- * algorithm is not fast sorting algorithm and
- * has worst complexity of O(n^2) and average
- * time complexity of O(n + n^2 / k + k), where
- * the k is the count of the buckets.
- *  
- */
-function bucket_sort(array, buckets, mode) {
-    if (typeof mode === 'undefined') mode = true
-    if (mode === 'decrease') mode = false
-    let sorted_array = [], i, j, temp, min, indices = [],
-        temp_array = [], temp_indices = [], n, max
-    for (i = 0; i < buckets; i++) {
-        temp_array.push([])
-        temp_indices.push([])
-    }
-    // find the biggest element of the array.
-    max = array[0]
-    n = array.length
-    for (i = 0; i < n; i++) if (array[i] > max) max = array[i]
-    // find the min element:
-    min = array[0]
-    for (i = 0; i < n; i++) if (array[i] < min) min = array[i]
-    // push the arrays into the right sub-array of the temp_array
-    for (i = 0; i < n; i++) {
-        j = (((array[i] - min) / (max - min)) * (buckets - 1)) | 0
-        temp_array[j].push(array[i])
-        temp_indices[j].push(i)
-    }
-    // sort all the subarrays of the temp and concatenate then to
-    // the sorted_array
-    for (j = mode ? 0 : buckets - 1; mode ? j < buckets : j >= 0; mode ? j++ : j--) {
-        temp = insertion_sort(temp_array[j], mode)
-        sorted_array.push(...temp.array)
-        indices.push(...temp.indices.map(el => {
-            return temp_indices[j][el]
-        }))
-    }
-    return { array: sorted_array, indices }
-}
 /**
  * 
  * @param {Array.<object>} array 
@@ -1446,15 +1788,8 @@ function SortArray(array, method, ascending_order = true) {
 }
 
 const sorting_algorithms = {
+    addElementInSortedArray,
     addElementInSortedObjectArrayByProperty,
-    SortArray,
-    PutInSortedArray,
-    merge_sort: mergeSort,
-    MergeSort: mergeSort,
-    Merge_sort: mergeSort,
-    quick_sort: quickSort,
-    QuickSort: quickSort,
-    Quick_sort: quickSort,
     bubble_sort,
     BubbleSort: bubble_sort,
     Bubble_sort: bubble_sort,
@@ -1464,26 +1799,37 @@ const sorting_algorithms = {
     cocktail_sort,
     CocktailSort: cocktail_sort,
     cocktailSort: cocktail_sort,
+    filterWithValidator,
+    find_best_elements: find_best_elements,
+    findBestElements: find_best_elements,
+    FindBestElements: find_best_elements,
+    find_best_for_object_array_by_property,
+    findElementsInSortedArray,
+    findElementsInSortedObjectArray,
+    find_worst_elements: find_worst_elements,
+    findWorstElements: find_worst_elements,
+    FindWorstElements: find_worst_elements,
+    find_worst_for_object_array_by_property,
+    generate_random_array: generate_random_array,
+    GenerateRandomArray: generate_random_array,
+    Generate_random_array: generate_random_array,
+    generate_random_string_array,
     heap_sort,
     heapSort: heap_sort,
     HeapSort: heap_sort,
     insertion_sort,
     insertionSort: insertion_sort,
     InsertionSort: insertion_sort,
+    merge_sort: mergeSort,
+    MergeSort: mergeSort,
+    Merge_sort: mergeSort,
+    quick_sort: quickSort,
+    QuickSort: quickSort,
+    Quick_sort: quickSort,
     selection_sort,
     selectionSort: selection_sort,
     SelectionSort: selection_sort,
-    generate_random_array: random_array_generator,
-    GenerateRandomArray: random_array_generator,
-    Generate_random_array: random_array_generator,
-    find_best_elements: find_best_elements,
-    findBestElements: find_best_elements,
-    FindBestElements: find_best_elements,
-    find_worst_elements: find_worst_elements,
-    findWorstElements: find_worst_elements,
-    FindWorstElements: find_worst_elements,
+    SortArray,
     sort_object_array_by_property: sort_object_array_by_property,
-    find_best_for_object_array_by_property,
-    find_worst_for_object_array_by_property,
 }
 module.exports = sorting_algorithms;
