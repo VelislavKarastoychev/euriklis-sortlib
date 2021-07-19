@@ -466,10 +466,16 @@ class SortLib {
         new validator(n).is_undefined()
             .on(true, () => n = array.length)
         new validator(n).not().is_number()
-            .on(true, () => warnings.IncorrectCountParameterInFindBestElements())
+            .on(true, () => {
+                warnings.IncorrectCountParameterInFindBestElements()
+            })
         new validator(n).is_integer().and().is_in_closed_range(1, array.length)
-            .or().is_float().and().is_in_range(0, 1)
-            .on(false, () => warnings.IncorrectCountParameterInFindBestElements());
+            .on(false, () => {
+                new validator(n).is_float().and().is_in_range(0, 1)
+                .on(false, () => {
+                    warnings.IncorrectCountParameterInFindBestElements()
+                });
+            });
         new validator(n).is_float().and().is_in_range(0, 1)
             .on(true, () => {
                 n = ((array.length * n) >> 0);
