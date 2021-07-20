@@ -286,6 +286,79 @@ function cocktail_sort(array, mode) {
 }
 
 /**
+ * 
+ * @param {Array.<any>} array 
+ * @param {function(validator, number)} callback
+ * @returns {{array: Array, indices: Array.<number>}}
+ * @description this function localize all array elements
+ * which satisfy the callback validator condition.
+ * @example
+ * const array = [{id: 1}, {id: 2, {id: 3}, {id: 4}, {id: 5}];
+ * const filter = SortLib.filter_with_validator(array, (el, iter) => {
+ *    return el.interface2({id: id => id.is_lesser_than(4)});
+ * });
+ */
+function filterWithValidator(array, callback) {
+    let arr_v, v;
+    const n = array.length, output = { array: [], indices: [] };
+    for (let i = 0; i < n >> 2; i++) {
+        v = i << 2;
+        arr_v = new validator(array[v]);
+        new validator(callback(arr_v, v).answer).is_same(true)
+            .on(true, () => {
+                output.array.push(array[v]);
+                output.indices.push(v);
+            });
+        v = (i << 2) + 1;
+        arr_v = new validator(array[v]);
+        new validator(callback(arr_v, v).answer).is_same(true)
+            .on(true, () => {
+                output.array.push(array[v]);
+                output.indices.push(v);
+            });
+        v = (i << 2) + 2;
+        arr_v = new validator(array[v]);
+        new validator(callback(arr_v, v).answer).is_same(true)
+            .on(true, () => {
+                output.array.push(array[v]);
+                output.indices.push(v);
+            });
+        v = (i << 2) + 3;
+        arr_v = new validator(array[v]);
+        new validator(callback(arr_v, v).answer).is_same(true)
+            .on(true, () => {
+                output.array.push(array[v]);
+                output.indices.push(v);
+            });
+    }
+    if (n % 4 >= 1) {
+        arr_v = new validator(array[n - 1]);
+        new validator(callback(arr_v, n - 1).answer).is_same(true)
+            .on(true, () => {
+                output.array.push(array[n - 1]);
+                output.indices.push(n - 1);
+            });
+    }
+    if (n % 4 >= 2) {
+        arr_v = new validator(array[n - 2]);
+        new validator(callback(arr_v, n - 2).answer).is_same(true)
+            .on(true, () => {
+                output.array.push(array[n - 2]);
+                output.indices.push(n - 2);
+            });
+    }
+    if (n % 4 >= 3) {
+        arr_v = new validator(array[n - 3]);
+        new validator(callback(arr_v, n - 3).answer).is_same(true)
+            .on(true, () => {
+                output.array.push(array[n - 3]);
+                output.indices.push(n - 3);
+            });
+    }
+    return output;
+}
+
+/**
  * @param {Array.<string | number>} array
  * @param {number} count
  * @returns {{array : Array.<string | number>, indices : Array.<number>}}
@@ -384,77 +457,166 @@ function find_best_elements(array, count) {
 
     return { array: detected_items, indices: detected_indices }
 }
+
+
 /**
  * 
- * @param {Array.<any>} array 
- * @param {function(validator, number)} callback
- * @returns {{array: Array, indices: Array.<number>}}
- * @description this function localize all array elements
- * which satisfy the callback validator condition.
- * @example
- * const array = [{id: 1}, {id: 2, {id: 3}, {id: 4}, {id: 5}];
- * const filter = SortLib.filter_with_validator(array, (el, iter) => {
- *    return el.interface2({id: id => id.is_lesser_than(4)});
- * });
+ * @param {Array.<Object>} array 
+ * @param {string | Array.<string>} property
+ * @param {number} count - has to be integer
+ * @return {{array : Array.<Object>, indices : Array.<number>}}
+ * @description this function is used in the static method
+ * find_best_for_object_array_by_property to extract the first
+ * count element that have the hightest values. The property is the
+ * key value of the object or the keys that are nested into the object.
+ * If some element has undefined value for the last level of the object,
+ * then this element will be omitted, otherwise an error message will be
+ * thrown. 
  */
-function filterWithValidator(array, callback) {
-    let arr_v, v;
-    const n = array.length, output = { array: [], indices: [] };
-    for (let i = 0; i < n >> 2; i++) {
-        v = i << 2;
-        arr_v = new validator(array[v]);
-        new validator(callback(arr_v, v).answer).is_same(true)
-            .on(true, () => {
-                output.array.push(array[v]);
-                output.indices.push(v);
-            });
-        v = (i << 2) + 1;
-        arr_v = new validator(array[v]);
-        new validator(callback(arr_v, v).answer).is_same(true)
-            .on(true, () => {
-                output.array.push(array[v]);
-                output.indices.push(v);
-            });
-        v = (i << 2) + 2;
-        arr_v = new validator(array[v]);
-        new validator(callback(arr_v, v).answer).is_same(true)
-            .on(true, () => {
-                output.array.push(array[v]);
-                output.indices.push(v);
-            });
-        v = (i << 2) + 3;
-        arr_v = new validator(array[v]);
-        new validator(callback(arr_v, v).answer).is_same(true)
-            .on(true, () => {
-                output.array.push(array[v]);
-                output.indices.push(v);
-            });
+function find_best_for_object_array_by_property(array, property, count) {
+    const n = array.length
+    let i, j, k, sorted_array = [],
+        sorted_indices = [], item, temp,
+        temp_array = [], temp_indices = []
+    // copy the array values in the temporary array.
+    for (i = 0; i < n >> 2; i++) {
+        // if the array elements are not
+        // objects throw error.
+        new validator(array[i << 2]).not().is_object()
+            .or().bind(new validator(array[(i << 2) + 1]).not().is_object())
+            .or().bind(new validator(array[(i << 2) + 2]).not().is_object())
+            .or().bind(new validator(array[(i << 2) + 3]).not().is_object())
+            .on(true, () => errors.IncorrectArrayParameterInFindBestInObjectArray())
+        k = 0
+        while (k <= 3) {
+            item = array[(i << 2) + k]
+            if (typeof property === 'string') temp = item[property]
+            else {
+                // the property is a string array
+                for (j = 0; j < property.length; j++) {
+                    new validator(j).is_lesser_than(property.length - 1)
+                        .and().bind(new validator(item).not().is_object())
+                        .on(true, () => {
+                            errors.IncorrectPropertyParameterInFindBestInObjectArray()
+                        })
+                    item = item[property[j]]
+                }
+                temp = item
+            }
+            new validator(temp).is_string().and().is_number()
+                .on(false, () => {
+                    temp_array.push(temp)
+                    temp_indices.push((i << 2) + k)
+                })
+            ++k
+        }
     }
     if (n % 4 >= 1) {
-        arr_v = new validator(array[n - 1]);
-        new validator(callback(arr_v, n - 1).answer).is_same(true)
-        .on(true, () => {
-            output.array.push(array[n - 1]);
-            output.indices.push(n - 1);
-        });
+        item = array[n - 1]
+        new validator(item).not().is_object()
+            .on(true, () => errors.IncorrectArrayParameterInFindBestInObjectArray())
+        if (typeof property === 'string') temp = item[property]
+        else {
+            for (j = 0; j < property.length; j++) {
+                new validator(j).is_lesser_than(property.length - 1)
+                    .and().bind(new validator(item).not().is_object())
+                    .on(true, () => {
+                        errors.IncorrectPropertyParameterInFindBestInObjectArray()
+                    })
+                item = item[property[j]]
+            }
+            temp = item
+        }
+        new validator(temp).not().is_number().and()
+            .not().is_string()
+            .on(false, () => {
+                temp_array.push(temp)
+                temp_indices.push(n - 1)
+            })
     }
     if (n % 4 >= 2) {
-        arr_v = new validator(array[n - 2]);
-        new validator(callback(arr_v, n - 2).answer).is_same(true)
-        .on(true, () => {
-            output.array.push(array[n - 2]);
-            output.indices.push(n - 2);
-        });
+        item = array[n - 2]
+        new validator(item).not().is_object()
+            .on(true, () => errors.IncorrectArrayParameterInFindBestInObjectArray())
+        if (typeof property === 'string') {
+            temp = item[property]
+        } else {
+            for (j = 0; j < property.length; j++) {
+                new validator(j).is_lesser_than(property.length - 1)
+                    .and().bind(new validator(item).not().is_object())
+                    .on(true, () => {
+                        errors.IncorrectPropertyParameterInFindBestInObjectArray()
+                    }).on(false, () => {
+                        item = item[property[j]]
+                    })
+            }
+            temp = item
+        }
+        new validator(temp).is_string().or().is_number()
+            .on(true, () => {
+                temp_array.push(temp)
+                temp_indices.push(n - 2)
+            }).on(false, () => {
+                errors.IncorrectArrayParameterInFindBestInObjectArray()
+            })
     }
     if (n % 4 >= 3) {
-        arr_v = new validator(array[n - 3]);
-        new validator(callback(arr_v, n - 3).answer).is_same(true)
-        .on(true, () => {
-            output.array.push(array[n - 3]);
-            output.indices.push(n - 3);
-        });
+        item = array[n - 3]
+        new validator(item).not().is_object()
+            .on(true, () => errors.IncorrectArrayParameterInFindBestInObjectArray())
+        if (typeof property === 'string') temp = item[property]
+        else {
+            for (j = 0; j < property.length; j++) {
+                new validator(j).is_lesser_than(property.length)
+                    .and().bind(new validator(item).not().is_object())
+                    .on(true, () => {
+                        errors.IncorrectPropertyParameterInFindBestInObjectArray()
+                    })
+                item = item[property[j]]
+            }
+            temp = item
+        }
+        new validator(temp).is_string().or().is_number()
+            .on(true, () => {
+                temp_array.push(temp)
+                temp_indices.push(n - 3)
+            }).on(false, () => errors.IncorrectArrayParameterInFindBestInObjectArray())
     }
-    return output;
+    // get the first best elements
+    temp = find_best_elements(temp_array, count)
+    // copy the result into the sorted_array and the
+    // sorted indices...
+    k = temp.indices.length
+    for (i = 0; i < k >> 2; i++) {
+        j = temp.indices[i << 2]
+        sorted_indices[i << 2] = temp_indices[j]
+        sorted_array[i << 2] = array[sorted_indices[i << 2]]
+        j = temp.indices[(i << 2) + 1]
+        sorted_indices[(i << 2) + 1] = temp_indices[j]
+        sorted_array[(i << 2) + 1] = array[sorted_indices[(i << 2) + 1]]
+        j = temp.indices[(i << 2) + 2]
+        sorted_indices[(i << 2) + 2] = temp_indices[j]
+        sorted_array[(i << 2) + 2] = array[sorted_indices[(i << 2) + 2]]
+        j = temp.indices[(i << 2) + 3]
+        sorted_indices[(i << 2) + 3] = temp_indices[j]
+        sorted_array[(i << 2) + 3] = array[sorted_indices[(i << 2) + 3]]
+    }
+    if (k % 4 >= 1) {
+        j = temp.indices[k - 1]
+        sorted_indices[k - 1] = temp_indices[j]
+        sorted_array[k - 1] = array[sorted_indices[k - 1]]
+    }
+    if (k % 4 >= 2) {
+        j = temp.indices[k - 2]
+        sorted_indices[k - 2] = temp_indices[j]
+        sorted_array[k - 2] = array[sorted_indices[k - 2]]
+    }
+    if (k % 4 >= 3) {
+        j = temp.indices[k - 3]
+        sorted_indices[k - 3] = temp_indices[j]
+        sorted_array[k - 3] = array[sorted_indices[k - 3]]
+    }
+    return { array: sorted_array, indices: sorted_indices }
 }
 
 /**
@@ -710,6 +872,177 @@ function find_worst_elements(array, count) {
         }
     }
     return { array: detected_items, indices: detected_indices }
+}
+
+/**
+ * 
+ * @param {Array.<object>} array 
+ * @param {string | Array.<string>} property 
+ * @param {number} count - an integer number
+ * @returns {{array : Array.<object>, indices : Array.<number>}}
+ * @description this utility function is used for the static
+ * method find_worst_for_object_array_by_property and computes
+ * the first worst count elements form an array each element
+ * of which is an object by given property(es) of the object.
+ * If the property is string array and the value of the array
+ * is not object for each property of the property, except the
+ * last level of the property array, then an error message will
+ * be thrown. Also if every element of the array is not object
+ * an error message will be thrown. If the last level property value
+ * is not string or number value, then this element will be omitted
+ * from the function and then output array will be all the elements that
+ * contains the corresponding property. 
+ */
+function find_worst_for_object_array_by_property(array, property, count) {
+    let i, item, j, k, n, sorted_array = [],
+        sorted_indices = [], temp, temp_array = [],
+        temp_indices = []
+    n = array.length
+    for (i = 0; i < n >> 2; i++) {
+        new validator(array[i << 2]).not().is_object()
+            .or().bind(
+                new validator(array[(i << 2) + 1]).not().is_object()
+            )
+            .or().bind(
+                new validator(array[(i << 2) + 2]).not().is_object()
+            )
+            .or().bind(
+                new validator(array[(i << 2) + 3]).not().is_object()
+            )
+            .on(true, () => errors.IncorrectArrayParameterInFindWorstInObjectArray())
+        k = 0
+        while (k <= 3) {
+            item = array[(i << 2) + k]
+            if (typeof property === 'string') temp = item[property]
+            else {
+                for (j = 0; j < property.length; j++) {
+                    new validator(j).is_lesser_than(property.length - 1)
+                        .and().bind(new validator(item).not().is_object())
+                        .on(true, () => {
+                            errors.IncorrectPropertyParameterInFindWorstInObjectArray()
+                        })
+                    item = item[property[j]]
+                }
+                temp = item
+            }
+            new validator(temp).is_string().or().is_number()
+                .on(true, () => {
+                    temp_array.push(temp)
+                    temp_indices.push((i << 2) + k)
+                })
+            ++k
+        }
+    }
+    if (n % 4 >= 1) {
+        item = array[n - 1]
+        new validator(item).not().is_object()
+            .on(true, () => {
+                errors.IncorrectArrayParameterInFindWorstInObjectArray()
+            })
+        if (typeof property === 'string') temp = item[property]
+        else {
+            for (j = 0; j < property.length; j++) {
+                new validator(j).is_lesser_than(property.length - 1)
+                    .and().bind(new validator(item).not().is_object())
+                    .on(true, () => {
+                        errors.IncorrectPropertyParameterInFindWorstInObjectArray()
+                    })
+                item = item[property[j]]
+            }
+            temp = item
+        }
+        new validator(temp).is_string().or().is_number()
+            .on(true, () => {
+                temp_array.push(temp)
+                temp_indices.push(n - 1)
+            })
+    }
+    if (n % 4 >= 2) {
+        item = array[n - 2]
+        new validator(item).not().is_object()
+            .on(true, () => {
+                errors.IncorrectArrayParameterInFindWorstInObjectArray()
+            })
+        if (typeof property === 'string') temp = item[property]
+        else {
+            for (j = 0; j < property.length; j++) {
+                new validator(j).is_lesser_than(property.length - 1)
+                    .and().bind(new validator(item).not().is_object())
+                    .on(true, () => {
+                        errors.IncorrectPropertyParameterInFindWorstInObjectArray()
+                    })
+                item = item[property[j]]
+            }
+            temp = item
+        }
+        new validator(item).is_string().or().is_number()
+            .on(true, () => {
+                temp_array.push(temp)
+                temp_indices.push(n - 2)
+            })
+    }
+    if (n % 4 >= 3) {
+        item = array[n - 3]
+        new validator(item).not().is_object()
+            .on(true, () => {
+                errors.IncorrectArrayParameterInFindWorstInObjectArray()
+            })
+        if (typeof property === 'string') temp = item[property]
+        else {
+            for (j = 0; j < property.length; j++) {
+                new validator(j).is_lesser_than(property.length - 1)
+                    .and().bind(new validator(item).not().is_object())
+                    .on(true, () => {
+                        errors.IncorrectPropertyParameterInFindWorstInObjectArray()
+                    })
+                item = item[property[j]]
+            }
+            temp = item
+        }
+        new validator(temp).is_string().or().is_number()
+            .on(true, () => {
+                temp_array.push(temp)
+                temp_indices.push(n - 3)
+            })
+    }
+    // find the worst elements of the temp_array...
+    temp = find_worst_elements(temp_array, count)
+    // copy the elements into the sorted_array
+    n = temp.indices.length
+    for (i = 0; i < n >> 2; i++) {
+        k = i << 2
+        j = temp.indices[k]
+        sorted_indices[k] = temp_indices[j]
+        sorted_array[k] = array[sorted_indices[k]]
+        ++k
+        j = temp.indices[k]
+        sorted_indices[k] = temp_indices[j]
+        sorted_array[k] = array[sorted_indices[k]]
+        ++k
+        j = temp.indices[k]
+        sorted_indices[k] = temp_indices[j]
+        sorted_array[k] = array[sorted_indices[k]]
+        ++k
+        j = temp.indices[k]
+        sorted_indices[k] = temp_indices[j]
+        sorted_array[k] = array[sorted_indices[k]]
+    }
+    if (n % 4 >= 1) {
+        j = temp.indices[n - 1]
+        sorted_indices[n - 1] = temp_indices[j]
+        sorted_array[n - 1] = array[sorted_indices[n - 1]]
+    }
+    if (n % 4 >= 2) {
+        j = temp.indices[n - 2]
+        sorted_indices[n - 2] = temp_indices[j]
+        sorted_array[n - 2] = array[sorted_indices[n - 2]]
+    }
+    if (n % 4 >= 3) {
+        j = temp.indices[n - 3]
+        sorted_indices[n - 3] = temp_indices[j]
+        sorted_array[n - 3] = array[sorted_indices[n - 3]]
+    }
+    return { array: sorted_array, indices: sorted_indices }
 }
 
 /**
@@ -1216,8 +1549,126 @@ function quickSort(array, mode) {
     }
     return { array: sorted_array, indices: sorted_indices }
 }
+/**
+ * 
+ * @param {Array.<string | number>} array 
+ * @param {string | number} element
+ * @param {boolean | 'increase' | 'decrease'} [mode]
+ * @returns {Array.<number | string>}
+ * @description this function returns an updated array
+ * from the initial array parameter, which does not contains
+ * the element parameter in it. If the element however does not
+ * exists in the array, then the initial array will be returned
+ * as output without any changes. The array is assumed to be sorted.
+ * Note that this element returns only the first element which is
+ * equals to the element. The method uses the bisection method.
+ */
+function removeElementFromSortedArray(array, element, mode) {
+    const n = array.length, updatedArray = [];
+    if (typeof mode === 'undefined') mode = true;
+    if (mode === 'decrease') mode = false;
+    const undefined_element = new validator(element).is_undefined().and().not().is_number()
+        .and().not().is_string().answer;
+    if (undefined_element) return array;
+    let i, j, start = 0, end = n - 1, middle, condition;
+    while (true) {
+        middle = (start + end) >> 1;
+        condition = mode ? array[middle] >= element : array[middle] <= element;
+        if (start === end && middle === end) break;
+        if (condition) end = middle;
+        else start = middle + 1;
+    }
+    // in this phase we have located the index of the element that
+    // is at least equal to the element.
+    if (new validator(array[middle]).is_same(element).answer) {
+        // for all elements of the array form 0 to middle
+        // make copy of the array, and then continue without the
+        // element array[middle].
+        for (i = 0; i < (n - 1) >> 2; i++) {
+            j = i << 2;
+            if (j < middle) updatedArray[j] = array[j];
+            if (j > middle) updatedArray[j] = array[j + 1];
+            ++j;
+            if (j < middle) updatedArray[j] = array[j];
+            if (j > middle) updatedArray[j] = array[j + 1];
+            ++j;
+            if (j < middle) updatedArray[j] = array[j];
+            if (j > middle) updatedArray[j] = array[j + 1];
+            ++j;
+            if (j < middle) updatedArray[j] = array[j];
+            if (j > middle) updatedArray[j] = array[j + 1];
+        }
+        if ((n - 1) % 4 >= 1) {
+            if ((n - 1) > middle) updatedArray[n - 2] = array[n - 1];
+            if ((n - 1) < middle) updatedArray[n - 2] = array[n - 2]; // this is not possible
+        }
+        if ((n - 1) % 4 >= 2) {
+            if ((n - 2) > middle) updatedArray[n - 3] = array[n - 2];
+            if ((n - 2) < middle) updatedArray[n - 3] = array[n - 3];
+        }
+        if ((n - 1) % 4 >= 3) {
+            if ((n - 3) > middle) updatedArray[n - 4] = array[n - 3];
+            if ((n - 3) < middle) updatedArray[n - 4] = array[n - 4];
+        }
+    } else return array;
+    return updatedArray;
+}
 
-
+/**
+ * 
+ * @param {Array.<object>} array
+ * @param {string | Array.<string>} property
+ * @param {object} element
+ * @param {boolean | 'increase' | 'decrease'} [mode]
+ * @returns {Array.<object>}
+ * @description this function returns an array which does
+ * not consists the element parameter. If this parameter does 
+ * not exists in the underlined array, then the same array will 
+ * be returned as output, but if the element exists in the array
+ * it will be removed. The difference with the remove_element_form_sorted_array
+ * is that in this method we assume that the array is relatively sorted, i.e.,
+ * the array is sorted by some object property.  
+ */
+function removeElementFromSortedObjectArray(array, property, element, mode) {
+    // the steps which we will realize will be the following:
+    // set start = 0, end = n - 1
+    // following criteria:
+    // while true:
+    // set middle = floor((start + end) / 2)
+    // for all elements of the property if are not object with exception to the last element,
+    // then throw an error of the array parameter.
+    // let arr_el = array[middle][last level of the property array]
+    // set condition = mode is true ? arr_el >= el_p : arr_el <= el_p
+    // if start = end = middle stop
+    // if condition is true , set end = middle, otherwise start = middle + 1
+    // if array[middle] is equals to the element, then copy the array in the updatedArray except the array[middle] element
+    // otherwise return the array
+    if (typeof mode === 'undefined') mode = true;
+    if (mode === 'decrease') mode = false;
+    if (new validator(element).is_undefined().or().not().is_object().answer) return array;
+    new validator(property).is_string().on(true, () => property = [property]);
+    const n = array.length, m = property.length;
+    let i, j, start = 0, end = n - 1, middle, arr_el, el_p = Object.assign({}, element);
+    for (i = 0; i < m; i++) {
+        new validator(el_p[property[i]]).is_object()
+            .and().bind(new validator(i).is_lesser_than(m - 1))
+            .on(true, () => el_p = el_p[property[i]])
+            .on(false, () => {
+                if (i !== m - 1) errors.IncorrectPropertyParameterInRemoveElementFromSortedObjectArray();
+            });
+        new validator(el_p[property[i]]).is_string().or().is_number()
+            .and().bind(
+                new validator(i).is_same(m - 1)
+            ).on(true, () => el_p = el_p[property[i]])
+            .on(false, () => {
+                if (i === m - 1) errors.IncorrectPropertyParameterInRemoveElementInSortedObjectArray();
+            });
+        while (true) {
+            
+        }
+    }
+    return updatedArray;
+}
 /**
  * 
  * @param {Array.<number | string>} array 
@@ -1435,335 +1886,6 @@ function sort_object_array_by_property(array, property, mode, algorithm) {
     }
     return { array: sorted_array, indices: sorted_indices }
 }
-/**
- * 
- * @param {Array.<Object>} array 
- * @param {string | Array.<string>} property
- * @param {number} count - has to be integer
- * @return {{array : Array.<Object>, indices : Array.<number>}}
- * @description this function is used in the static method
- * find_best_for_object_array_by_property to extract the first
- * count element that have the hightest values. The property is the
- * key value of the object or the keys that are nested into the object.
- * If some element has undefined value for the last level of the object,
- * then this element will be omitted, otherwise an error message will be
- * thrown. 
- */
-function find_best_for_object_array_by_property(array, property, count) {
-    const n = array.length
-    let i, j, k, sorted_array = [],
-        sorted_indices = [], item, temp,
-        temp_array = [], temp_indices = []
-    // copy the array values in the temporary array.
-    for (i = 0; i < n >> 2; i++) {
-        // if the array elements are not
-        // objects throw error.
-        new validator(array[i << 2]).not().is_object()
-            .or().bind(new validator(array[(i << 2) + 1]).not().is_object())
-            .or().bind(new validator(array[(i << 2) + 2]).not().is_object())
-            .or().bind(new validator(array[(i << 2) + 3]).not().is_object())
-            .on(true, () => errors.IncorrectArrayParameterInFindBestInObjectArray())
-        k = 0
-        while (k <= 3) {
-            item = array[(i << 2) + k]
-            if (typeof property === 'string') temp = item[property]
-            else {
-                // the property is a string array
-                for (j = 0; j < property.length; j++) {
-                    new validator(j).is_lesser_than(property.length - 1)
-                        .and().bind(new validator(item).not().is_object())
-                        .on(true, () => {
-                            errors.IncorrectPropertyParameterInFindBestInObjectArray()
-                        })
-                    item = item[property[j]]
-                }
-                temp = item
-            }
-            new validator(temp).is_string().and().is_number()
-                .on(false, () => {
-                    temp_array.push(temp)
-                    temp_indices.push((i << 2) + k)
-                })
-            ++k
-        }
-    }
-    if (n % 4 >= 1) {
-        item = array[n - 1]
-        new validator(item).not().is_object()
-            .on(true, () => errors.IncorrectArrayParameterInFindBestInObjectArray())
-        if (typeof property === 'string') temp = item[property]
-        else {
-            for (j = 0; j < property.length; j++) {
-                new validator(j).is_lesser_than(property.length - 1)
-                    .and().bind(new validator(item).not().is_object())
-                    .on(true, () => {
-                        errors.IncorrectPropertyParameterInFindBestInObjectArray()
-                    })
-                item = item[property[j]]
-            }
-            temp = item
-        }
-        new validator(temp).not().is_number().and()
-            .not().is_string()
-            .on(false, () => {
-                temp_array.push(temp)
-                temp_indices.push(n - 1)
-            })
-    }
-    if (n % 4 >= 2) {
-        item = array[n - 2]
-        new validator(item).not().is_object()
-            .on(true, () => errors.IncorrectArrayParameterInFindBestInObjectArray())
-        if (typeof property === 'string') {
-            temp = item[property]
-        } else {
-            for (j = 0; j < property.length; j++) {
-                new validator(j).is_lesser_than(property.length - 1)
-                    .and().bind(new validator(item).not().is_object())
-                    .on(true, () => {
-                        errors.IncorrectPropertyParameterInFindBestInObjectArray()
-                    }).on(false, () => {
-                        item = item[property[j]]
-                    })
-            }
-            temp = item
-        }
-        new validator(temp).is_string().or().is_number()
-            .on(true, () => {
-                temp_array.push(temp)
-                temp_indices.push(n - 2)
-            }).on(false, () => {
-                errors.IncorrectArrayParameterInFindBestInObjectArray()
-            })
-    }
-    if (n % 4 >= 3) {
-        item = array[n - 3]
-        new validator(item).not().is_object()
-            .on(true, () => errors.IncorrectArrayParameterInFindBestInObjectArray())
-        if (typeof property === 'string') temp = item[property]
-        else {
-            for (j = 0; j < property.length; j++) {
-                new validator(j).is_lesser_than(property.length)
-                    .and().bind(new validator(item).not().is_object())
-                    .on(true, () => {
-                        errors.IncorrectPropertyParameterInFindBestInObjectArray()
-                    })
-                item = item[property[j]]
-            }
-            temp = item
-        }
-        new validator(temp).is_string().or().is_number()
-            .on(true, () => {
-                temp_array.push(temp)
-                temp_indices.push(n - 3)
-            }).on(false, () => errors.IncorrectArrayParameterInFindBestInObjectArray())
-    }
-    // get the first best elements
-    temp = find_best_elements(temp_array, count)
-    // copy the result into the sorted_array and the
-    // sorted indices...
-    k = temp.indices.length
-    for (i = 0; i < k >> 2; i++) {
-        j = temp.indices[i << 2]
-        sorted_indices[i << 2] = temp_indices[j]
-        sorted_array[i << 2] = array[sorted_indices[i << 2]]
-        j = temp.indices[(i << 2) + 1]
-        sorted_indices[(i << 2) + 1] = temp_indices[j]
-        sorted_array[(i << 2) + 1] = array[sorted_indices[(i << 2) + 1]]
-        j = temp.indices[(i << 2) + 2]
-        sorted_indices[(i << 2) + 2] = temp_indices[j]
-        sorted_array[(i << 2) + 2] = array[sorted_indices[(i << 2) + 2]]
-        j = temp.indices[(i << 2) + 3]
-        sorted_indices[(i << 2) + 3] = temp_indices[j]
-        sorted_array[(i << 2) + 3] = array[sorted_indices[(i << 2) + 3]]
-    }
-    if (k % 4 >= 1) {
-        j = temp.indices[k - 1]
-        sorted_indices[k - 1] = temp_indices[j]
-        sorted_array[k - 1] = array[sorted_indices[k - 1]]
-    }
-    if (k % 4 >= 2) {
-        j = temp.indices[k - 2]
-        sorted_indices[k - 2] = temp_indices[j]
-        sorted_array[k - 2] = array[sorted_indices[k - 2]]
-    }
-    if (k % 4 >= 3) {
-        j = temp.indices[k - 3]
-        sorted_indices[k - 3] = temp_indices[j]
-        sorted_array[k - 3] = array[sorted_indices[k - 3]]
-    }
-    return { array: sorted_array, indices: sorted_indices }
-}
-/**
- * 
- * @param {Array.<object>} array 
- * @param {string | Array.<string>} property 
- * @param {number} count - an integer number
- * @returns {{array : Array.<object>, indices : Array.<number>}}
- * @description this utility function is used for the static
- * method find_worst_for_object_array_by_property and computes
- * the first worst count elements form an array each element
- * of which is an object by given property(es) of the object.
- * If the property is string array and the value of the array
- * is not object for each property of the property, except the
- * last level of the property array, then an error message will
- * be thrown. Also if every element of the array is not object
- * an error message will be thrown. If the last level property value
- * is not string or number value, then this element will be omitted
- * from the function and then output array will be all the elements that
- * contains the corresponding property. 
- */
-function find_worst_for_object_array_by_property(array, property, count) {
-    let i, item, j, k, n, sorted_array = [],
-        sorted_indices = [], temp, temp_array = [],
-        temp_indices = []
-    n = array.length
-    for (i = 0; i < n >> 2; i++) {
-        new validator(array[i << 2]).not().is_object()
-            .or().bind(
-                new validator(array[(i << 2) + 1]).not().is_object()
-            )
-            .or().bind(
-                new validator(array[(i << 2) + 2]).not().is_object()
-            )
-            .or().bind(
-                new validator(array[(i << 2) + 3]).not().is_object()
-            )
-            .on(true, () => errors.IncorrectArrayParameterInFindWorstInObjectArray())
-        k = 0
-        while (k <= 3) {
-            item = array[(i << 2) + k]
-            if (typeof property === 'string') temp = item[property]
-            else {
-                for (j = 0; j < property.length; j++) {
-                    new validator(j).is_lesser_than(property.length - 1)
-                        .and().bind(new validator(item).not().is_object())
-                        .on(true, () => {
-                            errors.IncorrectPropertyParameterInFindWorstInObjectArray()
-                        })
-                    item = item[property[j]]
-                }
-                temp = item
-            }
-            new validator(temp).is_string().or().is_number()
-                .on(true, () => {
-                    temp_array.push(temp)
-                    temp_indices.push((i << 2) + k)
-                })
-            ++k
-        }
-    }
-    if (n % 4 >= 1) {
-        item = array[n - 1]
-        new validator(item).not().is_object()
-            .on(true, () => {
-                errors.IncorrectArrayParameterInFindWorstInObjectArray()
-            })
-        if (typeof property === 'string') temp = item[property]
-        else {
-            for (j = 0; j < property.length; j++) {
-                new validator(j).is_lesser_than(property.length - 1)
-                    .and().bind(new validator(item).not().is_object())
-                    .on(true, () => {
-                        errors.IncorrectPropertyParameterInFindWorstInObjectArray()
-                    })
-                item = item[property[j]]
-            }
-            temp = item
-        }
-        new validator(temp).is_string().or().is_number()
-            .on(true, () => {
-                temp_array.push(temp)
-                temp_indices.push(n - 1)
-            })
-    }
-    if (n % 4 >= 2) {
-        item = array[n - 2]
-        new validator(item).not().is_object()
-            .on(true, () => {
-                errors.IncorrectArrayParameterInFindWorstInObjectArray()
-            })
-        if (typeof property === 'string') temp = item[property]
-        else {
-            for (j = 0; j < property.length; j++) {
-                new validator(j).is_lesser_than(property.length - 1)
-                    .and().bind(new validator(item).not().is_object())
-                    .on(true, () => {
-                        errors.IncorrectPropertyParameterInFindWorstInObjectArray()
-                    })
-                item = item[property[j]]
-            }
-            temp = item
-        }
-        new validator(item).is_string().or().is_number()
-            .on(true, () => {
-                temp_array.push(temp)
-                temp_indices.push(n - 2)
-            })
-    }
-    if (n % 4 >= 3) {
-        item = array[n - 3]
-        new validator(item).not().is_object()
-            .on(true, () => {
-                errors.IncorrectArrayParameterInFindWorstInObjectArray()
-            })
-        if (typeof property === 'string') temp = item[property]
-        else {
-            for (j = 0; j < property.length; j++) {
-                new validator(j).is_lesser_than(property.length - 1)
-                    .and().bind(new validator(item).not().is_object())
-                    .on(true, () => {
-                        errors.IncorrectPropertyParameterInFindWorstInObjectArray()
-                    })
-                item = item[property[j]]
-            }
-            temp = item
-        }
-        new validator(temp).is_string().or().is_number()
-            .on(true, () => {
-                temp_array.push(temp)
-                temp_indices.push(n - 3)
-            })
-    }
-    // find the worst elements of the temp_array...
-    temp = find_worst_elements(temp_array, count)
-    // copy the elements into the sorted_array
-    n = temp.indices.length
-    for (i = 0; i < n >> 2; i++) {
-        k = i << 2
-        j = temp.indices[k]
-        sorted_indices[k] = temp_indices[j]
-        sorted_array[k] = array[sorted_indices[k]]
-        ++k
-        j = temp.indices[k]
-        sorted_indices[k] = temp_indices[j]
-        sorted_array[k] = array[sorted_indices[k]]
-        ++k
-        j = temp.indices[k]
-        sorted_indices[k] = temp_indices[j]
-        sorted_array[k] = array[sorted_indices[k]]
-        ++k
-        j = temp.indices[k]
-        sorted_indices[k] = temp_indices[j]
-        sorted_array[k] = array[sorted_indices[k]]
-    }
-    if (n % 4 >= 1) {
-        j = temp.indices[n - 1]
-        sorted_indices[n - 1] = temp_indices[j]
-        sorted_array[n - 1] = array[sorted_indices[n - 1]]
-    }
-    if (n % 4 >= 2) {
-        j = temp.indices[n - 2]
-        sorted_indices[n - 2] = temp_indices[j]
-        sorted_array[n - 2] = array[sorted_indices[n - 2]]
-    }
-    if (n % 4 >= 3) {
-        j = temp.indices[n - 3]
-        sorted_indices[n - 3] = temp_indices[j]
-        sorted_array[n - 3] = array[sorted_indices[n - 3]]
-    }
-    return { array: sorted_array, indices: sorted_indices }
-}
 
 /**
  * 
@@ -1826,6 +1948,8 @@ const sorting_algorithms = {
     quick_sort: quickSort,
     QuickSort: quickSort,
     Quick_sort: quickSort,
+    remove_element_form_sorted_array: removeElementFromSortedArray,
+    remove_element_from_sorted_object_array: removeElementFromSortedObjectArray,
     selection_sort,
     selectionSort: selection_sort,
     SelectionSort: selection_sort,
