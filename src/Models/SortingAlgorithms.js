@@ -1587,28 +1587,28 @@ function removeElementFromSortedArray(array, element, mode) {
         for (i = 0; i < (n - 1) >> 2; i++) {
             j = i << 2;
             if (j < middle) updatedArray[j] = array[j];
-            if (j > middle) updatedArray[j] = array[j + 1];
+            if (j >= middle) updatedArray[j] = array[j + 1];
             ++j;
             if (j < middle) updatedArray[j] = array[j];
-            if (j > middle) updatedArray[j] = array[j + 1];
+            if (j >= middle) updatedArray[j] = array[j + 1];
             ++j;
             if (j < middle) updatedArray[j] = array[j];
-            if (j > middle) updatedArray[j] = array[j + 1];
+            if (j >= middle) updatedArray[j] = array[j + 1];
             ++j;
             if (j < middle) updatedArray[j] = array[j];
-            if (j > middle) updatedArray[j] = array[j + 1];
+            if (j >= middle) updatedArray[j] = array[j + 1];
         }
         if ((n - 1) % 4 >= 1) {
-            if ((n - 1) > middle) updatedArray[n - 2] = array[n - 1];
-            if ((n - 1) < middle) updatedArray[n - 2] = array[n - 2]; // this is not possible
+            if ((n - 2) >= middle) updatedArray[n - 2] = array[n - 1];
+            if ((n - 2) < middle) updatedArray[n - 2] = array[n - 2]; // this is not possible
         }
         if ((n - 1) % 4 >= 2) {
-            if ((n - 2) > middle) updatedArray[n - 3] = array[n - 2];
-            if ((n - 2) < middle) updatedArray[n - 3] = array[n - 3];
+            if ((n - 3) >= middle) updatedArray[n - 3] = array[n - 2];
+            if ((n - 3) < middle) updatedArray[n - 3] = array[n - 3];
         }
         if ((n - 1) % 4 >= 3) {
-            if ((n - 3) > middle) updatedArray[n - 4] = array[n - 3];
-            if ((n - 3) < middle) updatedArray[n - 4] = array[n - 4];
+            if ((n - 4) >= middle) updatedArray[n - 4] = array[n - 3];
+            if ((n - 4) < middle) updatedArray[n - 4] = array[n - 4];
         }
     } else return array;
     return updatedArray;
@@ -1630,25 +1630,14 @@ function removeElementFromSortedArray(array, element, mode) {
  * the array is sorted by some object property.  
  */
 function removeElementFromSortedObjectArray(array, property, element, mode) {
-    // the steps which we will realize will be the following:
-    // set start = 0, end = n - 1
-    // following criteria:
-    // while true:
-    // set middle = floor((start + end) / 2)
-    // for all elements of the property if are not object with exception to the last element,
-    // then throw an error of the array parameter.
-    // let arr_el = array[middle][last level of the property array]
-    // set condition = mode is true ? arr_el >= el_p : arr_el <= el_p
-    // if start = end = middle stop
-    // if condition is true , set end = middle, otherwise start = middle + 1
-    // if array[middle] is equals to the element, then copy the array in the updatedArray except the array[middle] element
-    // otherwise return the array
     if (typeof mode === 'undefined') mode = true;
     if (mode === 'decrease') mode = false;
     if (new validator(element).is_undefined().or().not().is_object().answer) return array;
     new validator(property).is_string().on(true, () => property = [property]);
     const n = array.length, m = property.length;
-    let i, j, start = 0, end = n - 1, middle, arr_el, el_p = Object.assign({}, element);
+    let i, j, start = 0, end = n - 1, middle, arr_el,
+        el_p = Object.assign({}, element), condition,
+        updatedArray = [];
     for (i = 0; i < m; i++) {
         new validator(el_p[property[i]]).is_object()
             .and().bind(new validator(i).is_lesser_than(m - 1))
@@ -1661,12 +1650,63 @@ function removeElementFromSortedObjectArray(array, property, element, mode) {
                 new validator(i).is_same(m - 1)
             ).on(true, () => el_p = el_p[property[i]])
             .on(false, () => {
-                if (i === m - 1) errors.IncorrectPropertyParameterInRemoveElementInSortedObjectArray();
+                if (i === m - 1) errors.IncorrectPropertyParameterInRemoveElementFromSortedObjectArray();
             });
-        while (true) {
-            
-        }
     }
+    while (true) {
+        middle = (start + end) >> 1;
+        arr_el = array[middle];
+        for (i = 0; i < m; i++) {
+            new validator(arr_el[property[i]])
+                .is_object().and().bind(
+                    new validator(i).is_lesser_than(m - 1)
+                ).on(true, () => {
+                    arr_el = arr_el[property[i]];
+                }).on(false, () => {
+                    if (i < m - 1) errors.IncorrectArrayInRemoveElementFromSortedObjectArray();
+                });
+            new validator(i).is_same(m - 1)
+                .and().bind(
+                    new validator(arr_el[property[i]]).is_string().or().is_number()
+                ).on(true, () => {
+                    arr_el = arr_el[property[i]];
+                }).on(false, () => {
+                    if (i === m - 1) errors.IncorrectArrayInRemoveElementFromSortedObjectArray();
+                });
+        }
+        condition = mode ? arr_el >= el_p : arr_el <= el_p;
+        if (start === end && middle === end) break;
+        if (condition) end = middle;
+        else start = middle + 1;
+    }
+    if (new validator(array[middle]).is_same(element).answer) {
+        for (i = 0; i < (n - 1) >> 2; i++) {
+            j = i << 2;
+            if (j < middle) updatedArray[j] = array[j];
+            if (j >= middle) updatedArray[j] = array[j + 1];
+            ++j;
+            if (j < middle) updatedArray[j] = array[j];
+            if (j >= middle) updatedArray[j] = array[j + 1];
+            ++j;
+            if (j < middle) updatedArray[j] = array[j];
+            if (j >= middle) updatedArray[j] = array[j + 1];
+            ++j;
+            if (j < middle) updatedArray[j] = array[j];
+            if (j >= middle) updatedArray[j] = array[j + 1];
+        }
+        if ((n - 1) % 4 >= 1) {
+            if ((n - 2) >= middle) updatedArray[n - 2] = array[n - 1];
+            if ((n - 2) < middle) updatedArray[n - 2] = array[n - 2];
+        }
+        if ((n - 1) % 4 >= 2) {
+            if ((n - 3) >= middle) updatedArray[n - 3] = array[n - 2];
+            if ((n - 3) < middle) updatedArray[n - 3] = array[n - 3];
+        }
+        if ((n - 1) % 4 >= 3) {
+            if ((n - 4) >= middle) updatedArray[n - 4] = array[n - 3];
+            if ((n - 4) < middle) updatedArray[n - 4] = array[n - 4];
+        }
+    } else return array;
     return updatedArray;
 }
 /**
