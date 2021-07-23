@@ -201,15 +201,15 @@ class SortLib {
             errors.IncorrectArrayInFilterWithValidator();
         });
         new validator(callback).not().is_function()
-        .on(true, () => {
-            errors.IncorrectCallbackParameterInFilterkWithValidator();
-        })
-        .on(false, () => {
-            new validator(callback.arguments[0] instanceof validator)
-            .is_same(true).on(false, () => {
-                errors.IncorrectArgumentOfCallbackInFilterWithValidator();
+            .on(true, () => {
+                errors.IncorrectCallbackParameterInFilterkWithValidator();
+            })
+            .on(false, () => {
+                new validator(callback.arguments[0] instanceof validator)
+                    .is_same(true).on(false, () => {
+                        errors.IncorrectArgumentOfCallbackInFilterWithValidator();
+                    });
             });
-        });
         return sort_algorithms.filterWithValidator(array, callback);
     }
 
@@ -272,7 +272,73 @@ class SortLib {
         });
         return sort_algorithms.findElementsInSortedObjectArray(array, property, element, mode);
     }
-
+    /**
+     * 
+     * @param {Array.<number | string>} array 
+     * @param {number | string} element
+     * @returns {SortLib}
+     * @description this method removes/deletes an element from
+     * an array if this element really exists in the array. If the
+     * element is not present in this array, then the method returns
+     * the same array as in the input of the function. 
+     */
+    static remove_element_from_sorted_array(array, element) {
+        new validator(array).is_array_and_for_any(elem => {
+            return elem.not().is_string().and().not().is_number();
+        }).on(true, () => {
+            errors.IncorrectArrayInRemoveElementFromSortedArray();
+        });
+        new validator(element).is_string().or().is_number()
+            .on(false, () => {
+                errors.IncorrectElementParameterInRemoveElementFromSortedArray();
+            });
+        // set the mode parameter. Note that this method does not
+        // tests the array if is ordered or not.
+        let mode = true;
+        for (let i = 0; i < array.length - 1; i++) {
+            if (array[i] > array[i + 1]) {
+                mode = false;
+                break;
+            }
+        }
+        const updatedArray = sort_algorithms.remove_element_form_sorted_array(array, element, mode);
+        return new SortLib({ array: updatedArray, 'sort mode': mode, status: 'sorted' });
+    }
+    /**
+     * 
+     * @param {Array.<object>} array 
+     * @param {string | Array} property 
+     * @param {object} element 
+     * @param {boolean | 'increase' | 'decrease'} mode
+     * @returns {SortLib}
+     * @description this method removes/deletes a given element
+     * from sorted by property array from object arrays. 
+     */
+    static remove_element_from_sorted_object_array_by_property(array, property, element, mode) {
+        new validator(array).is_array_and_for_any(el => {
+            return el.not().is_object();
+        }).on(true, () => {
+            errors.IncorrectArrayInRemoveElementFromSortedObjectArray();
+        });
+        new validator(property).is_string_array()
+            .on(false, () => {
+                errors.IncorrectPropertyParameterInRemoveElementFromSortedObjectArray();
+            });
+        new validator(element).is_object()
+            .on(false, () => {
+                errors.IncorrectElementParameterInRemoveElementFromSortedObjectArray();
+            });
+        // define the mode
+        new validator(mode).is_boolean().or().is_same('increase')
+            .or().is_same('decrease').on(true, () => {
+                if (mode === 'increase') mode = true;
+                else if (mode === 'decrease') mode = false;
+            }).on(false, () => {
+                errors.IncorrectModeParameterInRemoveElementFromSortedObjectArray();
+            });
+        const updatedArray = sort_algorithms.remove_element_from_sorted_object_array(array, property, element, mode);
+        return updatedArray;
+    }
     /**
      * @method merge_sort
      * @param {Array.<number | string>} array 
@@ -472,9 +538,9 @@ class SortLib {
         new validator(n).is_integer().and().is_in_closed_range(1, array.length)
             .on(false, () => {
                 new validator(n).is_float().and().is_in_range(0, 1)
-                .on(false, () => {
-                    warnings.IncorrectCountParameterInFindBestElements()
-                });
+                    .on(false, () => {
+                        warnings.IncorrectCountParameterInFindBestElements()
+                    });
             });
         new validator(n).is_float().and().is_in_range(0, 1)
             .on(true, () => {
