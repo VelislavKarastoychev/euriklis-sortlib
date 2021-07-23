@@ -28,6 +28,12 @@ const IncorrectPropertyParameterInFindElementsInSortedObjectArray = 'Incorrect p
 const IncorrectElementParameterInFindElementsInSortedObjectArray = 'Incorrect element parameter in the find elements in sorted object array. Note that this property has to be an object with keys, which are identical to the elements of the property array.';
 const IncorrectArrayInFilterWithValidator = 'Incorrect array argument in the filter with validator static method. The argument/parameter has to be an arbitrary array.';
 const IncorrectArgumentOfCallbackInFilterWithValidator = 'Incorrect first argument in the callback function parameter in the static method filter with validator. Note that the argument of the callback function has to be a validator instance variable.';
+const IncorrectArrayInRemoveElementFromSortedArray = 'Incorrect array parameter in the static method remove element from sorted array. Note that the array has to contain only number or string elements.';
+const IncorrectElementParameterInRemoveElementFromSortedArray = 'Incorrect element parameter in the static method remove element from sorted array. Note that the element parameter has to be of string or number type.';
+const IncorrectArrayInRemoveElementFromSortedObjectArray = 'Incorrect array parameter in the static method remove element from sorted object array by property. Note that this parameter has to be an array, each element of which is an arbitrary object.';
+const IncorrectPropertyParameterInRemoveElementFromSortedObjectArray = 'Incorrect property parameter in the remove element from sorted object array by property static method. Note that this argument has to be an string array which elements corresponds to the keys of the element structure.';
+const IncorrectElementParameterInRemoveElementFromSortedObjectArray = 'Incorrect element parameter in the static method remove element from sorted object array by property. Note that this element has to be an arbitrary object.';
+const IncorrectModeParameterInRemoveElementFromSortedObjectArray = 'Incorrect mode parameter in the static method remove element from sorted object array. Note that this parameter has to be a boolean value or increase or decrease. '
 module.exports = {
     ErrorText,
     IncorrectArrayDeclarationInSortLibConstructor,
@@ -58,6 +64,10 @@ module.exports = {
     IncorrectElementParameterInFindElementsInSortedObjectArray,
     IncorrectArrayInFilterWithValidator,
     IncorrectArgumentOfCallbackInFilterWithValidator,
-
-    
+    IncorrectArrayInRemoveElementFromSortedArray,
+    IncorrectElementParameterInRemoveElementFromSortedArray,
+    IncorrectArrayInRemoveElementFromSortedObjectArray,
+    IncorrectPropertyParameterInRemoveElementFromSortedObjectArray,
+    IncorrectElementParameterInRemoveElementFromSortedObjectArray,
+    IncorrectModeParameterInRemoveElementFromSortedObjectArray,
 }
