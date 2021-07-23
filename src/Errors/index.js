@@ -29,6 +29,11 @@ module.exports = {
     IncorrectElementParameterInFindElementsInSortedObjectArray : require('./IncorrectElementParameterInFindElementsInSortedObjectArray'),
     IncorrectArrayInFilterWithValidator: require('./IncorrectArrayInFilterWithValidator'),
     IncorrectArgumentOfCallbackInFilterWithValidator: require('./IncorrectArgumentOfCallbackInFilterWithValidator'),
-        
-    
+    IncorrectArrayInRemoveElementFromSortedArray: require('./IncorrectArrayInRemoveElementFromSortedArray'),
+    IncorrectElementParameterInRemoveElementFromSortedArray: require('./IncorrectElementInRemoveElementFromSortedArray'),
+    IncorrectArrayInRemoveElementFromSortedObjectArray: require('./IncorrectArrayInRemoveElementFromSortedObjectArray'),
+    IncorrectPropertyParameterInRemoveElementFromSortedObjectArray: require('./IncorrectPropertyParameterInRemoveElementFromSortedObjectArray'),
+    IncorrectElementParameterInRemoveElementFromSortedObjectArray: require('./IncorrectElementParameterInRemoveElementFromSortedObjectArray'),
+    IncorrectModeParameterInRemoveElementFromSortedObjectArray: require('./IncorrectModeParameterInRemoveElementInSortedObjectArray'),
+         
 }
