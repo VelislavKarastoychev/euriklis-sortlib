@@ -89,13 +89,15 @@ class SortLib {
      */
     static addElementInSortedArray(array, element) {
         let i, _array, ascending_order = true, element_is_string = new validator(element).is_string(),
-            element_is_array = new validator(element).is_number(),
             item_is_number = (item) => {
                 return new validator(item).is_number();
             },
             item_is_string = (item) => {
                 return new validator(item).is_string();
             }, array_type, its = 0;
+        if (new validator(array).is_array().and().is_empty().answer && new validator(element).is_number().or().is_string().answer) {
+            return new SortLib({ array: [element], 'sort mode': true, 'status': 'sorted' });
+        }
         new validator(array[0])
             .is_number().on(true, () => array_type = 'number');
         new validator(array[0]).is_string().on(true, () => array_type = 'string');
@@ -180,7 +182,27 @@ class SortLib {
             });
         new validator(element).not().is_object()
             .on(true, () => errors.IncorrectElementInAddElementInSortedObjectArrayByProperty());
-        return sort_algorithms.addElementInSortedObjectArrayByProperty(array, property, element, mode);
+        if (new validator(array).is_array().and().is_empty().answer) {
+            // test if the property array satisfy the element structure.
+            if (new validator(property).is_string().answer) property = [property];
+            let k = Object.assign({}, element), p;
+            for (let i = 0; i < property.length; i++) {
+                if (i < property.length - 1) {
+                    p = property[i];
+                    k = k[p]
+                    if (new validator(k).not().is_object().answer) {
+                        errors.IncorrectElementInAddElementInSortedObjectArrayByProperty();
+                    } else continue;
+                } else {
+                    p = property[i];
+                    k = k[p];
+                    if (new validator(k).not().is_number().and().not().is_string().answer) {
+                        errors.IncorrectElementInAddElementInSortedObjectArrayByProperty();
+                    } else continue;
+                }
+            }
+            return [element];
+        } else return sort_algorithms.addElementInSortedObjectArrayByProperty(array, property, element, mode);
     }
     /**
      * 
@@ -196,19 +218,13 @@ class SortLib {
      *    return el.interface2({id: id => id.is_lesser_than(4)});
      * });
      */
-    filter_with_validator(array, callback) {
+    static filter_with_validator(array, callback) {
         new validator(array).is_array().on(false, () => {
             errors.IncorrectArrayInFilterWithValidator();
         });
         new validator(callback).not().is_function()
             .on(true, () => {
                 errors.IncorrectCallbackParameterInFilterkWithValidator();
-            })
-            .on(false, () => {
-                new validator(callback.arguments[0] instanceof validator)
-                    .is_same(true).on(false, () => {
-                        errors.IncorrectArgumentOfCallbackInFilterWithValidator();
-                    });
             });
         return sort_algorithms.filterWithValidator(array, callback);
     }
