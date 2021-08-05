@@ -263,6 +263,8 @@ class SortLib {
                 break;
             } else continue;
         }
+        // set empty output when the array is empty.
+        if (array.length === 0) return {array: [], indices: [-1]};
         return sort_algorithms.findElementsInSortedArray(array, element, mode);
     }
 
@@ -280,12 +282,15 @@ class SortLib {
         new validator(array)
             .not().is_array()
             .on(true, () => errors.IncorrectArrayInFindElementsInObjectArray());
+        new validator(property).is_string().on(true, () => property = [property]);
         new validator(property).is_string_array().on(false, () => {
             errors.IncorrectPropertyParameterInFindElementsInSortedObjectArray();
         });
         new validator(element).is_object().on(false, () => {
             errors.IncorrectElementParameterInFindElementsInSortedObjectArray();
         });
+        // when the array is empty, set the output to be empty.
+        if (array.length === 0) return {array: [], indices: [-1]};
         return sort_algorithms.findElementsInSortedObjectArray(array, property, element, mode);
     }
     /**
@@ -317,6 +322,7 @@ class SortLib {
                 break;
             }
         }
+        if (array.length === 0) return new SortLib({array: [],'sort mode': true, 'status': 'sorted'});
         const updatedArray = sort_algorithms.remove_element_form_sorted_array(array, element, mode);
         return new SortLib({ array: updatedArray, 'sort mode': mode, status: 'sorted' });
     }
@@ -352,6 +358,7 @@ class SortLib {
             }).on(false, () => {
                 errors.IncorrectModeParameterInRemoveElementFromSortedObjectArray();
             });
+        if (array.length === 0) return {array: [], indices: []};
         const updatedArray = sort_algorithms.remove_element_from_sorted_object_array(array, property, element, mode);
         return updatedArray;
     }
