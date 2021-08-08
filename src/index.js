@@ -281,7 +281,7 @@ class SortLib {
     static find_elements_in_sorted_object_array_by_property(array, property, element, mode) {
         new validator(array)
             .not().is_array()
-            .on(true, () => errors.IncorrectArrayInFindElementsInObjectArray());
+            .on(true, () => errors.IncorrectArrayInFindElementsInSortedObjectArray());
         new validator(property).is_string().on(true, () => property = [property]);
         new validator(property).is_string_array().on(false, () => {
             errors.IncorrectPropertyParameterInFindElementsInSortedObjectArray();
