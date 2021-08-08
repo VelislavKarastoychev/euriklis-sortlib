@@ -663,6 +663,7 @@ function findElementsInSortedArray(array, element, mode) {
                 output.indices[index] = middle;
                 ++index;
                 ++middle;
+                if (middle === n) break;
             }
         })
     return output;
@@ -748,6 +749,7 @@ function findElementsInSortedObjectArray(array, property, element, mode) {
         output.indices[i] = middle;
         ++middle;
         ++i;
+        if (middle === n) break;
         // update the arr_el variables:
         arr_el = array[middle];
         for (p = 0; p < m; p++) {
