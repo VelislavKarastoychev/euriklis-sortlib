@@ -34,7 +34,7 @@ const IncorrectArrayInRemoveElementFromSortedObjectArray = 'Incorrect array para
 const IncorrectPropertyParameterInRemoveElementFromSortedObjectArray = 'Incorrect property parameter in the remove element from sorted object array by property static method. Note that this argument has to be an string array which elements corresponds to the keys of the element structure.';
 const IncorrectElementParameterInRemoveElementFromSortedObjectArray = 'Incorrect element parameter in the static method remove element from sorted object array by property. Note that this element has to be an arbitrary object.';
 const IncorrectModeParameterInRemoveElementFromSortedObjectArray = 'Incorrect mode parameter in the static method remove element from sorted object array. Note that this parameter has to be a boolean value or increase or decrease. '
-module.exports = {
+export {
     ErrorText,
     IncorrectArrayDeclarationInSortLibConstructor,
     IncorrectArrayInAddElementInSortedArray,
@@ -70,4 +70,4 @@ module.exports = {
     IncorrectPropertyParameterInRemoveElementFromSortedObjectArray,
     IncorrectElementParameterInRemoveElementFromSortedObjectArray,
     IncorrectModeParameterInRemoveElementFromSortedObjectArray,
-}
+};
