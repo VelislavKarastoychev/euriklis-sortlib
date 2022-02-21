@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 const InfoText = 'Euriklis SortLib information message:\n'
 const AutomaticallySetToDefault = (parameters) => {
     let keys = Object.keys(parameters), i
@@ -12,8 +12,7 @@ const AutomaticallySetToDefault = (parameters) => {
     return output
 }
 
-module.exports = {
+export {
     InfoText,
     AutomaticallySetToDefault,
-    
-}
+};
