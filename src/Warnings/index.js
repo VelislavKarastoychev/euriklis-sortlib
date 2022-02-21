@@ -1,12 +1,19 @@
-'use strict'
-module.exports = {
-    UndefinedArrayInSortLibConstructor : require('./UndefinedArrayInSortLibConstructor'),
-    IncorrectAlgorithmDeclaration : require('./IncorrectAlgorithmDeclaration'),
-    IncorrectSortModeDeclaration : require('./IncorrectSortModeDeclaration'),
-    IncorrectAlgorithmInAlgorithmSetter : require('./IncorrectAlgorithmInAlgorithmSetter'),
-    IncorrectCountParameterInFindBestElements : require('./IncorrectCountParameterInFindBestElements'),
-    IncorrectCountParameterInFindWorstElements : require('./IncorrectCountParameterInFindWorstElements'),
-    IncorrectOrUndefinedModeParameterInSortObjectArray : require('./IncorrectOrUndefinedModeParameterInSortObjectArray'),
-    IncorrectOrUndefinedAlgorithmParameterInSortObjectArray : require('./IncorrectOrUndefinedAlgorithmParameterInSortObjectArray'),
-    
-}
+'use strict';
+import UndefinedArrayInSortLibConstructor from './UndefinedArrayInSortLibConstructor.js';
+import IncorrectAlgorithmDeclaration from './IncorrectAlgorithmDeclaration.js';
+import IncorrectSortModeDeclaration from './IncorrectSortModeDeclaration.js';
+import IncorrectAlgorithmInAlgorithmSetter from './IncorrectAlgorithmInAlgorithmSetter.js';
+import IncorrectCountParameterInFindBestElements from './IncorrectCountParameterInFindBestElements.js';
+import IncorrectCountParameterInFindWorstElements from './IncorrectCountParameterInFindWorstElements.js';
+import IncorrectOrUndefinedModeParameterInSortObjectArray from './IncorrectOrUndefinedModeParameterInSortObjectArray.js';
+import IncorrectOrUndefinedAlgorithmParameterInSortObjectArray from './IncorrectOrUndefinedAlgorithmParameterInSortObjectArray.js';
+export {
+    UndefinedArrayInSortLibConstructor,
+    IncorrectAlgorithmDeclaration,
+    IncorrectSortModeDeclaration,
+    IncorrectAlgorithmInAlgorithmSetter,
+    IncorrectCountParameterInFindBestElements,
+    IncorrectCountParameterInFindWorstElements,
+    IncorrectOrUndefinedModeParameterInSortObjectArray,
+    IncorrectOrUndefinedAlgorithmParameterInSortObjectArray,   
+};
