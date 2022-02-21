@@ -1,10 +1,12 @@
-'use strict'
-const sort_algorithms = require('./Models').sort_algorithms;
-const sort_algorithms_list = require('./Models').sort_algorithms_list;
-const validator = require('@euriklis/validator');
-const infos = require('./Infos');
-const warnings = require('./Warnings');
-const errors = require('./Errors');
+'use strict';
+import sort_algorithms from './Models/SortingAlgorithms.js';
+import sort_algorithms_list from './Models/SortAlgorithmList.js';
+import validator from '@euriklis/validator';
+import * as infos from './Infos/index.js';
+import * as warnings from './Warnings/index.js';
+import * as errors from './Errors/index.js';
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
 const package_file = require('../package.json');
 class SortLib {
     /**
@@ -883,4 +885,4 @@ class SortLib {
 }
 SortLib.version = package_file.version;
 SortLib.author = package_file.author;
-module.exports = SortLib;
+export default SortLib;
