@@ -1,7 +1,7 @@
 'use strict';
 import message from '@euriklis/message';
 import * as texts from './errorTexts.js';
-module.exports = () => {
+export default () => {
     const error = new Error();
     error.name = new message().bold().italic().underline()
         .set_color_yellow().append(texts.ErrorText).reset().text;
