@@ -1,6 +1,6 @@
 'use strict'
-const validator = require('@euriklis/validator');
-const errors = require('../Errors');
+import validator from '@euriklis/validator';
+import * as errors from '../Errors/index.js';
 
 /**
  * 
@@ -1951,7 +1951,7 @@ function SortArray(array, method, ascending_order = true) {
     return sorted_array
 }
 
-const sorting_algorithms = {
+const sort_algorithms = {
     addElementInSortedArray,
     addElementInSortedObjectArrayByProperty,
     bubble_sort,
@@ -1997,5 +1997,5 @@ const sorting_algorithms = {
     SelectionSort: selection_sort,
     SortArray,
     sort_object_array_by_property: sort_object_array_by_property,
-}
-module.exports = sorting_algorithms;
+};
+export default sort_algorithms ; 
