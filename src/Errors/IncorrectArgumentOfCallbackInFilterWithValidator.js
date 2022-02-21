@@ -1,7 +1,7 @@
 'use strict';
-const texts = require('./errorTexts');
-const message = require('@euriklis/message');
-module.exports = () => {
+import message from '@euriklis/message';
+import * as texts from './errorTexts.js';
+export default () => {
     const error = new Error();
     error.name = new message().bold().italic().underscore()
         .set_color_yellow().append(texts.ErrorText).reset().text;
