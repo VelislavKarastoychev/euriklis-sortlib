@@ -10,4 +10,4 @@ const sort_algorithms_list = [
     'bucket sort',
     
 ]
-module.exports = sort_algorithms_list
+export default sort_algorithms_list
