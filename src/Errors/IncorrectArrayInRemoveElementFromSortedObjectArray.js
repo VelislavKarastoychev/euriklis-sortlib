@@ -1,6 +1,6 @@
 'use strict';
 import message from '@euriklis/message';
-import * as texts from './errorTExts.js';
+import * as texts from './errorTexts.js';
 export default () => {
     const error = new Error();
     error.name = new message().bold().italic()
