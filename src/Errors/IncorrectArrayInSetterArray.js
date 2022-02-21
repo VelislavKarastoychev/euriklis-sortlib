@@ -7,6 +7,6 @@ export default () => {
         .set_color_yellow().append(texts.ErrorText).reset().text;
     error.message = new message().set_color_red()
         .append_warning_sign().set_color_cyan().append_white_space()
-        .append(texts.IncorrectArrayInSetterArray).text;
+        .append(texts.IncorrectArrayInSetterArray).reset().text;
     throw new error;
 }
