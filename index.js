@@ -1,3 +1,3 @@
 'use strict';
-const SortLib = require('./src');
-module.exports = SortLib;
+import SortLib from './src/index.js';
+export default SortLib;
