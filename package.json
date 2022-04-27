@@ -32,8 +32,8 @@
     },
     "homepage": "https://github.com/VelislavKarastoychev/euriklis-sortlib#readme",
     "dependencies": {
-        "@euriklis/message": "^2.0.0",
-        "@euriklis/validator": "^2.0.0"
+        "@euriklis/message": "^2.0.1",
+        "@euriklis/validator": "^2.1.1"
     },
     "devDependencies": {
         "eslint": "^7.32.0",
