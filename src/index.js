@@ -5,7 +5,7 @@ import validator from '@euriklis/validator';
 import * as infos from './Infos/index.js';
 import * as warnings from './Warnings/index.js';
 import * as errors from './Errors/index.js';
-const package_file = {version: '2.0.1', author: 'Velislav S. Karastoychev'};
+const package_file = {version: '2.0.2', author: 'Velislav S. Karastoychev'};
 class SortLib {
     /**
      * 
