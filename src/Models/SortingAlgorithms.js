@@ -168,6 +168,7 @@ function bubble_sort(array, ascending_order) {
         n = array.length, temp
     if (typeof ascending_order === 'undefined') ascending_order = true
     if (ascending_order === 'decrease') ascending_order = false
+    console.log('Mnogo da vi eba mamata!!!')
     for (i = 0; i < n; i++) {
         for (j = 0; j < n - 1; j++) {
             if (ascending_order) condition = sorted_array[j + 1] > sorted_array[j]
