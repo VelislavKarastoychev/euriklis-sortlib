@@ -866,6 +866,13 @@ class SortLib {
             this.#sort_mode = 'increase';
         };
     }
+    /**
+     * 
+     * @param {number | string} element 
+     * @returns { SortLib}
+     * @description this method uses the bisection method
+     * to add an element in sorted array.
+     */
     add(element) {
         if (!conditions.IsNumber(element) && !conditions.IsString(element)) {
             errors.IncorrectElementInAddElementInSortedArray()
