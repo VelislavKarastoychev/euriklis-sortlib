@@ -31,4 +31,3 @@ export { default as RemoveElementFromSortedObjectArray } from './RemoveElementFr
 export { default as SelectionSort } from './SelectionSort.js';
 export { default as SelectionSortArray } from './SelectionSortArray.js';
 export { default as SortObjectArrayByProperty } from './SortObjectArrayByProperty.js';
-export { default as sort_algorithms } from './SortingAlgorithms.js';
