@@ -1,12 +1,18 @@
 'use strict';
-import sort_algorithms from './Models/SortingAlgorithms.js';
-import sort_algorithms_list from './Models/SortAlgorithmList.js';
-import validator from '@euriklis/validator';
-import * as infos from './Infos/index.js';
-import * as warnings from './Warnings/index.js';
+import * as conditions from './Conditions/index.js';
 import * as errors from './Errors/index.js';
-const package_file = {version: '2.0.3', author: 'Velislav S. Karastoychev'};
+import * as infos from './Infos/index.js';
+import * as models from './Models/index.js';
+const package_file = { version: '3.0.0', author: 'Velislav S. Karastoychev' };
+import validator from '@euriklis/validator';
+import * as warnings from './Warnings/index.js';
 class SortLib {
+    #algorithm = 'merge sort';
+    #array = [];
+    #indices = [];
+    #sort_mode = 'increase';
+    #status = 'unsorted';
+    #warnings = false;
     /**
      * 
      * @param {{
@@ -20,60 +26,25 @@ class SortLib {
      * algorithm and sort mode to use the sorting algorithms of this library. 
      */
     constructor(options) {
-        new validator(options)
-            .is_object()
-            .on(true, () => {
-                new validator(options.array).is_number_array()
-                    .or().is_string_array()
-                    .on(true, () => {
-                        this.__array__ = options.array;
-                        this.__size__ = this.array.length;
-                    }).on(false, () => {
-                        new validator(options.array).is_undefined()
-                            .on(true, () => {
-                                warnings.UndefinedArrayInSortLibConstructor();
-                                this.__array__ = [];
-                                this.__size__ = 0;
-                            }).on(false, () => {
-                                errors.IncorrectArrayDeclarationInSortLibConstructor();
-                            });
-                    });
-                new validator(options.algorithm)
-                    .is_same_with_any(sort_algorithms_list)
-                    .on(true, () => {
-                        this.__algorithm__ = options.algorithm;
-                    }).on(false, () => {
-                        this.__algorithm__ = 'merge sort';
-                        warnings.IncorrectAlgorithmDeclaration();
-                        infos.AutomaticallySetToDefault({ algorithm: 'merge sort' });
-                    });
-                new validator(options['sort mode'])
-                    .is_same_with_any([true, false, 'increase', 'decrease'])
-                    .on(true, () => {
-                        this.__sort_mode__ = options['sort mode'];
-                    }).on(false, () => {
-                        warnings.IncorrectSortModeDeclaration();
-                        infos.AutomaticallySetToDefault({ 'sort mode': 'increase' });
-                        this.__sort_mode__ = 'increase';
-                    });
-                new validator(options.status).not().is_undefined()
-                    .and().is_same_with_any(['sorted', 'unsorted']).on(true, () => {
-                        this.__status__ = options.status;
-                    }).on(false, () => this.status = 'unsorted');
-                new validator(options.indices).is_number_array()
-                    .and().has_length(this.size).on(true, () => {
-                        this.__indices__ = options.indices;
-                    }).on(false, () => {
-                        this.__indices__ = Array.from({ length: this.size }).map((e, i) => { return e = i });
-                    });
-            }).on(false, () => {
-                this.__array__ = [];
-                this.__indices__ = [];
-                this.__algorithm__ = 'merge sort';
-                this.__size__ = 0;
-                this.__sort_mode__ = 'increase';
-            });
+        if (conditions.IsObject(options)) {
+            if (conditions.IsUndefined(options.array)) {
+                if (this.show_warnings) warnings.UndefinedArrayInSortLibConstructor();
+            } else this.array = options.array;
+            this.algorithm = options.algorithm;
+            this.sort_mode = options['sort mode'];
+            this.status = 'unsorted';
+            this.status = options.status;
+            this.indices = options.indices;
+        }
     }
+    get show_warnings() {
+        return this.#warnings;
+    }
+    set show_warnings(warnings) {
+        if (conditions.IsBoolean(warnings)) this.#warnings = warnings;
+    }
+    static version = package_file.version;
+    static author = package_file.author;
     /**
      * @method addElementInSortedArray
      * @param {Array<number | string>} array 
@@ -87,72 +58,24 @@ class SortLib {
      * the result of inserting of the element in an SortLib
      * instance.
      */
-    static addElementInSortedArray(array, element) {
-        let i, _array, ascending_order = true, element_is_string = new validator(element).is_string(),
-            item_is_number = (item) => {
-                return new validator(item).is_number();
-            },
-            item_is_string = (item) => {
-                return new validator(item).is_string();
-            }, array_type, its = 0;
-        if (new validator(array).is_array().and().is_empty().answer && new validator(element).is_number().or().is_string().answer) {
-            return new SortLib({ array: [element], 'sort mode': true, 'status': 'sorted' });
+    static addElementInSortedArray(array, element, ascending_order) {
+        if (!conditions.IsCorrectArray(array)) {
+            errors.IncorrectArrayInAddElementInSortedArray();
         }
-        new validator(array[0])
-            .is_number().on(true, () => array_type = 'number');
-        new validator(array[0]).is_string().on(true, () => array_type = 'string');
-        new validator(array[0]).not().is_string().and().not().is_number()
-            .on(true, () => array_type = 'error');
-        // the array has to be sorted and either number or string array.
-        for (i = 0; i < array.length - 1; i++) {
-            if (array_type === 'error') break;
-            item_is_string(array[i]).and().bind(item_is_string(array[i + 1]))
-                .and().bind(element_is_string).and().bind(new validator(array_type).is_same('string'))
-                .on(true, () => {
-                    if (array[i].toLowerCase() > array[i + 1].toLowerCase()) {
-                        ascending_order = false;
-                        ++its;
-                    }
-                    if (array[i].toLowerCase() < array[i + 1].toLowerCase()) {
-                        ascending_order = true;
-                        ++its;
-                    }
-                })
-            item_is_number(array[i]).and().bind(item_is_number(array[i + 1]))
-                .and().bind(new validator(array_type).is_same('number'))
-                .on(true, () => {
-                    if (array[i] > array[i + 1]) {
-                        ascending_order = false;
-                        ++its;
-                    }
-                    if (array[i] < array[i + 1]) {
-                        ascending_order = true;
-                        ++its;
-                    }
-                })
-            item_is_number(array[i]).and().bind(item_is_string(array[i + 1]))
-                .or().bind(item_is_string(array[i]).and().bind(item_is_number(array[i + 1])))
-                .on(true, () => {
-                    array_type = 'error';
-                    ++its;
-                })
-            if (its) break;
-        }
-        if (array_type === 'error') errors.IncorrectArrayInAddElementInSortedArray();
-        _array = sort_algorithms.addElementInSortedArray(array, element, ascending_order);
-        return new SortLib({ array: _array, 'sort mode': ascending_order, status: 'sorted' });
+        return new SortLib({ array: array, 'sort mode': ascending_order, status: 'sorted' }).add(element);
     }
     /**
      * 
      * @method add_element_in_sorted_array
      * @param {Array.<number | string>} array 
      * @param {number | string} element
+     * @param {boolean | 'increase' | 'decrease' } ascending_order
      * @return {SortLib}
      * @description this method is copy of the addElementInSortedArray
      * static method. 
      */
-    static add_element_in_sorted_array(array, element) {
-        return SortLib.addElementInSortedArray(array, element);
+    static add_element_in_sorted_array(array, element, ascending_order = true) {
+        return SortLib.addElementInSortedArray(array, element, ascending_order);
     }
     /**
      * 
@@ -171,38 +94,44 @@ class SortLib {
      * be observed from the sorted array. The array is sorted
      * only for the observed property.  
      */
-    static add_element_in_sorted_object_array_by_property(array, property, element, mode) {
-        new validator(array).not().is_array()
-            .on(true, () => {
+    static add_element_in_sorted_object_array_by_property(array, property, element, mode, test_array = false) {
+        if (!conditions.IsObject(element)) {
+            errors.IncorrectElementInAddElementInSortedObjectArrayByProperty();
+        }
+        if (conditions.IsString(property)) property = [property];
+        if (!conditions.IsStringArray(property)) {
+            errors.IncorrectPropertyParameterInAddElementInSortedObjectArrayByProperty();
+        }
+        if (!conditions.IsCorrectElement(element, property)) {
+            errors.IncorrectElementInAddElementInSortedObjectArrayByProperty();
+        }
+        if (test_array) {
+            if (!conditions.IsCorrectObjectArray(array, property)) {
                 errors.IncorrectArrayParameterInAddElementInSortedObjectArrayByProperty();
-            });
-        new validator(property).not().is_string_array().and().not().is_string()
-            .on(true, () => {
-                errors.IncorrectPropertyParameterInAddElementInSortedObjectArrayByProperty()
-            });
-        new validator(element).not().is_object()
-            .on(true, () => errors.IncorrectElementInAddElementInSortedObjectArrayByProperty());
-        if (new validator(array).is_array().and().is_empty().answer) {
-            // test if the property array satisfy the element structure.
-            if (new validator(property).is_string().answer) property = [property];
-            let k = Object.assign({}, element), p;
-            for (let i = 0; i < property.length; i++) {
-                if (i < property.length - 1) {
-                    p = property[i];
-                    k = k[p]
-                    if (new validator(k).not().is_object().answer) {
-                        errors.IncorrectElementInAddElementInSortedObjectArrayByProperty();
-                    } else continue;
-                } else {
-                    p = property[i];
-                    k = k[p];
-                    if (new validator(k).not().is_number().and().not().is_string().answer) {
-                        errors.IncorrectElementInAddElementInSortedObjectArrayByProperty();
-                    } else continue;
-                }
             }
-            return [element];
-        } else return sort_algorithms.addElementInSortedObjectArrayByProperty(array, property, element, mode);
+        }
+        if (!conditions.IsBoolean(mode)) {
+            if (mode === 'increase') mode = true;
+            else if (mode === 'decrease') mode = false;
+            else mode = true;
+        }
+        if (conditions.IsEmpty(array)) return [element];
+        return models.AddElementInSortedObjectArrayByProperty(array, property, element, mode);
+    }
+    /**
+     * 
+     * @param {Array.<number | string | {}>} array 
+     * @param {function(number, number, Array):boolean} callback 
+     * @returns {{array: Array.<number | string | {}>,indices: Array.<number>}}
+     */
+    static filter (array, callback) {
+        if (!conditions.IsArray(array)) {
+            errors.IncorrectArrayParameterInFilter();
+        }
+        if (!conditions.IsFunction(callback)) {
+            errors.IncorrectCallbackParameterInFilter();
+        }
+        return models.Filter(array, callback);
     }
     /**
      * 
@@ -219,14 +148,13 @@ class SortLib {
      * });
      */
     static filter_with_validator(array, callback) {
-        new validator(array).is_array().on(false, () => {
+        if (!conditions.IsArray(array)) {
             errors.IncorrectArrayInFilterWithValidator();
-        });
-        new validator(callback).not().is_function()
-            .on(true, () => {
-                errors.IncorrectCallbackParameterInFilterkWithValidator();
-            });
-        return sort_algorithms.filterWithValidator(array, callback);
+        }
+        if (!conditions.IsFunction(callback)) {
+            errors.IncorrectArgumentOfCallbackInFilterWithValidator();
+        }
+        return models.FilterWithValidator(array, callback);
     }
 
     /**
@@ -234,6 +162,7 @@ class SortLib {
      * @method find_elements_in_sorted_array
      * @param {Array.<number | string>} array 
      * @param {number | string} element
+     * @param {boolean | 'increase' | 'decrease' } mode
      * @returns {{array : Array.<number | string>, index : Array.<number>}}
      * @description this function uses the bisection method to
      * locate (find) an element in an ordered array which is
@@ -247,25 +176,20 @@ class SortLib {
      * @example
      * SortLib.find_element_in_sorted_array(array, 59); 
      */
-    static find_elements_in_sorted_array(array, element) {
-        let mode = true;
-        new validator(element).not().is_number().and().not()
-            .is_string().on(true, () => errors.IncorrectElementInFindElementInSortedArray());
-        new validator(array).not().is_array()
-            .on(true, () => errors.IncorrectArrayParameterInFindElementInSortedArray());
-        // define the mode:
-        for (let i = 0; i < array.length - 1; i++) {
-            if (array[i] > array[i + 1]) {
-                mode = false;
-                break;
-            } else if (array[i] !== array[i + 1]) {
-                mode = true;
-                break;
-            } else continue;
+    static find_elements_in_sorted_array(array, element, mode) {
+        if (!conditions.IsBoolean(mode)) {
+            if (mode === 'increase') mode = true;
+            else if (mode === 'decrease') mode = false;
+            else mode = true;
         }
-        // set empty output when the array is empty.
-        if (array.length === 0) return {array: [], indices: [-1]};
-        return sort_algorithms.findElementsInSortedArray(array, element, mode);
+        if (!conditions.IsNumber(element) && !conditions.IsString(element)) {
+            errors.IncorrectElementInFindElementInSortedArray()
+        }
+        if (!conditions.IsNumberArray(array) && !conditions.IsStringArray(array)) {
+            errors.IncorrectArrayParameterInFindElementInSortedArray()
+        }
+        if (array.length === 0) return { array: [], indices: [-1] };
+        return models.FindElementsInSortedArray(array, element, mode);
     }
 
     /**
@@ -279,52 +203,51 @@ class SortLib {
      * are equals to the object type element parameter.
      */
     static find_elements_in_sorted_object_array_by_property(array, property, element, mode) {
-        new validator(array)
-            .not().is_array()
-            .on(true, () => errors.IncorrectArrayInFindElementsInSortedObjectArray());
-        new validator(property).is_string().on(true, () => property = [property]);
-        new validator(property).is_string_array().on(false, () => {
+        if (!conditions.IsArray(array)) {
+            errors.IncorrectArrayInFindElementsInSortedObjectArray()
+        };
+        if (conditions.IsString(property)) property = [property];
+        if (!conditions.IsStringArray(property)) {
             errors.IncorrectPropertyParameterInFindElementsInSortedObjectArray();
-        });
-        new validator(element).is_object().on(false, () => {
+        };
+        if (!conditions.IsCorrectElement(element, property)) {
             errors.IncorrectElementParameterInFindElementsInSortedObjectArray();
-        });
+        }
+        if (!conditions.IsBoolean(mode)) {
+            if (mode === 'increase') mode = true;
+            else if (mode === 'decrease') mode = false;
+            else mode = true;
+        }
         // when the array is empty, set the output to be empty.
-        if (array.length === 0) return {array: [], indices: [-1]};
-        return sort_algorithms.findElementsInSortedObjectArray(array, property, element, mode);
+        if (array.length === 0) return { array: [], indices: [-1] };
+        return models.FindElementsInSortedObjectArrayByProperty(array, property, element, mode);
     }
     /**
      * 
      * @param {Array.<number | string>} array 
      * @param {number | string} element
-     * @returns {SortLib}
+     * @param {boolean | 'increase' | 'decrease'} mode
+     * @returns {{array: Array.<number | string>, indices: Array.<number>}}
      * @description this method removes/deletes an element from
      * an array if this element really exists in the array. If the
      * element is not present in this array, then the method returns
-     * the same array as in the input of the function. 
+     * the same array (and indices) as in the input of the function.The method
+     * returns the indices without the index of the removed element. 
      */
-    static remove_element_from_sorted_array(array, element) {
-        new validator(array).is_array_and_for_any(elem => {
-            return elem.not().is_string().and().not().is_number();
-        }).on(true, () => {
+    static remove_element_from_sorted_array(array, element, mode = true) {
+        /*if (!conditions.IsNumberArray(array) && !conditions.IsStringArray(array)) {
             errors.IncorrectArrayInRemoveElementFromSortedArray();
-        });
-        new validator(element).is_string().or().is_number()
-            .on(false, () => {
-                errors.IncorrectElementParameterInRemoveElementFromSortedArray();
-            });
-        // set the mode parameter. Note that this method does not
-        // tests the array if is ordered or not.
-        let mode = true;
-        for (let i = 0; i < array.length - 1; i++) {
-            if (array[i] > array[i + 1]) {
-                mode = false;
-                break;
-            }
+        }*/
+        if (!conditions.IsNumber(element) && !conditions.IsString(element)) {
+            errors.IncorrectElementParameterInRemoveElementFromSortedArray();
         }
-        if (array.length === 0) return new SortLib({array: [],'sort mode': true, 'status': 'sorted'});
-        const updatedArray = sort_algorithms.remove_element_form_sorted_array(array, element, mode);
-        return new SortLib({ array: updatedArray, 'sort mode': mode, status: 'sorted' });
+        if (!conditions.IsBoolean(mode)) {
+            if (mode === 'increase') mode = true;
+            else if (mode === 'decrease') mode = false;
+            else mode = true;
+        }
+        if (array.length === 0) return [];
+        return models.RemoveElementFormSortedArray(array, element, mode);
     }
     /**
      * 
@@ -332,35 +255,37 @@ class SortLib {
      * @param {string | Array} property 
      * @param {object} element 
      * @param {boolean | 'increase' | 'decrease'} mode
-     * @returns {SortLib}
+     * @param {boolean} test
+     * @returns {{array: Array.<object>, indices : Array.<number>}}
      * @description this method removes/deletes a given element
      * from sorted by property array from object arrays. 
      */
-    static remove_element_from_sorted_object_array_by_property(array, property, element, mode) {
-        new validator(array).is_array_and_for_any(el => {
-            return el.not().is_object();
-        }).on(true, () => {
-            errors.IncorrectArrayInRemoveElementFromSortedObjectArray();
-        });
-        new validator(property).is_string_array()
-            .on(false, () => {
-                errors.IncorrectPropertyParameterInRemoveElementFromSortedObjectArray();
-            });
-        new validator(element).is_object()
-            .on(false, () => {
-                errors.IncorrectElementParameterInRemoveElementFromSortedObjectArray();
-            });
-        // define the mode
-        new validator(mode).is_boolean().or().is_same('increase')
-            .or().is_same('decrease').on(true, () => {
-                if (mode === 'increase') mode = true;
-                else if (mode === 'decrease') mode = false;
-            }).on(false, () => {
+    static remove_element_from_sorted_object_array_by_property(array, property, element, mode, test = false) {
+        if (conditions.IsString(property)) property = [property];
+        if (!conditions.IsStringArray(property)) {
+            errors.IncorrectPropertyParameterInRemoveElementFromSortedObjectArray();
+        }
+        if (test) {
+            if (!conditions.IsCorrectObjectArray(array, property)) {
+                errors.IncorrectArrayInRemoveElementFromSortedObjectArray();
+            }
+        }
+        if (!conditions.IsObject(element)) {
+            errors.IncorrectElementParameterInRemoveElementFromSortedObjectArray();
+        }
+        if (!conditions.IsCorrectElement(element, property)) {
+            errors.IncorrectElementParameterInRemoveElementFromSortedObjectArray();
+        }
+        // (re)define the mode
+        if (!conditions.IsBoolean(mode)) {
+            if (mode === 'increase') mode = true;
+            else if (mode === 'decrease') mode = false;
+            else {
                 errors.IncorrectModeParameterInRemoveElementFromSortedObjectArray();
-            });
-        if (array.length === 0) return {array: [], indices: []};
-        const updatedArray = sort_algorithms.remove_element_from_sorted_object_array(array, property, element, mode);
-        return updatedArray;
+            }
+        }
+        if (array.length === 0) return { array: [], indices: [] };
+        return models.RemoveElementFromSortedObjectArray(array, property, element, mode);
     }
     /**
      * @method merge_sort
@@ -371,7 +296,19 @@ class SortLib {
      * algorithm that is invented from Jon von Neumann in 1945
      */
     static merge_sort(array, sort_mode) {
-        return sort_algorithms.merge_sort(array, sort_mode);
+        return models.MergeSort(array, sort_mode);
+    }
+    /**
+     * 
+     * @param {Array.<number | string>} array 
+     * @param {boolean | "increase" | "decrease"} sort_mode 
+     * @returns {Array.<number | string>}
+     * @description this method applies the merge sort algorithm
+     * to sort an array and returns only the array without the
+     * corresponded indices of the array.
+     */
+    static merge_sort_array(array, sort_mode) {
+        return models.MergeSortArray(array, sort_mode);
     }
     /**
      * 
@@ -388,7 +325,16 @@ class SortLib {
      * descending order.
      */
     static insertion_sort(array, sort_mode) {
-        return sort_algorithms.insertion_sort(array, sort_mode);
+        return models.InsertionSort(array, sort_mode);
+    }
+    /**
+     * 
+     * @param {Array.<number | string>} array 
+     * @param {boolean | 'increase' | 'decrease'} sort_mode 
+     * @returns {Array.<number | string>}
+     */
+    static insertion_sort_array(array, sort_mode) {
+        return models.InsertionSortArray(array, sort_mode);
     }
     /**
      * 
@@ -403,19 +349,39 @@ class SortLib {
      * not fast sorting algorithm. 
      */
     static selection_sort(array, sort_mode) {
-        return sort_algorithms.selection_sort(array, sort_mode);
+        return models.SelectionSort(array, sort_mode);
     }
     /**
      * 
-     * @param {array.<number | string>} array 
+     * @param {Array.<number | string>} array 
+     * @param {boolean | 'increase' | 'decrease'} sort_mode 
+     * @returns {Array.<number | string>}
+     * @description this method applies the selection sort algorithm
+     * to the array parameter and returns only the sorted array.
+     */
+    static selection_sort_array(array, sort_mode) {
+        return models.SelectionSortArray(array, sort_mode);
+    }
+    /**
+     * 
+     * @param {Array.<number | string>} array 
      * @param {boolean | 'increase' | 'decrease'} sort_mode
-     * @returns {{array : Array.<number | string>, indices : Array.<number>}}
+     * @returns {{array: Array.<number | string>, indices : Array.<number>}}
      * @description This static method implements the
      * quick sort algorithm that was created form
      * Tony Hoare in 1959 and published in 1961. 
      */
     static quick_sort(array, sort_mode) {
-        return sort_algorithms.quick_sort(array, sort_mode);
+        return models.QuickSort(array, sort_mode);
+    }
+    /**
+     * 
+     * @param {array.<number>} array 
+     * @param {boolean | 'increase' | 'decrease'} sort_mode 
+     * @returns {Array.<number | string>}
+     */
+    static quick_sort_array(array, sort_mode) {
+        return models.QuickSortArray(array, sort_mode);
     }
     /**
      * 
@@ -426,7 +392,19 @@ class SortLib {
      * bubble sort algorithm. 
      */
     static bubble_sort(array, sort_mode) {
-        return sort_algorithms.bubble_sort(array, sort_mode);
+        return models.BubbleSort(array, sort_mode);
+    }
+    /**
+     * 
+     * @param {Array.<number | string>} array 
+     * @param {boolean | 'increase' | 'decrease'} sort_mode 
+     * @returns {Array.<number | string>}
+     * @description this method applies the bubble sort
+     * algorithm on the array parameter and returns only
+     * the sorted array.
+     */
+    static bubble_sort_array(array, sort_mode) {
+        return models.BubbleSortArray(array, sort_mode);
     }
     /**
      * 
@@ -437,9 +415,20 @@ class SortLib {
      * algorithm invented by J.W.J. Williams in 1964.
      */
     static heap_sort(array, sort_mode) {
-        return sort_algorithms.heap_sort(array, sort_mode);
+        return models.HeapSort(array, sort_mode);
     }
-
+    /**
+     * 
+     * @param {Array.<number | string>} array 
+     * @param {boolean | 'increase' | 'decrease'} sort_mode 
+     * @returns {Array.<number | string>}
+     * @description this method applies the heap sort
+     * algorithm on the array parameter and returns only
+     * the sorted array without the indices.
+     */
+    static heap_sort_array(array, sort_mode) {
+        return models.HeapSortArray(array, sort_mode);
+    }
     /**
      * 
      * @param {Array.<number | string>} array 
@@ -451,7 +440,19 @@ class SortLib {
      * has complexity proportional to O(n^2).
      */
     static cocktail_sort(array, sort_mode) {
-        return sort_algorithms.cocktail_sort(array, sort_mode);
+        return models.CocktailSort(array, sort_mode);
+    }
+    /**
+     * 
+     * @param {Array.<number | string>} array 
+     * @param {boolean | 'increase' | 'decrease'} sort_mode 
+     * @returns {Array.<number | string>}
+     * @description this method applies the cocktail sort
+     * algorithm to the array parameter and returns only
+     * the sorted array without the indices.
+     */
+    static cocktail_sort_array(array, sort_mode) {
+        return models.CocktailSortArray(array, sort_mode);
     }
     /**
      * 
@@ -463,17 +464,31 @@ class SortLib {
      * the bucket sort algorithm. 
      */
     static bucket_sort(array, buckets, sort_mode) {
-        new validator(array).not().is_number_array()
-            .on(true, () => errors.IncorrectArrayParameterInBucketSort());
-        new validator(buckets)
-            .is_integer().on(false, () => buckets = array.length >> 1)
-        new validator(buckets).not().is_in_range(0, array.length).on(true, () => buckets = array.length - 1);
-        return sort_algorithms.bucket_sort(array, buckets, sort_mode);
+        if (!conditions.IsNumberArray(array)) errors.IncorrectArrayParameterInBucketSort();
+        if (!conditions.IsInteger(buckets)) buckets = array.length >> 1;
+        if (buckets <= 0 || buckets >= array.length) buckets = array.length - 1;
+        return models.BucketSort(array, buckets, sort_mode);
+    }
+    /**
+     * 
+     * @param {Array.<number | string>} array 
+     * @param {number} buckets 
+     * @param {boolean | 'increase' | 'decrease'} sort_mode 
+     * @returns {Array.<number | string>}
+     * @description this method applies the bucket sort algorithm
+     * on the array argument and returns only the sorted array
+     * without the indices.
+     */
+    static bucket_sort_array(array, buckets, sort_mode) {
+        if (!conditions.IsNumberArray(array)) errors.IncorrectArrayParameterInBucketSort();
+        if (!conditions.IsInteger(buckets)) buckets = array.length >> 1;
+        if (buckets <= 0 || buckets >= array.length) buckets = array.length - 1;
+        return models.BucketSortArray(array, buckets, sort_mode);
     }
     /**
      * 
      * @param {number} n 
-     * @param {number | 123456} seed
+     * @param {number} seed
      * @param {function(number, number)} callback
      * @returns {Array.<number | {}>}
      * @description this is an utility static method,
@@ -499,10 +514,10 @@ class SortLib {
      * const arr = SortLib.generate_random_array(100, null, el => (el * 100) << 0)
      **/
     static generate_random_array(n, seed = 123456, callback) {
-        new validator(seed).not().is_number().on(true, () => seed = 123456);
-        new validator(n).is_integer().on(false, () => errors.IncorrectParameterInGRA());
-        new validator(callback).is_function().on(false, () => callback = null);
-        return sort_algorithms.generate_random_array(n, seed, callback);
+        if (!conditions.IsInteger(seed)) seed = 123456;
+        if (!conditions.IsInteger(n)) errors.IncorrectParameterInGRA();
+        if (!conditions.IsFunction(callback)) callback = null;
+        return models.GenerateRandomArray(n, seed, callback);
     }
     /**
      * 
@@ -527,17 +542,17 @@ class SortLib {
      * });
      */
     static generate_random_string_array(length, word_size, seed, callback) {
-        new validator(length).not().is_integer().on(true, () => errors.IncorrectLengthInGRSA());
-        new validator(word_size).not().is_integer().and().not().is_bigger_than(0)
-            .on(true, () => errors.IncorrectWordSizeInGRSA());
-        new validator(seed).not().is_integer().on(true, () => seed = 123456);
-        return sort_algorithms.generate_random_string_array(length, word_size, seed, callback);
+        if (!conditions.IsInteger(length)) errors.IncorrectLengthInGRSA();
+        if (!conditions.IsInteger(word_size)) errors.IncorrectWordSizeInGRSA();
+        if (!conditions.IsInteger(seed)) seed = 123456;
+        return models.GenerateRandomStringArray(length, word_size, seed, callback);
     }
     /**
      * 
      * @param {Array.<number | string>} array 
      * @param {number} n
      * @returns {{array : Array.<number | string>, indices : Array.<number>}}
+     * @param {boolean} show_warnings
      * @description this method finds out the p best elements of an array of
      * number or string elements. The p has to be either integer which is
      * bigger than 0 or a real number into the open interval (0, 1). If the
@@ -546,38 +561,36 @@ class SortLib {
      * In this case the speed (time efficiency) of the algorithm will be the same
      * as the complexity of the heap sort algorithm. 
      */
-    static find_best_elements(array, n) {
-        new validator(array).not().is_number_array()
-            .and().not().is_string_array()
-            .on(true, () => {
-                errors.IncorrectArrayParameterInFindBestElements();
-            })
-        new validator(n).is_undefined()
-            .on(true, () => n = array.length)
-        new validator(n).not().is_number()
-            .on(true, () => {
+    static find_best_elements(array, n, show_warnings = false) {
+        if (!conditions.IsStringArray(array) && !conditions.IsNumberArray(array)) {
+            errors.IncorrectArrayParameterInFindBestElements();
+        }
+        if (conditions.IsUndefined(n)) n = array.length
+        if (!conditions.IsNumber(n)) {
+            if (show_warnings) {
                 warnings.IncorrectCountParameterInFindBestElements()
-            })
-        new validator(n).is_integer().and().is_in_closed_range(1, array.length)
-            .on(false, () => {
-                new validator(n).is_float().and().is_in_range(0, 1)
-                    .on(false, () => {
-                        warnings.IncorrectCountParameterInFindBestElements()
-                    });
-            });
-        new validator(n).is_float().and().is_in_range(0, 1)
-            .on(true, () => {
-                n = ((array.length * n) >> 0);
-                if (n === 0) n = 1;
-                if (n > array.length) n = array.length;
-            })
-        return sort_algorithms.find_best_elements(array, n);
+            }
+        }
+        if (conditions.IsNumber(n)) {
+            if (!(n >= 1) || !(n <= array.length)) {
+                if (show_warnings) {
+                    warnings.IncorrectCountParameterInFindBestElements()
+                }
+            }
+        }
+        if (conditions.IsNumber(n) && !conditions.IsInteger(n)) {
+            if (n > 0 && n < 1) n = ((array.length * n) >> 0);
+            if (n === 0) n = 1;
+            if (n > array.length) n = array.length;
+        }
+        return models.FindBestElements(array, n);
     }
     /**
      * 
      * @param {Array.<number | string>} array 
      * @param {number} n
      * @returns {{array : Array.<number | string>, indices : Array.<number>}}
+     * @param {boolean} show_warnings
      * @description this method returns the worst (smallest) n elements
      * of an string or number array. If the array is not correctly defined,
      * then the method will throw an error. If the n is not integer
@@ -585,21 +598,19 @@ class SortLib {
      * the method throws a warning message and assumes that n is equals to
      * the array.length.
      */
-    static find_worst_elements(array, n) {
-        new validator(array).not().is_number_array()
-            .and().not().is_string_array()
-            .on(true, () => errors.IncorrectArrayParameterInFindWorstElements());
-        new validator(n).not().is_integer()
-            .and().not().is_in_closed_range(1, array.length)
-            .or().not().is_float().and().is_in_range(0, 1)
-            .on(true, () => {
-                warnings.IncorrectCountParameterInFindWortsElements();
-            });
-        new validator(n).is_bigger_than(array.length).and().is_integer()
-            .or().is_float().and().not().is_in_range(0, 1)
-            .on(true, () => n = array.length);
-        new validator(n).is_in_range(0, 1).on(true, () => n = (array.length * n) >> 0);
-        return sort_algorithms.find_worst_elements(array, n);
+    static find_worst_elements(array, n, show_warnings = false) {
+        if (!conditions.IsNumberArray(array) && !conditions.IsStringArray(array)) {
+            errors.IncorrectArrayParameterInFindWorstElements();
+        }
+        if (conditions.IsNumber(n)) {
+            if (!conditions.IsInteger(n) && !(n >= 0 && n <= 1) || n >= array.length) {
+                if (show_warnings) warnings.IncorrectCountParameterInFindWortsElements();
+                if (n >= 0 && n < 1) n = n * array.length << 0;
+                if (!conditions.IsInteger(n)) n = n << 0;
+                if (n > array.length) n = array.length;
+            }
+        } else n = array.length;
+        return models.FindWorstElements(array, n);
     }
     /**
      * 
@@ -607,6 +618,7 @@ class SortLib {
      * @param {string | Array.<string>} property 
      * @param {boolean | 'increase' | 'decrease'} mode 
      * @param {'quick sort' | 'merge sort' | 'heap sort' | 'bucket sort'} algorithm
+     * @param {boolean} show_warnings
      * @returns {{array : Array.<object>, indices : Array.<number>}}
      * @description this method sorts an array of object elements by given property or
      * by given set of properties. If the array is not constructed form object elements,
@@ -638,27 +650,27 @@ class SortLib {
      * let is_same = new validator(output).is_same(result).answer
      * console.log(is_same) // true (the forth element is omitted)
      */
-    static sort_object_array_by_property(array, property, mode, algorithm) {
-        new validator(array).not().is_array()
-            .on(true, () => {
+    static sort_object_array_by_property(array, property, mode, algorithm, show_warnings = false, test = false) {
+        const allowedAlgorithms = ['merge sort', 'quick sort', 'heap sort', 'bucket sort'];
+        const mode_types = [true, false, 'decrease', 'increase'];
+        if (conditions.IsString(property)) property = [property];
+        if (!conditions.IsStringArray(property)) {
+            errors.IncorrectPropertyInSortObjectArray();
+        }
+        if (test) {
+            if (!conditions.IsCorrectObjectArray(array, property)) {
                 errors.IncorrectArrayParameterInSortObjectArray();
-            });
-        new validator(property).not().is_string().and().not().is_string_array()
-            .on(true, () => {
-                errors.IncorrectPropertyInSortObjectArray();
-            });
-        new validator(mode).is_undefined().or().not().is_same_with_any([true, false, 'decrease', 'increase'])
-            .on(true, () => {
-                warnings.IncorrectOrUndefinedModeParameterInSortObjectArray();
-                mode = true;
-            });
-        new validator(algorithm).is_undefined()
-            .or().not().is_same_with_any(['merge sort', 'quick sort', 'heap sort', 'bucket sort'])
-            .on(true, () => {
-                warnings.IncorrectOrUndefinedAlgorithmParameterInSortObjectArray();
-                algorithm = 'quick sort';
-            });
-        return sort_algorithms.sort_object_array_by_property(array, property, mode, algorithm);
+            }
+        }
+        if (conditions.IsUndefined(mode) || !conditions.IsSameWithAny(mode, mode_types)) {
+            if (show_warnings) warnings.IncorrectOrUndefinedModeParameterInSortObjectArray();
+            mode = true;
+        }
+        if (conditions.IsUndefined(algorithm) || !conditions.IsSameWithAny(algorithm, allowedAlgorithms)) {
+            if (show_warnings) warnings.IncorrectOrUndefinedAlgorithmParameterInSortObjectArray();
+            algorithm = 'quick sort';
+        }
+        return models.SortObjectArrayByProperty(array, property, mode, algorithm);
     }
     /**
      * 
@@ -676,26 +688,32 @@ class SortLib {
      * If the n parameter is a floating point number, then the first 100 * n% best elements
      * will be returned.
      */
-    static find_best_for_object_array_by_property(array, property, n) {
-        new validator(array).not().is_array()
-            .on(true, () => errors.IncorrectArrayParameterInFindBestInObjectArray());
-        new validator(property).not().is_string()
-            .and().not().is_string_array().on(true, () => {
-                errors.IncorrectPropertyParameterInFindBestInObjectArray();
-            });
-        new validator(n).is_float().and().is_in_range(0, 1)
-            .on(true, () => {
-                n = (array.length * n) >> 0;
-            });
-        new validator(n).is_integer().and().is_in_closed_range(1, n)
-            .on(false, () => n = array.length);
-        return sort_algorithms.find_best_for_object_array_by_property(array, property, n);
+    static find_best_for_object_array_by_property(array, property, n, test = false) {
+        if (conditions.IsString(property)) property = [property];
+        if (!conditions.IsStringArray(property)) {
+            errors.IncorrectPropertyParameterInFindBestInObjectArray();
+        }
+        if (test) {
+            if (!conditions.IsCorrectObjectArray(array, property)) {
+                errors.IncorrectArrayParameterInFindBestInObjectArray()
+            }
+        }
+        if (conditions.IsNumber(n)) {
+            if (conditions.IsInteger(n)) {
+                if (n <= 0 || n > array.length) n = array.length;
+            } else if (n > 0 && n < 1) {
+                n = n * array.length << 0;
+            } else n = array.length
+        } else n = array.length;
+        if (n === array.length) return models.SortObjectArrayByProperty(array, property, false, 'quick sort');
+        else return models.FindBestForObjectArrayByProperty(array, property, n);
     }
     /**
      * 
      * @param {Array.<object>} array
      * @param {string | Array.<string>} 
      * @param {number} n
+     * @param {boolean} test
      * @returns {{array : Array.<object>, indices : Array.<number>}}
      * @description this method finds out the n most worst elements of an
      * array, each element of which is an object by given property or set of
@@ -705,46 +723,50 @@ class SortLib {
      * message.Finally if some level of the property array is not object, then the
      * method throws error for incorrect property parameter. 
      */
-    static find_worst_for_object_array_by_property(array, property, n) {
-        new validator(array).not().is_array()
-            .on(true, () => errors.IncorrectArrayParameterInFindWorstInObjectArray());
-        new validator(property).not().is_string().and().not().is_string_array()
-            .on(true, () => errors.IncorrectPropertyParameterInFindWorstInObjectArray());
-        new validator(n).not().is_integer().and().not().is_in_closed_range(1, array.length)
-            .and().not().is_float().and().not().is_in_range(0, 1)
-            .on(true, () => errors.IncorrectCountParameterInFindWorstInObjectArray());
-        new validator(n).is_float().and().is_in_range(0, 1)
-            .on(true, () => {
-                n = (array.length * n) << 0;
-            });
-        new validator(n).is_same(array.length).on(true, () => {
-            return sort_algorithms.sort_object_array_by_property(array, property, true, 'quick sort');
-        });
-        return sort_algorithms.find_worst_for_object_array_by_property(array, property, n);
+    static find_worst_for_object_array_by_property(array, property, n, test = false) {
+        if (conditions.IsString(property)) property = [property];
+        if (!conditions.IsStringArray(property)) {
+            errors.IncorrectPropertyParameterInFindWorstInObjectArray()
+        }
+        if (test) {
+            if (!conditions.IsCorrectObjectArray(array, property)) {
+                errors.IncorrectArrayParameterInFindWorstInObjectArray()
+            }
+        }
+        if (conditions.IsNumber(n)) {
+            if (conditions.IsInteger(n)) {
+                if (n <= 0 || n > array.length) n = array.length;
+            } else if (n > 0 && n < 1) n = n * array.length << 0;
+            else n = array.length;
+        } else n = array.length;
+        if (n === array.length) return models.SortObjectArrayByProperty(array, property, true, 'quick sort');
+        else return models.FindWorstForObjectArrayByProperty(array, property, n);
     }
     get algorithm() {
-        return this.__algorithm__;
+        return this.#algorithm;
     }
     /**
-     * @param {string} algorithm
+     * @param {"quick sort" | "merge sort" | "heap sort" | "bucket sort" | "cocktail sort" | "insertion sort" | "selection sort" | "bubble sort"} algorithm
      * @description this method set the algorithm that
      * the current SortLib instance will use to sort
      * the items of the array. 
      */
     set algorithm(algorithm) {
-        new validator(algorithm).is_same_with_any(sort_algorithms_list)
-            .on(true, () => this.__algorithm__ = algorithm)
-            .on(false, () => {
-                warnings.IncorrectAlgorithmInAlgorithmSetter();
+        if (conditions.IsSortingAlgorithm(algorithm)) {
+            this.#algorithm = algorithm;
+        } else {
+            this.#algorithm = 'merge sort';
+            if (this.show_warnings) {
+                warnings.IncorrectAlgorithmDeclaration();
                 infos.AutomaticallySetToDefault({ algorithm: 'merge sort' });
-                this.__algorithm__ = 'merge sort';
-            })
+            }
+        };
     }
     get size() {
-        return this.__size__;
+        return this.#array.length;
     }
     get array() {
-        return this.__array__;
+        return this.#array;
     }
     /**
      * @param {Array.<number | string>} array
@@ -752,15 +774,14 @@ class SortLib {
      * of the current SortLib instance.
      */
     set array(array) {
-        new validator(array).is_number_array().or().is_string_array()
-            .on(true, () => {
-                this.__array__ = array;
-                this.__size__ = array.length;
-            })
-            .on(false, () => errors.IncorrectArrayInSetterArray())
+        if (!conditions.IsCorrectArray(array)) {
+            errors.IncorrectArrayInSetterArray();
+        }
+        this.#array = array;
+        this.#indices = models.GenerateInitialIndices(this.size);
     }
     get indices() {
-        return this.__indices__;
+        return this.#indices;
     }
     /**
      * @param {Array.<number | string>} indices
@@ -768,30 +789,29 @@ class SortLib {
      * property of the current SortLib instance.
      */
     set indices(indices) {
-        new validator(indices).is_number_array().and().has_length(this.size)
-            .and().for_all(elements => {
-                return elements.is_equal_or_bigger_than(0).is_lesser_than(this.size);
-            }).on(true, () => {
-                this.__indices__ = indices;
-            }).on(false, () => errors.IncorrectIndicesParameterInSetter());
+        if (conditions.IsCorrectlyDefinedIndices(indices, this.size)) {
+            this.#indices = indices;
+        } else if (conditions.IsUndefined(indices)) {
+            this.#indices = models.GenerateInitialIndices(this.size);
+        } else {
+            errors.IncorrectIndicesParameterInSetter()
+        }
     }
     /**
      * @param {{index : number, item  : number | string}} options
      * @description This method set the item of some index. 
      */
     set index(options) {
-        new validator(options).is_object()
-            .on(true, () => {
-                new validator(options.index).is_in_closed_range(0, this.size - 1)
-                    .and().bind(new validator(options.item).is_number())
-                    .on(false, () => errors.IncorrectArgumentInIndexSetter())
-                    .on(true, () => {
-                        this.__array__[options.index] = options.item;
-                    })
-            }).on(false, () => errors.IncorrectArgumentInIndexSetter());
+        if (!conditions.IsObject(options)) errors.IncorrectArgumentInIndexSetter()
+        if (conditions.IsInteger(options.index)
+            && conditions.IsNumber(options.item)) {
+            if (options.index >= 0 && options.index < this.size) {
+                this.#array[options.index] = options.item;
+            } else errors.IncorrectArgumentInIndexSetter()
+        } else errors.IncorrectArgumentInIndexSetter()
     }
     get status() {
-        return this.__status__;
+        return this.#status;
     }
     /**
      * @param {"sorted" | "unsorted"} status
@@ -799,11 +819,10 @@ class SortLib {
      * property of the current SortLib instance.
      */
     set status(status) {
-        new validator(status).is_string().and()
-            .is_same_with_any(['sorted', 'unsorted'])
-            .on(true, () => {
-                this.__status__ = status;
-            }).on(false, () => errors.IncorrectStatusInSetter());
+        if (!conditions.IsStatus(status)) {
+            errors.IncorrectStatusInSetter();
+        };
+        this.#status = status;
     }
     /**
      * @param {"increase" | "decrease" | boolean } sort_mode
@@ -817,33 +836,81 @@ class SortLib {
      * current SortLib instance. 
      */
     set ['sort mode'](sort_mode) {
-        new validator(sort_mode).is_string().or().is_boolean()
-            .on(true, () => {
-                new validator(sort_mode).is_same_with_any([true, false, 'increase', 'decrease'])
-                    .on(true, () => this.__sort_mode__ = sort_mode)
-                    .on(false, () => {
-                        warnings.IncorrectSortModeDeclaration();
-                        infos.AutomaticallySetToDefault({ "sort mode": "increase" });
-                        this.__sort_mode__ = 'increase';
-                    });
-            }).on(false, () => {
-                warnings.IncorrectSortModeDeclaration();
-                infos.AutomaticallySetToDefault({ "sort mode": "decrease" });
-                this.__sort_mode__ = 'increase';
-            })
+        return this.sort_mode = sort_mode;
     }
     get ['sort mode']() {
-        return this.__sort_mode__;
+        return this.#sort_mode;
     }
     get sort_mode() {
-        return this['sort mode']();
+        return this.#sort_mode;
     }
     /**
-     * @param {"increase" | "decrease" | boolean} sort_mode
-     * @description See the sort mode setter method.
+     * @param {"increase" | "decrease" | boolean} sortMode
+     * @description This method set the order of sorting of the
+     * array property. The possible values are "increase" if we
+     * want to sort the array in ascending order, "decrease" in
+     * the case that we want to sort the array in descending order.
+     * The same values can be expressed with boolean values i.e.
+     * true for the "increase" case and false for the "decrease"
+     * case. The choice is saved in the property sort_mode of the
+     * current SortLib instance. 
      */
-    set sort_mode(sort_mode) {
-        this['sort mode'] = sort_mode;
+    set sort_mode(sortMode) {
+        if (conditions.IsSortMode(sortMode)) {
+            this.#sort_mode = sortMode;
+        } else {
+            if (this.show_warnings) {
+                warnings.IncorrectSortModeDeclaration();
+                infos.AutomaticallySetToDefault({ 'sort mode': 'increase' });
+            }
+            this.#sort_mode = 'increase';
+        };
+    }
+    add(element) {
+        if (!conditions.IsNumber(element) && !conditions.IsString(element)) {
+            errors.IncorrectElementInAddElementInSortedArray()
+        }
+        if (this.#status === 'unsorted') this.sort()
+        this.#array = models.AddElementInSortedArray(this.#array, element, this.#sort_mode);
+        this.#indices = models.GenerateInitialIndices(this.size);
+        return this;
+    }
+    /**
+     * 
+     * @param {number | string} element
+     * @returns { SortLib} 
+     * @description this method 
+     * sorts the array if its status is not sorted,
+     * deletes/removes the first item of the array 
+     * which is equals to the element parameter and 
+     * finally generates new indices of the array.
+     *  
+     */
+    delete(element) {
+        if (!conditions.IsNumber(element) && !conditions.IsString(element)) {
+            errors.IncorrectElementParameterInRemoveElementFromSortedArray();
+        }
+        if (this.status !== 'sorted') this.sort();
+        const removeModel = models.RemoveElementFormSortedArray(this.#array, element, this.sort_mode);
+        this.#array = removeModel.array;
+        this.#indices = removeModel.indices;
+        return this;
+    }
+    /**
+     * 
+     * @param {function(number, number, Array)} callback 
+     * @returns {SortLib}
+     * @description this method filters the elements
+     * of the current SortLib instance by given function. 
+     */
+    filter (callback) {
+        if (!conditions.IsFunction(callback)) {
+            errors.IncorrectCallbackParameterInFilter();
+        }
+        const filtered = models.Filter(this.#array, callback);
+        this.#array = filtered.array;
+        this.#indices = filtered.indices;
+        return this;
     }
     /**
      * @returns {SortLib}
@@ -860,27 +927,27 @@ class SortLib {
         if (this.size <= 1) return this;
         else if (this.status === 'sorted') return this;
         else {
-            if (this.algorithm === 'merge sort') output = sort_algorithms.merge_sort(this.array, this["sort mode"]);
-            else if (this.algorithm === 'quick sort') output = sort_algorithms.quick_sort(this.array, this["sort mode"]);
-            else if (this.algorithm === 'bubble sort') output = sort_algorithms.bubble_sort(this.array, this["sort mode"]);
-            else if (this.algorithm === 'heap sort') output = sort_algorithms.heap_sort(this.array, this["sort mode"]);
-            else if (this.algorithm === 'insertion sort') output = sort_algorithms.insertion_sort(this.array, this["sort mode"]);
-            else if (this.algorithm === 'selection sort') output = sort_algorithms.selection_sort(this.array, this["sort mode"]);
-            else if (this.algorithm === 'cocktail sort') output = sort_algorithms.cocktail_sort(this.array, this["sort mode"]);
-            else if (this.algorithm === 'bucket sort') output = sorting_algorithms.bucket_sort(this.array, this["sort mode"]);
+            if (this.algorithm === 'merge sort') output = models.MergeSort(this.array, this["sort mode"]);
+            else if (this.algorithm === 'quick sort') output = models.QuickSort(this.array, this["sort mode"]);
+            else if (this.algorithm === 'bubble sort') output = models.BubbleSort(this.array, this["sort mode"]);
+            else if (this.algorithm === 'heap sort') output = models.HeapSort(this.array, this["sort mode"]);
+            else if (this.algorithm === 'insertion sort') output = models.InsertionSort(this.array, this["sort mode"]);
+            else if (this.algorithm === 'selection sort') output = models.SelectionSort(this.array, this["sort mode"]);
+            else if (this.algorithm === 'cocktail sort') output = models.CocktailSort(this.array, this["sort mode"]);
+            else if (this.algorithm === 'bucket sort') output = SortLib.bucket_sort(this.array, null, this["sort mode"]);
             else {
-                infos.UnknownSortingMethod(this.algorithm);
-                infos.AutomaticallySetToDefault({ algorithm: "merge sort" });
+                if (this.show_warnings) {
+                    infos.UnknownSortingMethod(this.algorithm);
+                    infos.AutomaticallySetToDefault({ algorithm: "merge sort" });
+                }
                 this.algorithm = "merge sort";
-                output = sort_algorithms.merge_sort(this.array, this["sort mode"]);
+                output = models.MergeSort(this.array, this["sort mode"]);
             }
-            this.array = output.array;
-            this.indices = output.indices;
-            this.status = 'sorted';
+            this.#array = output.array;
+            this.#indices = output.indices;
+            this.#status = 'sorted';
         }
         return this;
     }
 }
-SortLib.version = package_file.version;
-SortLib.author = package_file.author;
 export default SortLib;
