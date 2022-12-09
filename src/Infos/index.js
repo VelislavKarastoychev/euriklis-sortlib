@@ -1,5 +1,2 @@
 'use strict';
-import AutomaticallySetToDefault from './AutomaticallySetToDefault.js';
-export  {
-    AutomaticallySetToDefault,
-};
+export { default as AutomaticallySetToDefault } from './AutomaticallySetToDefault.js';
