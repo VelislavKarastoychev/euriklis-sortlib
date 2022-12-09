@@ -1612,6 +1612,8 @@ Average time filter with validator: 8.993777289533616s.
 Average time conventional filter: 0.0030568875789642336s.
 ```
 This method is very inefficient!!!
+
+
 20. Filter the array with arbitrary callback function.
 
 Because the filter_with_validator static method is very inefficient, we create the method filter, which works in the same way as the conventional javascript filter method but in addition returns also the indices of the initial array. The method is available in static and instance form, so if you wish to filter the array you have to use the following methods:
