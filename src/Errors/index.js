@@ -1,73 +1,40 @@
 'use strict'
-import IncorrectArrayDeclarationInSortLibConstructor from './IncorrectArrayDeclarationInSortLibConstructor.js';
-import IncorrectArrayInAddElementInSortedArray from './IncorrectArrayInAddElementInSortedArray.js';
-import IncorrectArrayInSetterArray from './IncorrectArrayInSetterArray.js';
-import IncorrectArgumentInIndexSetter from './IncorrectArgumentInIndexSetter.js';
-import IncorrectStatusInSetter from './IncorrectStatusInSetter.js'; 
-import IncorrectStatusParameterInBucketSort from './IncorrectArrayParameterInBucketSort.js';
-import IncorrectParameterInGRA from './IncorrectParameterInGRA.js';
-import IncorrectArrayParameterInFindBestElements from './IncorrectArrayParameterInFindBestElements.js';
-import IncorrectArrayParameterInFindWorstElements from './IncorrectArrayParameterInFindWorstElements.js';
-import IncorrectArrayParameterInSortObjectArray from './IncorrectArrayParameterInSortObjectArray.js';
-import IncorrectPropertyInSortObjectArray from './IncorrectPropertyInSortObjectArray.js';
-import IncorrectArrayParameterInFindBestInObjectArray from './IncorrectArrayParameterInFindBestInObjectArray.js';
-import IncorrectPropertyParameterInFindBestInObjectArray from './IncorrectPropertyParameterInFindBestInObjectArray.js';
-import IncorrectArrayParameterInFindWorstInObjectArray from './IncorrectArrayParameterInFindWorstInObjectArray.js';
-import IncorrectPropertyParameterInFindWorstInObjectArray from './IncorrectPropertyParameterInFindWorstInObjectArray.js';
-import IncorrectCountParameterInFindWorstInObjectArray from './IncorrectCountParameterInFindWorstInObjectArray.js';
-import IncorrectArrayParameterInBucketSort from './IncorrectArrayParameterInBucketSort.js';
-import IncorrectElementInFindElementInSortedArray from './IncorrectElementInFindElementInSortedArray.js';
-import IncorrectArrayParameterInFindElementInSortedArray from './IncorrectArrayParameterInFindElementInSortedArray.js';
-import IncorrectArrayParameterInAddElementInSortedObjectArrayByProperty from './IncorrectArrayParameterInAddElementInSortedObjectArrayByProperty.js';
-import IncorrectPropertyParameterInAddElementInSortedObjectArrayByProperty from './IncorrectPropertyParameterInAddElementInSortedObjectArrayByProperty.js';
-import IncorrectElementInAddElementInSortedObjectArrayByProperty from './IncorrectElementInAddElementInSortedObjectArrayByProperty.js';
-import IncorrectLengthInGRSA from './IncorrectLengthInGRSA.js';
-import IncorrectWordSizeInGRSA from './IncorrectWordSizeInGRSA.js';
-import IncorrectArrayInFindElementsInSortedObjectArray from './IncorrectArrayInFindElementsInSortedObjectArray.js';
-import IncorrectPropertyParameterInFindElementsInSortedObjectArray from './IncorrectPropertyParameterInFindElementsInSortedObjectArray.js';
-import IncorrectElementParameterInFindElementsInSortedObjectArray from './IncorrectElementParameterInFindElementsInSortedObjectArray.js';
-import IncorrectArrayInFilterWithValidator from './IncorrectArrayInFilterWithValidator.js';
-import IncorrectArgumentOfCallbackInFilterWithValidator from './IncorrectArgumentOfCallbackInFilterWithValidator.js';
-import IncorrectArrayInRemoveElementFromSortedArray from './IncorrectArrayInRemoveElementFromSortedArray.js';
-import IncorrectElementParameterInRemoveElementFromSortedArray from './IncorrectElementParameterInRemoveElementFromSortedArray.js';
-import IncorrectArrayInRemoveElementFromSortedObjectArray from './IncorrectArrayInRemoveElementFromSortedObjectArray.js';
-import IncorrectPropertyParameterInRemoveElementFromSortedObjectArray from './IncorrectPropertyParameterInRemoveElementFromSortedObjectArray.js';
-import IncorrectElementParameterInRemoveElementFromSortedObjectArray from './IncorrectElementParameterInRemoveElementFromSortedObjectArray.js';
-import IncorrectModeParameterInRemoveElementFromSortedObjectArray from './IncorrectModeParameterInRemoveElementInSortedObjectArray.js';
-export {
-    IncorrectArrayDeclarationInSortLibConstructor,
-    IncorrectArrayInAddElementInSortedArray,
-    IncorrectArrayInSetterArray,
-    IncorrectArgumentInIndexSetter,
-    IncorrectStatusInSetter,
-    IncorrectStatusParameterInBucketSort,
-    IncorrectParameterInGRA,
-    IncorrectArrayParameterInFindBestElements,
-    IncorrectArrayParameterInFindWorstElements,
-    IncorrectArrayParameterInSortObjectArray,
-    IncorrectPropertyInSortObjectArray,
-    IncorrectArrayParameterInFindBestInObjectArray,
-    IncorrectPropertyParameterInFindBestInObjectArray,
-    IncorrectArrayParameterInFindWorstInObjectArray,
-    IncorrectPropertyParameterInFindWorstInObjectArray,
-    IncorrectCountParameterInFindWorstInObjectArray,
-    IncorrectArrayParameterInBucketSort,   
-    IncorrectElementInFindElementInSortedArray,
-    IncorrectArrayParameterInFindElementInSortedArray,
-    IncorrectArrayParameterInAddElementInSortedObjectArrayByProperty,
-    IncorrectPropertyParameterInAddElementInSortedObjectArrayByProperty,
-    IncorrectElementInAddElementInSortedObjectArrayByProperty,
-    IncorrectLengthInGRSA,
-    IncorrectWordSizeInGRSA,
-    IncorrectArrayInFindElementsInSortedObjectArray,
-    IncorrectPropertyParameterInFindElementsInSortedObjectArray,
-    IncorrectElementParameterInFindElementsInSortedObjectArray,
-    IncorrectArrayInFilterWithValidator,
-    IncorrectArgumentOfCallbackInFilterWithValidator,
-    IncorrectArrayInRemoveElementFromSortedArray,
-    IncorrectElementParameterInRemoveElementFromSortedArray,
-    IncorrectArrayInRemoveElementFromSortedObjectArray,
-    IncorrectPropertyParameterInRemoveElementFromSortedObjectArray,
-    IncorrectElementParameterInRemoveElementFromSortedObjectArray,
-    IncorrectModeParameterInRemoveElementFromSortedObjectArray,
-};
+export { default as IncorrectArgumentInIndexSetter } from './IncorrectArgumentInIndexSetter.js';
+export { default as IncorrectArgumentOfCallbackInFilterWithValidator } from './IncorrectArgumentOfCallbackInFilterWithValidator.js';
+export { default as IncorrectArrayDeclarationInSortLibConstructor } from './IncorrectArrayDeclarationInSortLibConstructor.js';
+export { default as IncorrectArrayInAddElementInSortedArray } from './IncorrectArrayInAddElementInSortedArray.js';
+export { default as IncorrectArrayInFilterWithValidator } from './IncorrectArrayInFilterWithValidator.js';
+export { default as IncorrectArrayInFindElementsInSortedObjectArray } from './IncorrectArrayInFindElementsInSortedObjectArray.js';
+export { default as IncorrectArrayParameterInFindElementInSortedArray } from './IncorrectArrayParameterInFindElementInSortedArray.js';
+export { default as IncorrectArrayInRemoveElementFromSortedArray } from './IncorrectArrayInRemoveElementFromSortedArray.js';
+export { default as IncorrectArrayInRemoveElementFromSortedObjectArray } from './IncorrectArrayInRemoveElementFromSortedObjectArray.js';
+export { default as IncorrectArrayInSetterArray } from './IncorrectArrayInSetterArray.js';
+export { default as IncorrectArrayParameterInAddElementInSortedObjectArrayByProperty } from './IncorrectArrayParameterInAddElementInSortedObjectArrayByProperty.js';
+export { default as IncorrectArrayParameterInBucketSort } from './IncorrectArrayParameterInBucketSort.js';
+export { default as IncorrectArrayParameterInFilter } from './IncorrectArrayParameterInFilter.js';
+export { default as IncorrectArrayParameterInFindBestElements } from './IncorrectArrayParameterInFindBestElements.js';
+export { default as IncorrectArrayParameterInFindBestInObjectArray } from './IncorrectArrayParameterInFindBestInObjectArray.js';
+export { default as IncorrectArrayParameterInFindWorstElements } from './IncorrectArrayParameterInFindWorstElements.js';
+export { default as IncorrectArrayParameterInFindWorstInObjectArray } from './IncorrectArrayParameterInFindWorstInObjectArray.js';
+export { default as IncorrectArrayParameterInSortObjectArray } from './IncorrectArrayParameterInSortObjectArray.js';
+export { default as IncorrectCallbackParameterInFilter } from './IncorrectCallbackParameterInFilter.js';
+export { default as IncorrectCountParameterInFindWorstInObjectArray } from './IncorrectCountParameterInFindWorstInObjectArray.js';
+export { default as IncorrectElementInAddElementInSortedArray } from './IncorrectElementInAddElementInSortedArray.js';
+export { default as IncorrectElementInAddElementInSortedObjectArrayByProperty } from './IncorrectElementInAddElementInSortedObjectArrayByProperty.js';
+export { default as IncorrectElementInFindElementInSortedArray } from './IncorrectElementInFindElementInSortedArray.js';
+export { default as IncorrectElementParameterInFindElementsInSortedObjectArray } from './IncorrectElementParameterInFindElementsInSortedObjectArray.js';
+export { default as IncorrectElementParameterInRemoveElementFromSortedArray } from './IncorrectElementParameterInRemoveElementFromSortedArray.js';
+export { default as IncorrectElementParameterInRemoveElementFromSortedObjectArray } from './IncorrectElementParameterInRemoveElementFromSortedObjectArray.js';
+export { default as IncorrectIndicesParameterInSetter } from './IncorrectIndicesParameterInSetter.js';
+export { default as IncorrectLengthInGRSA } from './IncorrectLengthInGRSA.js';
+export { default as IncorrectModeParameterInRemoveElementFromSortedObjectArray } from './IncorrectModeParameterInRemoveElementInSortedObjectArray.js';
+export { default as IncorrectParameterInGRA } from './IncorrectParameterInGRA.js';
+export { default as IncorrectPropertyParameterInAddElementInSortedObjectArrayByProperty } from './IncorrectPropertyParameterInAddElementInSortedObjectArrayByProperty.js';
+export { default as IncorrectPropertyParameterInFindBestInObjectArray } from './IncorrectPropertyParameterInFindBestInObjectArray.js';
+export { default as IncorrectPropertyParameterInFindElementsInSortedObjectArray } from './IncorrectPropertyParameterInFindElementsInSortedObjectArray.js';
+export { default as IncorrectPropertyParameterInFindWorstInObjectArray } from './IncorrectPropertyParameterInFindWorstInObjectArray.js';
+export { default as IncorrectPropertyParameterInRemoveElementFromSortedObjectArray } from './IncorrectPropertyParameterInRemoveElementFromSortedObjectArray.js';
+export { default as IncorrectStatusInSetter } from './IncorrectStatusInSetter.js';
+export { default as IncorrectPropertyInSortObjectArray } from './IncorrectPropertyInSortObjectArray.js';
+export { default as IncorrectStatusParameterInBucketSort } from './IncorrectArrayParameterInBucketSort.js';
+export { default as IncorrectWordSizeInGRSA } from './IncorrectWordSizeInGRSA.js';
