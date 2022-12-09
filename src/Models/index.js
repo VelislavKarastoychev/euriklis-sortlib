@@ -1,7 +1,34 @@
-'use strict'
-import sort_algorithms from './SortingAlgorithms.js';
-import sort_algorithms_list from './SortAlgorithmList.js';
-export  {
-    sort_algorithms,
-    sort_algorithms_list
-};
+'use strict';
+export { default as AddElementInSortedArray } from './AddElementInSortedArray.js';
+export { default as AddElementInSortedObjectArrayByProperty } from './AddElementInSortedObjectArrayByProperty.js';
+export { default as BubbleSort } from './BubbleSort.js';
+export { default as BubbleSortArray } from './BubbleSortArray.js';
+export { default as BucketSort } from './BucketSort.js';
+export { default as BucketSortArray } from './BucketSortArray.js';
+export { default as CocktailSort } from './CocktailSort.js';
+export { default as CocktailSortArray } from './CocktailSortArray.js';
+export { default as Filter } from './Filter.js';
+export { default as FilterWithValidator } from './FilterWithValidator.js';
+export { default as FindBestElements } from './FindBestElements.js';
+export { default as FindBestForObjectArrayByProperty } from './FindBestForObjectArrayByProperty.js';
+export { default as FindElementsInSortedArray } from './FindElementInSortedArray.js';
+export { default as FindElementsInSortedObjectArrayByProperty } from './FindElementInSortedObjectArray.js';
+export { default as FindWorstElements } from './FindWorstElements.js';
+export { default as FindWorstForObjectArrayByProperty } from './FindWorstForObjectArrayByProperty.js';
+export { default as GenerateInitialIndices } from './GenerateInitialIndices.js';
+export { default as GenerateRandomArray } from './GenerateRandomArray.js';
+export { default as GenerateRandomStringArray } from './GenerateRandomStringArray.js';
+export { default as HeapSort } from './HeapSort.js';
+export { default as HeapSortArray } from './HeapSortArray.js';
+export { default as InsertionSort } from './InsertionSort.js';
+export { default as InsertionSortArray } from './InsertionSortArray.js'
+export { default as MergeSort } from './MergeSort.js';
+export { default as MergeSortArray } from './MergeSortArray.js';
+export { default as QuickSort } from './QuickSort.js'
+export { default as QuickSortArray } from './QuickSortArray.js';
+export { default as RemoveElementFormSortedArray } from './RemoveElementFromSortedArray.js';
+export { default as RemoveElementFromSortedObjectArray } from './RemoveElementFromSortedObjectArray.js';
+export { default as SelectionSort } from './SelectionSort.js';
+export { default as SelectionSortArray } from './SelectionSortArray.js';
+export { default as SortObjectArrayByProperty } from './SortObjectArrayByProperty.js';
+export { default as sort_algorithms } from './SortingAlgorithms.js';
