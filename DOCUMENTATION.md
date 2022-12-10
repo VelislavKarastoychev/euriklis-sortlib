@@ -31,7 +31,7 @@ To use the static methods you simply have to call them from the SortLib
 import SortLib from '@euriklis/sortlib';
 const random_array = SortLib.generate_random_array(100);
 ```
-The SortLib package implements the __quick sort__, __merge sort__, __heap sort__, __bucket sort__, __cocktail sort__, __bubble sort__, __selection sort__ and __insertion sort__ algorithms for sorting of numeric/string arrays. Every of those algorithms need two parameters - the array and the sort mode , i.e the the order of which you wish to sort the array (increasing or decreasing order). Only the __bucket sort__ requires an additional argument which is the ___buckets___ - an integer smaller than the length of the array. If is not defined then the method set it automatically.
+The SortLib package implements the __quick sort__, __merge sort__, __heap sort__, __bucket sort__, __cocktail sort__, __bubble sort__, __selection sort__ and __insertion sort__ algorithms for sorting of numeric/string arrays. Every of those algorithms need two parameters - the array and the sort mode , i.e the order in which you wish to sort the array (increasing or decreasing order). Only the __bucket sort__ requires an additional argument which is the ___buckets___ - an integer smaller than the length of the array. If is not defined then the method set it automatically.
 We categorize the methods in three categories - fast, semi-fast and slow sorting algorithms. In the category of fast algorithms belong the methods quick sort, merge sort and heap sort. In the semi - fast group we put the algorithms bucket sort and cocktail sort which are efficiently fast when we require only array sorting without output of the indices. In the last group we put the slow algorithms which are the selection sort, the bubble sort and the insertion sort.
 1. Quick sort algorithm:
 
@@ -56,7 +56,7 @@ const sorted = SortLib.quick_sort(array, mode);
 console.log(sorted.array);
 console.log(sorted.indices);
 ``` 
-To call the quick sort with the instance method you have to declare an SortLib instance and after the setting of the parameters to call the method.
+To call the quick sort with the instance method you have to declare a SortLib instance and after the setting of the parameters to call the method.
 
 Example: 
 
@@ -73,7 +73,7 @@ sl.array = array;
 sl.sort_mode = 'decrease'; 
 sl.algorithm = 'quick sort';
 // see if sorting algorithm was applied
-// this array:
+// on this array:
 console.log(sl.status); // 'unsorted'
 sl.sort();
 console.log(sl) // nothing because all
@@ -85,7 +85,7 @@ console.log(sl.indices);
 // see if the array is sorted
 console.log(sl.status); // 'sorted'
 ```
-For versions 3.x.x is possible to use the quick sort algorithm as a static method only getting the sorted array without the indices. It make the execution of the algorithm more efficient with respect to the time.
+For versions 3.x.x is possible to use the quick sort algorithm as a static method only getting the sorted array without the indices. It makes the execution of the algorithm more efficient with respect to the time.
 
 ```js
 import SortLib from '@euriklis/sortlib';
@@ -595,7 +595,7 @@ sorted with js sort for 1.1352241854238512 seconds.
 
 5. Cocktail sort algorithm: 
 
-The cocktail sort belongs to the group of the cubic time (slowest or non efficient ) algorithms
+The cocktail sort belongs to the group of the semi - fast but slow and asymptotically non efficient algorithms.
 
 The static and instance methods for the cocktail sort algorithm follow the same structure as the other algorithms. So to use the static method you have to write:
 
@@ -696,7 +696,7 @@ sorted with js sort for 0.0035355447959899908 seconds.
 ```
 6. Selection sort.
 
-The selection sort is inefficient sorting algorithm for large arrays.
+The selection sort is inefficient sorting algorithm for medium and large arrays.
 
 
 To call the selection sort with the static method you have to write:
@@ -784,7 +784,7 @@ sorted with the integrated selection sort for 0.1070611577796936 seconds.
 sorted with js sort for 0.0035141040372848524 seconds.
 ```
 
-The instance method can be used when the algorithm property will be set to "selection sort".
+The instance method can be used when the algorithm property is set to "selection sort".
 
 ```js
 import SortLib from "@euriklis/sortlib";
@@ -967,14 +967,14 @@ sorted with js sort for 0.0037493426752090455 seconds.
 ```
 8. Bubble sort algorithm.
 
-The bubble sort is also inefficient sorting algorithm, but for small arrays it is commonly used like the insertion sort, because is very simple for implementation. Some sorting routines use the bubble sort when implement the quick sort, merge sort and bucket sort. In our library we prefer the insertion sort algorithm. Our selection was made randomly without some mathematical arguments. We was suggested for the insertion sort choice from the book of Manolis Lukakis.
+The bubble sort is also inefficient sorting algorithm, but for small arrays it is commonly used like the insertion sort, because it is very simple for implementation. Some sorting routines use the bubble sort when implement the quick sort, merge sort and bucket sort. In our library we prefer the insertion sort algorithm. Our selection was made randomly without some mathematical arguments. We was suggested for the insertion sort choice from the book of Manolis Lukakis.
 
 The static methods which apply the bubble sort are the following:
 
 ```js
 SortLib.bubble_sort(array, sort_mode); // returns {array, indices}
 ```
-and for the sorted array only you may use
+and for the sorted array only, you may use
 
 ```js
 SortLib.bubble_sort_array(array, sort_mode);
@@ -1199,7 +1199,7 @@ If in the array does not exist elements which are equal to the element parameter
 {array: [], indices: [-1]}
 ```
 
-otherwise the method will return the elements and their indices.
+otherwise the method will returns the elements and their indices.
 
 Example:
 
@@ -1243,7 +1243,7 @@ average time conventional find 0.025960877709388736s
 If the user wishes to find some elements in array of objects which are sorted by some property, then the method which has to be used is the static method:
 
 ```js
-SortLib.find_elements_in_sorted_object_array_by_property(array, element, mode, )
+SortLib.find_elements_in_sorted_object_array_by_property(array, element, mode )
 ```
 
 ```js
@@ -1286,7 +1286,7 @@ average time conventional find 3.786335378255842s
 
 Note that this method can not be used like instance method, because the SortLib constructor gets only number or string arrays.
 
-13. removing of element from sorted array. 
+13. Removing of element from sorted array. 
 
 If you wish to delete some element from a sorted array, then the method which has to be used is the:
 
@@ -1329,7 +1329,7 @@ average time of remove element with SortLib --> 0.038564315462112427s
 average time of remove element with filter --> 0.04613672134399412s
 ```
 The method does not tests if the inserted in it array argument is sorted, or if is number or string array.
-The corresponded instance method is the delete method, so if you wish to remove element from a SortLib instance you have to write:
+The corresponded instance method is the __delete()__ method, so if you wish to remove element from a SortLib instance you have to write:
 
 ```js
 const sl = new SortLib();
@@ -1387,7 +1387,7 @@ average time of conventional filter --> 0.43436287065982815s
 
 15. Generate random array:
 
-The package provides two static methods which generates number or string arrays with random values . However it is possible to create arbitrary arrays with using the callback parameter. The callback gets as parameters the element and the index of the array (automatically).
+The package provides two static methods which generate number or string arrays with random values . However it is possible to create arbitrary arrays with using the callback parameter. The callback gets as parameters the element and the index of the array (automatically).
 
 The syntax of the methods is:
 
@@ -1461,7 +1461,7 @@ SortLib.find_best_for_object_array_by_property(array, property, count, test);
 // and for the worst elements
 SortLib.find_worst_for_object_array_by_property(array, property, count, test);
 ```
-These methods return an object with key values array and indices. The test parameter is a boolean variable which when is set to true checks if the array has correct structure.
+These methods return an object with key values "array" and "indices". The test parameter is a boolean variable which when is set to true checks if the array has correct structure.
 If the test is set to true, then the method will be executed very inefficiently.
 
 Example:
@@ -1521,7 +1521,7 @@ Average time worst 10 with SortLib: 0.3290558718633652s
 Average time worst 10 conventional way: 2.41432895591259s
 ```
 
-18. Sort array of objects by property given number/string property.
+18. Sort array of objects by given number/string property value.
 
 If you have an array of objects and wish to sort it with respect to some number or string property with arbitrary depth, then you have to use the static method:
 
@@ -1529,7 +1529,7 @@ If you have an array of objects and wish to sort it with respect to some number 
 // returns {array, indices};
 SortLib.sort_object_array_by_property(array, property, mode, algorithm, show_warnings, test);
 ```
-The array has to be an object array, the property has to be a string or a string array, depending on the structure of the object, the mode as above is a boolean variable or has to be equals to "increase" or "decrease". The show_warnings and test are both boolean variables and by default are false. If test is true, then the array will be checked for correct structure.
+The array has to be an object array, the property has to be a string or a string array, depending on the structure of the object, the mode as above is a boolean variable or has to be equals to "increase" or "decrease". The "show_warnings" and "test" method parameters are both boolean variables and by default are set to false. If test is true, then the array will be checked for correct structure.
 
 Example: 
 
@@ -1627,7 +1627,7 @@ const sl = new SortLib();
 sl.array = some_array;
 sl.filter(callback(item, index, array)); // sets the array and the indices properties.
 ```
-If the callback is not function, then an error message will be thrown. For the static method the array is tested, so if the parameter is not array also an error message will be thrown.
+If the callback is not function, then an error message will be thrown. When we use the static method the "array" property will be tested and if is not array also an error message will be thrown.
 
 Example:
 
