@@ -10,14 +10,14 @@
  ```sh
 npm install @euriklis/sortlib --save
  ```
- or  for more strict mode if you wish to save the version you may use the command:
+ or  for more strict mode, if you wish to save the version, you may use the command:
 
  ```sh
  npm install @euriklis/sortlib@x.x.x --save-exact
  ```
 where with the "x.x.x" we denote the current version of the sortlib library
 
-We recommend you to use the version 3.0.0 or greater versions (for more details see the technical characteristics bellow). The versions >= 2.x.x are ES mode constructed. 
+We recommend you to use the version 3.0.0 or greater versions (for more details see the technical characteristics bellow). The versions >= 2.x.x are constructed with the ES pattern of javascript. 
 
 After series of tests we found out that the versions of @euriklis/sortlib@1.0.x are very inefficient in time and memory aspects. For this reason we unpublished these versions and now only the versions ^1.1.x are available in the npm site. The versions 1.0.x may be found in the github account which corresponds to this library.  
 
@@ -69,11 +69,11 @@ for (i = 0;i < n >> 1;i++) {
 }
 if (n & 1) copied_array[n - 1] = array[n - 1]
 ```
-In our library we use two bits shifting for the copy procedures.
+In our library we use double shifting for the copy procedures (i.e. loops with size n >> 2 and four instructions in the body of the loop with three additional condition instructions).
 We also use the minimum count of variables and simulate the multiplication by two with bitwise techniques when it is possible.
 All algorithms and the theoretical basis for the implementation of the library are taken from the book of Manolis Loukakis "Data structures. Algorithms", Thessaloniki, 1998, Sofia press.
 # Why to use this package?
-This package is constructed and designed for the needs of efficient sorting of number or string arrays/lists. It is well known that the javascript language provides a conventional way for sorting of arrays. But because of the generality of the nature of the arrays, the method ___sort()___ of javascript is very inefficient and unstable when we need fast sorting of number or character/string arrays. For that reason we created this library in order to implements the crucial sorting algorithms merge sort, quick sort, heap sort, bucket sort and the conventional algorithms bubble sort, insertion sort, selection sort, cocktail sort and a dozen of other useful algorithms that may be used for the needs of the econometric or AI package construction or just for experimental needs like testing of the efficiency of the sorting algorithms for small random arrays, medium random arrays, large random arrays and extremely large random arrays, extracting of sorted object patterns etc. 
+This package is constructed and designed for the needs of efficient sorting of number or string arrays/lists. It is well known that the javascript language provides a conventional way for sorting of arrays. But because the method ___sort()___ is constructed to manage arrays with abstract nature, this method is very inefficient and unstable when we need fast sorting of number or character/string arrays. For that reason we created this library in order to implements the crucial sorting algorithms merge sort, quick sort, heap sort, bucket sort and the conventional algorithms bubble sort, insertion sort, selection sort, cocktail sort and a dozen of other useful algorithms that may be used for the needs of the econometric or AI package construction or just for experimental needs like testing of the efficiency of the sorting algorithms for small random arrays, medium random arrays, large random arrays and extremely large random arrays, extracting of sorted object patterns etc. 
 Our experiments showed that the quick sort (SortLib.quick_sort_array(array, order)), merge sort, and heap sort are nearly three times faster than the conventional sort method of javascript.
 The only surprising thing of the experiments was the time efficiency of the bucket sort algorithm. 
 # Bugs and tips
