@@ -3,7 +3,7 @@ import * as conditions from './Conditions/index.js';
 import * as errors from './Errors/index.js';
 import * as infos from './Infos/index.js';
 import * as models from './Models/index.js';
-const package_file = { version: '3.0.0', author: 'Velislav S. Karastoychev' };
+const package_file = { version: '4.0.0', author: 'Velislav S. Karastoychev' };
 import validator from '@euriklis/validator';
 import * as warnings from './Warnings/index.js';
 class SortLib {
@@ -79,6 +79,23 @@ class SortLib {
     }
     /**
      * 
+     * @param {Array.<number | string>} array 
+     * @param {number | string} element 
+     * @param {boolean | "increase" | "decrease"} ascending_order 
+     * @returns {Promise<SortLib, Error>}
+     */
+    static async add_element_in_sorted_array_async(array, element, ascending_order = true) {
+        const dt1 = performance.now();
+        if (!conditions.IsCorrectArray(array)) {
+            errors.IncorrectArrayInAddElementInSortedArray();
+        }
+        const result = new SortLib({ array: array, 'sort mode': ascending_order, status: 'sorted' }).add(element);
+        const dt2 = performance.now();
+        result.time_execution = 0.001 * (dt2 - dt1);
+        return result
+    }
+    /**
+     * 
      * @param {Array.<object>} array 
      * @param {Array.<string> | string} property 
      * @param {object} element
@@ -120,11 +137,52 @@ class SortLib {
     }
     /**
      * 
+     * @param {Array.<{}>} array 
+     * @param {string | Array.<string>} property 
+     * @param {{}} element 
+     * @param {boolean | 'increase' | 'decrease'} mode 
+     * @param {boolean} test_array 
+     * @returns {Promise<{array: Array.<{}>, time_execution: number}>}
+     * @description this method applies the bisection algorithm to
+     * an array of object elements asynchronously and return the
+     * as result the extended array and the time execution of the
+     * algorithm.
+     */
+    static async add_element_in_sorted_object_array_by_property_async(array, property, element, mode, test_array = false) {
+        let dt1 = performance.now(), dt2, result;
+        if (!conditions.IsObject(element)) {
+            errors.IncorrectElementInAddElementInSortedObjectArrayByProperty();
+        }
+        if (conditions.IsString(property)) property = [property];
+        if (!conditions.IsStringArray(property)) {
+            errors.IncorrectPropertyParameterInAddElementInSortedObjectArrayByProperty();
+        }
+        if (!conditions.IsCorrectElement(element, property)) {
+            errors.IncorrectElementInAddElementInSortedObjectArrayByProperty();
+        }
+        if (test_array) {
+            if (!conditions.IsCorrectObjectArray(array, property)) {
+                errors.IncorrectArrayParameterInAddElementInSortedObjectArrayByProperty();
+            }
+        }
+        if (!conditions.IsBoolean(mode)) {
+            if (mode === 'increase') mode = true;
+            else if (mode === 'decrease') mode = false;
+            else mode = true;
+        }
+        if (conditions.IsEmpty(array)) result = [element];
+        result = { array: models.AddElementInSortedObjectArrayByProperty(array, property, element, mode), time_execution: 0.001 * (dt2 - dt1) };
+        dt2 = performance.now();
+        result.time_execution = 0.001 * [dt2 - dt1];
+        return result;
+    }
+    /**
+     * 
      * @param {Array.<number | string | {}>} array 
      * @param {function(number, number, Array):boolean} callback 
      * @returns {{array: Array.<number | string | {}>,indices: Array.<number>}}
      */
-    static filter (array, callback) {
+    static filter(array, callback) {
         if (!conditions.IsArray(array)) {
             errors.IncorrectArrayParameterInFilter();
         }
@@ -132,6 +190,27 @@ class SortLib {
             errors.IncorrectCallbackParameterInFilter();
         }
         return models.Filter(array, callback);
+    }
+    /**
+     * 
+     * @param {Array.<{} | string | number>} array 
+     * @param {function(number, number, Array)} callback 
+     * @returns {Promise<{array: Array, indices: Array.<number>, time_execution: number}, Error>}
+     * @description this method applies the filter method in an
+     * asynchronous mode.
+     */
+    static async filter_async(array, callback) {
+        let dt1 = performance.now(), dt2, result;
+        if (!conditions.IsArray(array)) {
+            errors.IncorrectArrayParameterInFilter();
+        }
+        if (!conditions.IsFunction(callback)) {
+            errors.IncorrectCallbackParameterInFilter();
+        }
+        result = models.Filter(array, callback);
+        dt2 = performance.now();
+        result.time_execution = 0.001 * (dt2 - dt1);
+        return result;
     }
     /**
      * 
@@ -155,6 +234,27 @@ class SortLib {
             errors.IncorrectArgumentOfCallbackInFilterWithValidator();
         }
         return models.FilterWithValidator(array, callback);
+    }
+    /**
+     * 
+     * @param {Array.<{} | string | number>} array 
+     * @param {function(validator, number)} callback 
+     * @returns {Promise.<{array: Array.<{} | string | number>, indices: Array.<number>, time_execution: number}>}
+     * @description this method is the asynchronous version
+     * corresponded to the filter_with_validator() method.
+     */
+    static async filter_with_validator_async(array, callback) {
+        let result, dt1 = performance.now(), dt2;
+        if (!conditions.IsArray(array)) {
+            errors.IncorrectArrayInFilterWithValidator();
+        }
+        if (!conditions.IsFunction(callback)) {
+            errors.IncorrectArgumentOfCallbackInFilterWithValidator();
+        }
+        result = models.FilterWithValidator(array, callback);
+        dt2 = performance.now();
+        result.time_execution = 0.001 * (dt2 - dt1);
+        return result;
     }
 
     /**
@@ -191,6 +291,37 @@ class SortLib {
         if (array.length === 0) return { array: [], indices: [-1] };
         return models.FindElementsInSortedArray(array, element, mode);
     }
+    /**
+     * 
+     * @param {Array.<number | string>} array 
+     * @param {number | string} element 
+     * @param {boolean | 'increase' | 'decrease'} mode 
+     * @returns {Promise<{array: Array.<number | string>, indices: Array.<number>, time_execution: number}, Error>}
+     * @description this method executes the bisection algorithm to detect an
+     * element in sorted array and then searches if this element exists many times
+     * in the array asynchronously. The output is like the conventional method
+     * find_elements_in_sorted_array but has an additional property called
+     * time_execution which returns the time spent for the detection of all elements.
+     */
+    static async find_elements_in_sorted_array_async(array, element, mode) {
+        let result, dt2, dt1 = performance.now();
+        if (!conditions.IsBoolean(mode)) {
+            if (mode === 'increase') mode = true;
+            else if (mode === 'decrease') mode = false;
+            else mode = true;
+        }
+        if (!conditions.IsNumber(element) && !conditions.IsString(element)) {
+            errors.IncorrectElementInFindElementInSortedArray()
+        }
+        if (!conditions.IsNumberArray(array) && !conditions.IsStringArray(array)) {
+            errors.IncorrectArrayParameterInFindElementInSortedArray()
+        }
+        if (array.length === 0) return { array: [], indices: [-1] };
+        result = models.FindElementsInSortedArray(array, element, mode);
+        dt2 = performance.now();
+        result.time_execution = 0.001 * (dt2 - dt1);
+        return result;
+    }
 
     /**
      * 
@@ -224,6 +355,45 @@ class SortLib {
     }
     /**
      * 
+     * @param {Array.<{}>} array 
+     * @param {string | Array.<string>} property 
+     * @param {{}} element 
+     * @param {boolean | 'increase' | 'decrease'} mode 
+     * @returns {Promise<{array: Array.<{}>, indices: Array.<number>, time_execution: number}, Error>}
+     * @description this method is the asynchronous version of the
+     * find_elements_in_sorted_object_array_by_property method of the
+     * SortLib package. The method returns a property "time_execution"
+     * which does not exists in the conventional synchronous method,
+     * which computes the time spent for the detection of the elements.
+     * The method applies the bisection algorithm to detect the elements.
+     */
+    static async find_elements_in_sorted_object_array_by_property_async(array, property, element, mode) {
+        let result, dt2, dt1 = performance.now();
+        if (!conditions.IsArray(array)) {
+            errors.IncorrectArrayInFindElementsInSortedObjectArray()
+        };
+        if (conditions.IsString(property)) property = [property];
+        if (!conditions.IsStringArray(property)) {
+            errors.IncorrectPropertyParameterInFindElementsInSortedObjectArray();
+        };
+        if (!conditions.IsCorrectElement(element, property)) {
+            errors.IncorrectElementParameterInFindElementsInSortedObjectArray();
+        }
+        if (!conditions.IsBoolean(mode)) {
+            if (mode === 'increase') mode = true;
+            else if (mode === 'decrease') mode = false;
+            else mode = true;
+        }
+        // when the array is empty, set the output to be empty.
+        if (array.length === 0) result = { array: [], indices: [-1] };
+        result = models.FindElementsInSortedObjectArrayByProperty(array, property, element, mode);
+        dt2 = performance.now();
+        result.time_execution = 0.001 * (dt2 - dt1);
+        return result;
+    }
+
+    /**
+     * 
      * @param {Array.<number | string>} array 
      * @param {number | string} element
      * @param {boolean | 'increase' | 'decrease'} mode
@@ -246,9 +416,41 @@ class SortLib {
             else if (mode === 'decrease') mode = false;
             else mode = true;
         }
-        if (array.length === 0) return [];
+        if (array.length === 0) return { array: [], indices: [-1] };
         return models.RemoveElementFormSortedArray(array, element, mode);
     }
+    /**
+     * 
+     * @param {Array.<number | string>} array 
+     * @param {number | string} element 
+     * @param {boolean | 'increase' | 'decrease'} mode 
+     * @returns {Promise<{array.<number | string>, indices: Array.<number>, time_execution: number}, Error>}
+     * @description this method is the asynchronous version of the 
+     * static method remove_element_from_sorted_array(). The method
+     * returns the standard output object with array and indices properties
+     * and in addition returns an property time_execution with the computed
+     * time spent for the detection and deletion of the element.
+     */
+    static async remove_element_from_sorted_array_async(array, element, mode = true) {
+        let result, dt2, dt1 = performance.now();
+        /*if (!conditions.IsNumberArray(array) && !conditions.IsStringArray(array)) {
+            errors.IncorrectArrayInRemoveElementFromSortedArray();
+        }*/
+        if (!conditions.IsNumber(element) && !conditions.IsString(element)) {
+            errors.IncorrectElementParameterInRemoveElementFromSortedArray();
+        }
+        if (!conditions.IsBoolean(mode)) {
+            if (mode === 'increase') mode = true;
+            else if (mode === 'decrease') mode = false;
+            else mode = true;
+        }
+        if (array.length === 0) result = { array: [], indices: [-1] };
+        result = models.RemoveElementFormSortedArray(array, element, mode);
+        dt2 = performance.now();
+        result.time_execution = 0.001 * (dt2 - dt1);
+        return result;
+    }
+
     /**
      * 
      * @param {Array.<object>} array 
@@ -288,6 +490,52 @@ class SortLib {
         return models.RemoveElementFromSortedObjectArray(array, property, element, mode);
     }
     /**
+     * 
+     * @param {Array.<{}>} array 
+     * @param {string | Array.<string>} property 
+     * @param {{}} element 
+     * @param {boolean | 'increase' | 'decrease'} mode 
+     * @param {boolean} test 
+     * @returns {{array : Array.<object>, indices : Array.<number>, time_execution: number}}
+     * @description this method is the corresponded asynchronous version of the
+     * static method remove_element_from_sorted_object_array_by_property(). The method
+     * returns also an additional property named "time_execution" which computes
+     * the time spent for the detection and deletion of the underlined element.
+     *  
+     */
+    static async remove_element_from_sorted_object_array_by_property_async(array, property, element, mode, test = false) {
+        let result, dt2, dt1 = performance.now();
+        if (conditions.IsString(property)) property = [property];
+        if (!conditions.IsStringArray(property)) {
+            errors.IncorrectPropertyParameterInRemoveElementFromSortedObjectArray();
+        }
+        if (test) {
+            if (!conditions.IsCorrectObjectArray(array, property)) {
+                errors.IncorrectArrayInRemoveElementFromSortedObjectArray();
+            }
+        }
+        if (!conditions.IsObject(element)) {
+            errors.IncorrectElementParameterInRemoveElementFromSortedObjectArray();
+        }
+        if (!conditions.IsCorrectElement(element, property)) {
+            errors.IncorrectElementParameterInRemoveElementFromSortedObjectArray();
+        }
+        // (re)define the mode
+        if (!conditions.IsBoolean(mode)) {
+            if (mode === 'increase') mode = true;
+            else if (mode === 'decrease') mode = false;
+            else {
+                errors.IncorrectModeParameterInRemoveElementFromSortedObjectArray();
+            }
+        }
+        if (array.length === 0) result = { array: [], indices: [] };
+        result = models.RemoveElementFromSortedObjectArray(array, property, element, mode);
+        dt2 = performance.now();
+        result.time_execution = 0.001 * (dt2 - dt1);
+        return result;
+    }
+
+    /**
      * @method merge_sort
      * @param {Array.<number | string>} array 
      * @param {'increase' | 'decrease' | boolean} sort_mode
@@ -301,6 +549,23 @@ class SortLib {
     /**
      * 
      * @param {Array.<number | string>} array 
+     * @param {boolean | 'increase' | 'decrease'} sort_mode 
+     * @returns {Promise<{array: Array.<number | string>, indices: Array.<number>, time_execution: number}, Error>}
+     * @description this method applies the merge sort algorithm asynchronously
+     * to the underlined array parameter and returns a Promise with the properties
+     * array - the sorted array, indices the indices of the sorted array and
+     * time_execution - the time spent for the sorting of the array.
+     */
+    static async merge_sort_async(array, sort_mode) {
+        let result, dt2, dt1 = performance.now();
+        result = models.MergeSort(array, sort_mode);
+        dt2 = performance.now();
+        result.time_execution = 0.001 * (dt2 - dt1);
+        return result;
+    }
+    /**
+     * 
+     * @param {Array.<number | string>} array 
      * @param {boolean | "increase" | "decrease"} sort_mode 
      * @returns {Array.<number | string>}
      * @description this method applies the merge sort algorithm
@@ -309,6 +574,22 @@ class SortLib {
      */
     static merge_sort_array(array, sort_mode) {
         return models.MergeSortArray(array, sort_mode);
+    }
+    /**
+     * 
+     * @param {Array.<number | string>} array 
+     * @param {boolean | 'increase' | 'decrease'} sort_mode 
+     * @returns {Promise<{array: Array.<number | string>, time_execution: number}>}
+     * @description this method implements the merge sort algorithm for array
+     * in its asynchronous version. In addition the method returns
+     * the time needed for the execution of the algorithm.
+     */
+    static async merge_sort_array_async(__array__, sort_mode) {
+        let array, time_execution, dt2, dt1 = performance.now();
+        array = models.MergeSortArray(__array__, sort_mode);
+        dt2 = performance.now();
+        time_execution = 0.001 * (dt2 - dt1);
+        return { array, time_execution };
     }
     /**
      * 
@@ -331,6 +612,21 @@ class SortLib {
      * 
      * @param {Array.<number | string>} array 
      * @param {boolean | 'increase' | 'decrease'} sort_mode 
+     * @returns {Promise<{array: Array.<number | string>, indices: Array.<number>, time_execution: number}, Error>}
+     * @description this method is the asynchronous version of the
+     * insertion_sort() static method.
+     */
+    static async insertion_sort_async(array, sort_mode) {
+        let result, dt2, dt1 = performance.now();
+        result = models.InsertionSort(array, sort_mode);
+        dt2 = performance.now();
+        result.time_execution = 0.001 * (dt2 - dt1);
+        return result;
+    }
+    /**
+     * 
+     * @param {Array.<number | string>} array 
+     * @param {boolean | 'increase' | 'decrease'} sort_mode 
      * @returns {Array.<number | string>}
      */
     static insertion_sort_array(array, sort_mode) {
@@ -338,8 +634,24 @@ class SortLib {
     }
     /**
      * 
+     * @param {Array.<number | string>} __array__ 
+     * @param {boolean | 'increase' | 'decrease'} sort_mode 
+     * @returns {Promise<{array: Array.<number | string>, time_execution: number}, Error>}
+     * @description this method is the asynchronous version of the insertion_sort_array()
+     * static method. The method also returns the time needed for the execution
+     * of the algorithm.
+     */
+    static async insertion_sort_array_async(__array__, sort_mode) {
+        let array, time_execution, dt2, dt1 = performance.now();
+        array = models.InsertionSortArray(__array__, sort_mode);
+        dt2 = performance.now();
+        time_execution = 0.001 * (dt2 - dt1);
+        return { array, time_execution };
+    }
+    /**
+     * 
      * @param {Array.<number | string>} array 
-     * @param {boolean | 'increase' | 'decrease'} sort_mode
+     * @param {boolsean | 'increase' | 'decrease'} sort_mode
      * @returns {{array : Array.<number | string> , indices : Array.<number>}}
      * @description this method implements the selection sort algorithms. If the
      * sort_mode has the value 'increase' or is true, then the algorithm
@@ -355,12 +667,43 @@ class SortLib {
      * 
      * @param {Array.<number | string>} array 
      * @param {boolean | 'increase' | 'decrease'} sort_mode 
+     * @returns {Promise<{array: Array.<number | string>, indices :Array.<number>, time_execution: number}, Error>}
+     * @description this method is the asynchronous version of the selection_sort()
+     * static method of the SortLib package. The method also returns the
+     * time needed for the execution of the algorithm.
+     */
+    static async selection_sort_async(array, sort_mode) {
+        let result, dt2, dt1 = performance.now();
+        result = models.SelectionSort(array, sort_mode);
+        dt2 = performance.now();
+        result.time_execution = 0.001 * (dt2 - dt1);
+        return result;
+    }
+    /**
+     * 
+     * @param {Array.<number | string>} array 
+     * @param {boolean | 'increase' | 'decrease'} sort_mode 
      * @returns {Array.<number | string>}
      * @description this method applies the selection sort algorithm
      * to the array parameter and returns only the sorted array.
      */
     static selection_sort_array(array, sort_mode) {
         return models.SelectionSortArray(array, sort_mode);
+    }
+    /**
+     * 
+     * @param {Array.<number | string>} __array__ 
+     * @param {boolean | 'increase' | 'decrease'} sort_mode 
+     * @returns {Promise<{array: Array.<number | string>, time_execution: number}, Error>}
+     * @description this method is the asynchronous version of the selection_sort_array()
+     * method of the SortLib package.
+     */
+    static async selection_sort_array_async(__array__, sort_mode) {
+        let array, time_execution, dt2, dt1 = performance.now();
+        array = models.SelectionSortArray(__array__, sort_mode);
+        dt2 = performance.now();
+        time_execution = 0.001 * (dt2 - dt1);
+        return { array, time_execution };
     }
     /**
      * 
@@ -376,12 +719,47 @@ class SortLib {
     }
     /**
      * 
+     * @param {Array.<number | string>} array 
+     * @param {boolean | 'increase' | 'decrease'} sort_mode 
+     * @returns {Promise<{array: Array.<number | string>, indices: Array.<number>, time_execution: number}, Error>}
+     * @description this method is the asynchronous version of the
+     * quick_sort() static method of the SortLib package. The method
+     * returns additionally the time needed for the execution of the
+     * algorithm.
+     */
+    static async quick_sort_async(array, sort_mode) {
+        let result, dt2, dt1 = performance.now();
+        result = models.QuickSort(array, sort_mode);
+        dt2 = performance.now();
+        result.time_execution = 0.001 * (dt2 - dt1);
+        return result;
+    }
+    /**
+     * 
      * @param {array.<number>} array 
      * @param {boolean | 'increase' | 'decrease'} sort_mode 
      * @returns {Array.<number | string>}
      */
     static quick_sort_array(array, sort_mode) {
         return models.QuickSortArray(array, sort_mode);
+    }
+    /**
+     * 
+     * @param {Array.<number | string>} __array__ 
+     * @param {boolean | 'increase' | 'decrease'} sort_mode 
+     * @returns {Promise<{array: Array.<number | string>, time_execution: number}, Error>}
+     * @description this method is the asynchronous version of the
+     * quick_sort_array() static method of the SortLib package.The
+     * method returns an additional property named time_execution,
+     * which obtains the time needed for the array sorting with this
+     * algorithm.
+     */
+    static async quick_sort_array_async(__array__, sort_mode) {
+        let array, time_execution, dt2, dt1 = performance.now();
+        array = models.QuickSortArray(__array__, sort_mode);
+        dt2 = performance.now();
+        time_execution = 0.001 * (dt2 - dt1);
+        return { array, time_execution };
     }
     /**
      * 
@@ -398,6 +776,23 @@ class SortLib {
      * 
      * @param {Array.<number | string>} array 
      * @param {boolean | 'increase' | 'decrease'} sort_mode 
+     * @returns {Promise<{array: Array.<number | string>, indices: Array.<number>, time_execution: number}, Error>}
+     * @description this method is the asynchronous version of the bubble_sort()
+     * static method of the SortLib package. The method provides an additional
+     * property, named "time_execution" which obtains the time spent for the
+     * execution of the bubble sort algorithm on the array.
+     */
+    static bubble_sort_async(array, sort_mode) {
+        let result, dt2, dt1 = performance.now();
+        result = models.BubbleSort(array, sort_mode);
+        dt2 = performance.now()
+        result.time_execution = 0.001 * (dt2 - dt1);
+        return result;
+    }
+    /**
+     * 
+     * @param {Array.<number | string>} array 
+     * @param {boolean | 'increase' | 'decrease'} sort_mode 
      * @returns {Array.<number | string>}
      * @description this method applies the bubble sort
      * algorithm on the array parameter and returns only
@@ -405,6 +800,21 @@ class SortLib {
      */
     static bubble_sort_array(array, sort_mode) {
         return models.BubbleSortArray(array, sort_mode);
+    }
+    /**
+     * 
+     * @param {Array.<number | string>} __array__ 
+     * @param {boolean | 'increase' | 'decrease'} sort_mode 
+     * @returns {Promise<{array: Array.<number | string>, time_execution: number}, Error>}
+     * @description this method is the asynchronous version of the bubble_sort_array()
+     * static method of the SortLib package.
+     */
+    static async bubble_sort_array_async(__array__, sort_mode) {
+        let array, time_execution, dt2, dt1 = performance.now();
+        array = models.BubbleSortArray(__array__, sort_mode);
+        dt2 = performance.now();
+        time_execution = 0.001 * (dt2 - dt1);
+        return { array, time_execution };
     }
     /**
      * 
@@ -421,6 +831,23 @@ class SortLib {
      * 
      * @param {Array.<number | string>} array 
      * @param {boolean | 'increase' | 'decrease'} sort_mode 
+     * @returns {Promise<{array: Array.<number | string>, indices: Array.<number>, time_execution: number}, Error>}
+     * @description this method is the asynchronous version of the 
+     * heap_sort() static method of the SortLib package. The method returns an
+     * additional property named "time_execution" which computes the time, spent
+     * for the execution of the algorithm.
+     */
+    static async heap_sort_async(array, sort_mode) {
+        let result, dt2, dt1 = performance.now();
+        result = models.HeapSort(array, sort_mode);
+        dt2 = performance.now();
+        result.time_execution = 0.001 * (dt2 - dt1);
+        return result;
+    }
+    /**
+     * 
+     * @param {Array.<number | string>} array 
+     * @param {boolean | 'increase' | 'decrease'} sort_mode 
      * @returns {Array.<number | string>}
      * @description this method applies the heap sort
      * algorithm on the array parameter and returns only
@@ -428,6 +855,23 @@ class SortLib {
      */
     static heap_sort_array(array, sort_mode) {
         return models.HeapSortArray(array, sort_mode);
+    }
+    /**
+     * 
+     * @param {Array.<number | string>} __array__ 
+     * @param {boolean} sort_mode 
+     * @returns {Promise<{array: Array.<number | string>, time_execution: number}, Error>}
+     * @description this method is the asynchronous version of the
+     * heap_sort_array() static method of the SortLib package.The method
+     * returns an additional property, named "time_execution" which
+     * obtains the time spent for the execution of the algorithm.
+     */
+    static async heap_sort_array_async(__array__, sort_mode) {
+        let array, time_execution, dt2, dt1 = performance.now();
+        array = models.HeapSortArray(__array__, sort_mode);
+        dt2 = performance.now();
+        time_execution = 0.001 * (dt2 - dt1);
+        return { array, time_execution };
     }
     /**
      * 
@@ -446,6 +890,23 @@ class SortLib {
      * 
      * @param {Array.<number | string>} array 
      * @param {boolean | 'increase' | 'decrease'} sort_mode 
+     * @returns {Promise<{array: Array.<number | string>, indices: Array.<number>, time_extension: number}, Error>}
+     * @description this method is the asynchronous version of the
+     * cocktail sort algorithm. The method returns an additional
+     * property named time_execution, which computes the time spent
+     * for the sorting of the array with this algorithm.
+     */
+    static async cocktail_sort_async(array, sort_mode) {
+        let result, dt2, dt1 = performance.now();
+        result = models.CocktailSort(array, sort_mode);
+        dt2 = performance.now();
+        result.time_execution = 0.001 * (dt2 - dt1);
+        return result;
+    }
+    /**
+     * 
+     * @param {Array.<number | string>} array 
+     * @param {boolean | 'increase' | 'decrease'} sort_mode 
      * @returns {Array.<number | string>}
      * @description this method applies the cocktail sort
      * algorithm to the array parameter and returns only
@@ -453,6 +914,22 @@ class SortLib {
      */
     static cocktail_sort_array(array, sort_mode) {
         return models.CocktailSortArray(array, sort_mode);
+    }
+    /**
+     * 
+     * @param {Array.<number | string>} __array__ 
+     * @param {boolean | 'increase' | 'decrease'} sort_mode 
+     * @returns {Promise<{array: Array.<number | string>, time_execution: number}, Error>}
+     * @description this method is the asynchronous version of the cocktail_sort_array()
+     * static method. The method returns an additional property named time_execution which
+     * obtains the time spent for sorting of the array with this algorithm.
+     */
+    static async cocktail_sort_array_async(__array__, sort_mode) {
+        let array, time_execution, dt2, dt1 = performance.now();
+        array = models.CocktailSortArray(__array__, sort_mode);
+        dt2 = performance.now();
+        time_execution = 0.001 * (dt2 - dt1);
+        return { array, time_execution };
     }
     /**
      * 
@@ -472,6 +949,27 @@ class SortLib {
     /**
      * 
      * @param {Array.<number | string>} array 
+     * @param {number} buckets
+     * @param {boolean | 'increase' | 'decrease'} sort_mode 
+     * @returns {Promise<{array: Array.<number | string>, indices: Array.<number>, time_execution: number}, Error>}
+     * @description this method is the asynchronous version of the
+     * bucket_sort() static method. The method returns also an additional
+     * property which is named time_execution and obtains the time spent for the
+     * sorting of the array with this algorithm. 
+     */
+    static async bucket_sort_async(array, buckets, sort_mode) {
+        let result, dt2, dt1 = performance.now();
+        if (!conditions.IsNumberArray(array)) errors.IncorrectArrayParameterInBucketSort();
+        if (!conditions.IsInteger(buckets)) buckets = array.length >> 1;
+        if (buckets <= 0 || buckets >= array.length) buckets = array.length - 1;
+        result = models.BucketSort(array, buckets, sort_mode);
+        dt2 = performance.now();
+        result.time_execution = 0.001 * (dt2 - dt1);
+        return result;
+    }
+    /**
+     * 
+     * @param {Array.<number | string>} array 
      * @param {number} buckets 
      * @param {boolean | 'increase' | 'decrease'} sort_mode 
      * @returns {Array.<number | string>}
@@ -484,6 +982,28 @@ class SortLib {
         if (!conditions.IsInteger(buckets)) buckets = array.length >> 1;
         if (buckets <= 0 || buckets >= array.length) buckets = array.length - 1;
         return models.BucketSortArray(array, buckets, sort_mode);
+    }
+    /**
+     * 
+     * @param {Array.<number | string>} __array__ 
+     * @param {number} buckets
+     * @param {boolean | 'increase' | 'decrease'} sort_mode 
+     * @returns {Promise<{array: Array.<number | string>, time_execution: number}, Error>}
+     * @description this method is the asynchronous version of the
+     * bucket_sort_array() algorithm of the SortLib package. Note that
+     * this method returns an additional property, which is named
+     * time_execution and obtains the time spent for the sorting of the
+     * array of this algorithm. 
+     */
+    static async bucket_sort_array_async(__array__, buckets, sort_mode) {
+        let array, time_execution, dt2, dt1 = performance.now();
+        if (!conditions.IsNumberArray(__array__)) errors.IncorrectArrayParameterInBucketSort();
+        if (!conditions.IsInteger(buckets)) buckets = __array__.length >> 1;
+        if (buckets <= 0 || buckets >= __array__.length) buckets = __array__.length - 1;
+        array = models.BucketSortArray(__array__, buckets, sort_mode);
+        dt2 = performance.now();
+        time_execution = 0.001 * (dt2 - dt1);
+        return { array, time_execution };
     }
     /**
      * 
@@ -521,6 +1041,21 @@ class SortLib {
     }
     /**
      * 
+     * @param {number} n 
+     * @param {number} seed 
+     * @param {function(number, number)} callback 
+     * @returns {Promise<Array.<number>, Error>}
+     * @description this method is the asynchronous version
+     * of the generate random array method of the SortLib package.
+     */
+    static async generate_random_array_async(n, seed = 12345, callback) {
+        if (!conditions.IsInteger(seed)) seed = 123456;
+        if (!conditions.IsInteger(n)) errors.IncorrectParameterInGRA();
+        if (!conditions.IsFunction(callback)) callback = null;
+        return models.GenerateRandomArray(n, seed, callback);
+    }
+    /**
+     * 
      * @param {number} length 
      * @param {number} word_size 
      * @param {number} seed 
@@ -542,6 +1077,22 @@ class SortLib {
      * });
      */
     static generate_random_string_array(length, word_size, seed, callback) {
+        if (!conditions.IsInteger(length)) errors.IncorrectLengthInGRSA();
+        if (!conditions.IsInteger(word_size)) errors.IncorrectWordSizeInGRSA();
+        if (!conditions.IsInteger(seed)) seed = 123456;
+        return models.GenerateRandomStringArray(length, word_size, seed, callback);
+    }
+    /**
+     * 
+     * @param {number} length 
+     * @param {number} word_size 
+     * @param {number} seed 
+     * @param {function(number, number)} callback 
+     * @returns {Promise<Array.<string>, Error>}
+     * @description this method is the asynchronous version of the
+     * generate_random_string_array() static method of the SortLib package.
+     */
+    static async generate_random_string_array_async(length, word_size, seed, callback) {
         if (!conditions.IsInteger(length)) errors.IncorrectLengthInGRSA();
         if (!conditions.IsInteger(word_size)) errors.IncorrectWordSizeInGRSA();
         if (!conditions.IsInteger(seed)) seed = 123456;
@@ -588,6 +1139,45 @@ class SortLib {
     /**
      * 
      * @param {Array.<number | string>} array 
+     * @param {number} n 
+     * @param {boolean} show_warnings 
+     * @returns {Promise<{array: Array.<number | string>, indices: Array.<number>, time_execution: number}, Error>}
+     * @description this method is the asynchronous version of the
+     * find_best_elements() static method of the SortLib package.
+     * Note that this method returns an additional property named time_execution,
+     * which obtains the time spent for the finding of the biggest elements.
+     */
+    static async find_best_elements_async(array, n, show_warnings = false) {
+        let result, dt2, dt1 = performance.now();
+        if (!conditions.IsStringArray(array) && !conditions.IsNumberArray(array)) {
+            errors.IncorrectArrayParameterInFindBestElements();
+        }
+        if (conditions.IsUndefined(n)) n = array.length
+        if (!conditions.IsNumber(n)) {
+            if (show_warnings) {
+                warnings.IncorrectCountParameterInFindBestElements()
+            }
+        }
+        if (conditions.IsNumber(n)) {
+            if (!(n >= 1) || !(n <= array.length)) {
+                if (show_warnings) {
+                    warnings.IncorrectCountParameterInFindBestElements()
+                }
+            }
+        }
+        if (conditions.IsNumber(n) && !conditions.IsInteger(n)) {
+            if (n > 0 && n < 1) n = ((array.length * n) >> 0);
+            if (n === 0) n = 1;
+            if (n > array.length) n = array.length;
+        }
+        result = models.FindBestElements(array, n);
+        dt2 = performance.now();
+        result.time_execution = 0.001 * (dt2 - dt1);
+        return result;
+    }
+    /**
+     * 
+     * @param {Array.<number | string>} array 
      * @param {number} n
      * @returns {{array : Array.<number | string>, indices : Array.<number>}}
      * @param {boolean} show_warnings
@@ -614,11 +1204,41 @@ class SortLib {
     }
     /**
      * 
+     * @param {Array.<number | stirng>} array 
+     * @param {number} n 
+     * @param {boolean} show_warnings 
+     * @returns {Promise.<{array: Array.<number | string>, indices: Array.<number>, time_execution: number}, Error>}
+     * @description this method is the asynchronous version of the find_worst_elements
+     * static method of the SortLib package. Note that this method returns an additional
+     * property named time_execution which estimates the time spent for the execution of the
+     * algorithm.
+     */
+    static async find_worst_elements_async(array, n, show_warnings = false) {
+        let result, dt2, dt1 = performance.now();
+        if (!conditions.IsNumberArray(array) && !conditions.IsStringArray(array)) {
+            errors.IncorrectArrayParameterInFindWorstElements();
+        }
+        if (conditions.IsNumber(n)) {
+            if (!conditions.IsInteger(n) && !(n >= 0 && n <= 1) || n >= array.length) {
+                if (show_warnings) warnings.IncorrectCountParameterInFindWortsElements();
+                if (n >= 0 && n < 1) n = n * array.length << 0;
+                if (!conditions.IsInteger(n)) n = n << 0;
+                if (n > array.length) n = array.length;
+            }
+        } else n = array.length;
+        result = models.FindWorstElements(array, n);
+        dt2 = performance.now();
+        result.time_execution = 0.001 * (dt2 - dt1);
+        return result;
+    }
+    /**
+     * 
      * @param {Array.<object>} array 
      * @param {string | Array.<string>} property 
      * @param {boolean | 'increase' | 'decrease'} mode 
      * @param {'quick sort' | 'merge sort' | 'heap sort' | 'bucket sort'} algorithm
      * @param {boolean} show_warnings
+     * @param {boolean} test
      * @returns {{array : Array.<object>, indices : Array.<number>}}
      * @description this method sorts an array of object elements by given property or
      * by given set of properties. If the array is not constructed form object elements,
@@ -674,6 +1294,45 @@ class SortLib {
     }
     /**
      * 
+     * @param {Array.<{}>} array 
+     * @param {string | Array.<string>} property 
+     * @param {boolean | 'increase' | 'decrease'} mode 
+     * @param {'quick sort' | 'merge sort' | 'heap sort' | 'bucket sort'} algorithm 
+     * @param {boolean} show_warnings 
+     * @param {boolean} test
+     * @returns {Promise<{array: Array.<{}>, indices: Array.<number>, time_execution: number}>}
+     * @description this method is the asynchronous version of the method
+     * sort_object_array_by_property(). The method returns an additional property named
+     * time_execution that computes the time spent for the sorting of the array.
+     */
+    static async sort_object_array_by_property_async(array, property, mode, algorithm, show_warnings = false, test = false) {
+        let result, dt2, dt1 = performance.now();
+        const allowedAlgorithms = ['merge sort', 'quick sort', 'heap sort', 'bucket sort'];
+        const mode_types = [true, false, 'decrease', 'increase'];
+        if (conditions.IsString(property)) property = [property];
+        if (!conditions.IsStringArray(property)) {
+            errors.IncorrectPropertyInSortObjectArray();
+        }
+        if (test) {
+            if (!conditions.IsCorrectObjectArray(array, property)) {
+                errors.IncorrectArrayParameterInSortObjectArray();
+            }
+        }
+        if (conditions.IsUndefined(mode) || !conditions.IsSameWithAny(mode, mode_types)) {
+            if (show_warnings) warnings.IncorrectOrUndefinedModeParameterInSortObjectArray();
+            mode = true;
+        }
+        if (conditions.IsUndefined(algorithm) || !conditions.IsSameWithAny(algorithm, allowedAlgorithms)) {
+            if (show_warnings) warnings.IncorrectOrUndefinedAlgorithmParameterInSortObjectArray();
+            algorithm = 'quick sort';
+        }
+        result = models.SortObjectArrayByProperty(array, property, mode, algorithm);
+        dt2 = performance.now();
+        result.time_execution = 0.001 * (dt2 - dt1);
+        return result;
+    }
+    /**
+     * 
      * @param {Array.<object>} array 
      * @param {Array.<string>} property
      * @param {number} n
@@ -710,6 +1369,41 @@ class SortLib {
     }
     /**
      * 
+     * @param {Array} array 
+     * @param {string | Array.<string>} property 
+     * @param {number} n 
+     * @param {boolean} test 
+     * @returns {Promise<{array: Array.<{}>, indices: Array.<number>, time_execution: number}, Error>}
+     * @description this method is the asynchronous version of the
+     * find_best_for_object_array_by_property() method. The method returns also a property
+     * time_execution which obtains the time spent for the sorting of the array elements.
+     */
+    static async find_best_for_object_array_by_property_async(array, property, n, test = false) {
+        let result, dt2, dt1 = performance.now();
+        if (conditions.IsString(property)) property = [property];
+        if (!conditions.IsStringArray(property)) {
+            errors.IncorrectPropertyParameterInFindBestInObjectArray();
+        }
+        if (test) {
+            if (!conditions.IsCorrectObjectArray(array, property)) {
+                errors.IncorrectArrayParameterInFindBestInObjectArray()
+            }
+        }
+        if (conditions.IsNumber(n)) {
+            if (conditions.IsInteger(n)) {
+                if (n <= 0 || n > array.length) n = array.length;
+            } else if (n > 0 && n < 1) {
+                n = n * array.length << 0;
+            } else n = array.length
+        } else n = array.length;
+        if (n === array.length) result = models.SortObjectArrayByProperty(array, property, false, 'quick sort');
+        else result = models.FindBestForObjectArrayByProperty(array, property, n);
+        dt2 = performance.now();
+        result.time_execution = 0.001 * (dt2 - dt1);
+        return result;
+    }
+    /**
+     * 
      * @param {Array.<object>} array
      * @param {string | Array.<string>} 
      * @param {number} n
@@ -741,6 +1435,39 @@ class SortLib {
         } else n = array.length;
         if (n === array.length) return models.SortObjectArrayByProperty(array, property, true, 'quick sort');
         else return models.FindWorstForObjectArrayByProperty(array, property, n);
+    }
+    /**
+     * 
+     * @param {Array<{}>} array 
+     * @param {string | Array.<string>} property 
+     * @param {number} n 
+     * @param {boolean} test 
+     * @returns {Promise<{array: Array.<{}>, indices: Array.<number>, time_execution: number}, Error>}
+     * @description this method is asynchronous version of the 
+     * find_worst_for_object_array_by_property() static method.
+     */
+    static async find_worst_for_object_array_by_property_async(array, property, n, test = false) {
+        let result, dt2, dt1 = performance.now();
+        if (conditions.IsString(property)) property = [property];
+        if (!conditions.IsStringArray(property)) {
+            errors.IncorrectPropertyParameterInFindWorstInObjectArray()
+        }
+        if (test) {
+            if (!conditions.IsCorrectObjectArray(array, property)) {
+                errors.IncorrectArrayParameterInFindWorstInObjectArray()
+            }
+        }
+        if (conditions.IsNumber(n)) {
+            if (conditions.IsInteger(n)) {
+                if (n <= 0 || n > array.length) n = array.length;
+            } else if (n > 0 && n < 1) n = n * array.length << 0;
+            else n = array.length;
+        } else n = array.length;
+        if (n === array.length) result = models.SortObjectArrayByProperty(array, property, true, 'quick sort');
+        else result = models.FindWorstForObjectArrayByProperty(array, property, n);
+        dt2 = performance.now();
+        result.time_execution = 0.001 * (dt2 - dt1);
+        return result;
     }
     get algorithm() {
         return this.#algorithm;
@@ -910,7 +1637,7 @@ class SortLib {
      * @description this method filters the elements
      * of the current SortLib instance by given function. 
      */
-    filter (callback) {
+    filter(callback) {
         if (!conditions.IsFunction(callback)) {
             errors.IncorrectCallbackParameterInFilter();
         }
