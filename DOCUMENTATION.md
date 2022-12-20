@@ -1559,7 +1559,7 @@ average time of conventional filter --> 0.43436287065982815s
 From version 4.0.0 is available asynchronous mode version for this method:
 
 ```js
-SortLib.removed_element_from_sorted_object_array_by_property(array, property, element, sort_mode);
+SortLib.removed_element_from_sorted_object_array_by_property_async(array, property, element, sort_mode);
 ```
 
 Note that in this case the method returns a Promise instance.
@@ -1642,7 +1642,7 @@ Average time best 10 for conventional extraction --> 1.1376828888177875s
 Average time worst 10 for conventional extraction --> 1.198225995883942s
 ```
 
-From version 4.0.0 these method are available in asynchronous mode:
+From version 4.0.0 these method are also available in asynchronous mode:
 
 ```js
 SortLib.find_best_elements_async(array, n);
