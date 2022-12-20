@@ -651,7 +651,7 @@ class SortLib {
     /**
      * 
      * @param {Array.<number | string>} array 
-     * @param {boolsean | 'increase' | 'decrease'} sort_mode
+     * @param {boolean | 'increase' | 'decrease'} sort_mode
      * @returns {{array : Array.<number | string> , indices : Array.<number>}}
      * @description this method implements the selection sort algorithms. If the
      * sort_mode has the value 'increase' or is true, then the algorithm
