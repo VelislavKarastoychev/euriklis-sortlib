@@ -17,7 +17,7 @@ npm install @euriklis/sortlib --save
  ```
 where with the "x.x.x" we denote the current version of the sortlib library
 
-We recommend you to use the version 3.0.0 or greater versions (for more details see the technical characteristics bellow). The versions >= 2.x.x are constructed with the ES pattern of javascript. 
+We recommend you to use the version 4.0.0 or greater versions (for more details see the technical characteristics bellow). The versions >= 2.x.x are constructed with the ES pattern of javascript. 
 
 After series of tests we found out that the versions of @euriklis/sortlib@1.0.x are very inefficient in time and memory aspects. For this reason we unpublished these versions and now only the versions ^1.1.x are available in the npm site. The versions 1.0.x may be found in the github account which corresponds to this library.  
 
@@ -25,7 +25,7 @@ After series of tests we found out that the versions of @euriklis/sortlib@1.0.x 
  To declare the SortLib library/package you have to write after the installing procedure the following text into the (main) file:
  ```js
  import sortlib from '@euriklis/sortlib';
- console.log(sortlib.version) // 3.0.0
+ console.log(sortlib.version) // 4.0.0
  ```
 
  To create a SortLib instance you have to inside an object parameter into the SortLib constructor. This parameter has to contains the following properties:
@@ -46,10 +46,10 @@ After series of tests we found out that the versions of @euriklis/sortlib@1.0.x 
  })
  ```
  The constructor creates automatically the property "indices" that is an array that shows the order or the index of every element of the array when it is initially inserted. When the element position changes from the sorting procedure, then the indices property changes the position of the index of this element. In fact you need to create just the array parameter and all other parameters can be set automatically from the constructor of the SortLib class. 
- If you want to use just the sorting algorithms without creating of any instance, then you may use the static methods of the package. Note that when you create a SortLib instance, then the constructor automatically checks the validity of each element (i.e. if the array is from numeric or string elements).
+ If you want to use just the sorting algorithms without creating of any instance, then you may use the static methods of the package. Note that when you create a SortLib instance, then the constructor automatically checks the validity of each element (i.e. if the array is from numeric or string elements). From versions ^4.0.0 the library supports asynchronous static methods as well as the standard synchronous static methods.
 You can see all the methods of the SortLib package in the [documentation](./DOCUMENTATION.md).
 # Technical information and details
-For more time and memory efficiency we implement all fast sorting algorithms without internal functions and without recursions. Also in the copy  procedure of the arrays we avoid to use the javascript spread operator (...). The copy of the elements is made with bitwise operations and shifting techniques. For example we can realize a copy of an arbitrary array with random number elements by following alternative methods:*
+For more time and memory efficiency we implement all fast sorting algorithms without internal functions and without recursions. Also in the copy  procedure of the arrays we avoid to use the javascript spread operator (...). The copy of the elements is made with bitwise operations and shifting techniques. For example we can realize a copy of an arbitrary array with random number elements by following alternative methods (approaches):*
 1. *Very inefficient way:*
 ```js
 let n = 100, array = Array.from({length : n}).map(Math.random), copied_array
@@ -77,7 +77,7 @@ This package is constructed and designed for the needs of efficient sorting of n
 Our experiments showed that the quick sort (SortLib.quick_sort_array(array, order)), merge sort, and heap sort are nearly three times faster than the conventional sort method of javascript.
 The only surprising thing of the experiments was the time efficiency of the bucket sort algorithm. 
 # Bugs and tips
-If you have any well-meaning critique or have noticed any bug you may send me an email on exel_mmm@abv.bg or to euriklis@hotmail.bg
+If you have any well-meaning critique or have noticed any bug you may send me an email on exel_mmm@abv.bg or to euriklis@hotmail.com. A list of the observed bugs which was fixed may be found [here](./FIXEDBUGS.md). 
 # License   
 MIT License. This package will be provided for free to any user that use it for personal and non commercial usage. The author of the package is not liable for any errors in third party software, libraries, packages and source code used at these libraries. The author also may not responsible for some possible bugs that may exists in the library.
 # Dependencies
