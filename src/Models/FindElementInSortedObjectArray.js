@@ -24,10 +24,12 @@ const FindElementsInSortedObjectArrayByProperty = (array, property, element, mod
         if (get_item_value(array[middle], property) === get_item_value(element, property)) {
             found = true;
         }
-        if (middle === last) break;
         if (first === middle) {
             if (!found) ++middle;
-            else break;
+            if (get_item_value(array[middle], property) === get_item_value(element, property)) {
+                found = true;
+            }
+            break;
         }
         condition = mode ? get_item_value(array[middle], property) > get_item_value(element, property)
             : get_item_value(array) < element;
