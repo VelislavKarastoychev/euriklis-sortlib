@@ -20,8 +20,10 @@ function RemoveElementFromSortedArray(array, element, mode) {
         middle = (start + end) >> 1;
         condition = mode ? array[middle] > element : array[middle] < element;
         if (start === middle) {
-            if (array[middle] !== element) ++middle;
-            else break;
+            if (array[middle] !== element) {
+                ++middle;
+            }
+            break;
         }
         if (end === middle) break;
         if (condition) end = middle;
