@@ -134,11 +134,11 @@ const  get_sorted_array = async (array) => {
     return result.array; 
 } 
 ```
-If you want you also may use the asynchronous mode for the integrated quick sort method:
+If you want, you also may use the asynchronous mode for the integrated quick sort method:
 ```js
 ...
-const result = SortLib.quick_sort_async(array, sort_mode);
-// returns {array, indices, time_execution}...
+const result = await SortLib.quick_sort_async(array, sort_mode);
+// returns Promise<{array: Array, indices:Array, time_execution: number}>...
 ```
 
 The quick sort is the fastest algorithm in the package. Our experiments showed that the algorithm is three times faster than the conventional sort() method of the javascript library. To achieve this behavior we used bitwise operations where it is possible and loop splitting techniques. 
