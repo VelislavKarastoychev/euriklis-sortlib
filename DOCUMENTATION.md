@@ -1879,7 +1879,7 @@ output:
 Average time filter: 0.0008685545998625457s.
 Average time conventional filter: 0.0004637260998599232s.
 ```
-From version 4.0.0 this method is available in asynchronous mode:
+From version 4.0.0 this method is also available in asynchronous mode:
 
 ```js
 SortLib.filter_async(array, callback)
