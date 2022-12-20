@@ -17,10 +17,10 @@ function findElementsInSortedArray(array, element, mode) {
     while (1) {
         middle = (first + last) >> 1;
         if (array[middle] === element) found = true;
-        if (middle === last) break;
         if (first === middle) {
             if (!found) ++middle;
-            else break;
+            if (array[middle] === element) found = true;
+            break;
         }
         condition = mode ? element < array[middle] : element > array[middle];
         if (condition) last = middle;
