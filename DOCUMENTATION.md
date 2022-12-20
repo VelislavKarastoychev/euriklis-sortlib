@@ -121,6 +121,25 @@ output:
 sorted with quick sort for 0.18377225545406345 seconds.
 sorted with js sort for 0.8228233136510849 seconds.
 ```
+From version 4.0.0 you can use this method in asynchronous mode, i.e.
+```js
+import SortLib from '@euriklis/sortlib';
+const  get_sorted_array = async (array) => {
+    const result = SortLib.quick_sort_array_async(array);
+    // !important. This method returns also
+    // the time spent for the sorting of the array with the
+    // quick sort algorithm. To get the time execution
+    // of the method just type:
+    // const time_execution = result.time_execution.
+    return result.array; 
+} 
+```
+If you want you also may use the asynchronous mode for the integrated quick sort method:
+```js
+...
+const result = SortLib.quick_sort_async(array, sort_mode);
+// returns {array, indices, time_execution}...
+```
 
 The quick sort is the fastest algorithm in the package. Our experiments showed that the algorithm is three times faster than the conventional sort() method of the javascript library. To achieve this behavior we used bitwise operations where it is possible and loop splitting techniques. 
  
@@ -326,6 +345,26 @@ output:
 sorted with instance merge sort for 0.4899669378471375 seconds.
 sorted with js sort for 0.9878581756925583 seconds.
 ```
+From version ^4.0.0 you may use the merge sort method in asynchronous mode:
+
+```js
+const result = SortLib.merge_sort_async(array)
+    .then(result => {
+        // the result is object with properties
+        // { array, indices, time_execution }
+        return result;
+    }).catch(error => console.log(error));
+```
+
+The merge sort method only for the array output has also asynchronous version: 
+
+```js
+const result = SortLib.merge_sort_array_async(array, sort_mode)
+    .then(result => {
+        // returns object with properties { array, time_execution}
+        return result;
+    })
+```
 3. Heap sort algorithm:
 
 The static and instance methods are with structure similar to the previous, so we have to write:
@@ -457,6 +496,21 @@ output:
  ```
 sorted with instance heap sort for 0.3984684118604663 seconds.
 sorted with js sort for 0.9388659856557845 seconds.
+ ```
+ From version 4.0.0 are available asynchronous mode versions for the **heap_sort()** and **heap_sort_array()** static methods.
+
+ ```js
+ const integrated = SortLib.heap_sort_async(array, sort_mode)
+     .then(result => {
+        // returns {array, indices, time_execution}
+        return result;
+     })
+// or for the array only method...
+const result = SortLib.heap_sort_array_async(array, sort_mode)
+    .then(output => {
+        // {array, time_execution}
+        return output;
+    })
  ```
 
 4. Bucket sort algorithm:
@@ -593,6 +647,22 @@ sorted with the instance bucket sort for 1.1637805856418608 seconds.
 sorted with js sort for 1.1352241854238512 seconds.
 ```
 
+From version 4.0.0 asynchronous version for the bucket sort algorithm are available for the integrated and array mode:
+
+```js
+const integrated = SortLib.bucket_sort_async(array, sort_mode)
+    .then(result => {
+        // returns { array, indices, time_execution }
+        return result;
+    })
+// if you want to get only the array you may use the method:
+const result = SortLib.bucket_sort_array_async(array, sort_mode)
+    .then(output => {
+        // returns { array, time_execution }
+        return output;
+    })
+```
+
 5. Cocktail sort algorithm: 
 
 The cocktail sort belongs to the group of the semi - fast but slow and asymptotically non efficient algorithms.
@@ -694,6 +764,23 @@ output:
 sorted with the instance cocktail sort for 0.16240386292457568 seconds.
 sorted with js sort for 0.0035355447959899908 seconds.
 ```
+
+From version 4.0.0 you may use these methods in asynchronous mode:
+
+```js
+const integrated_cocktail_sort = SortLib.cocktail_sort_async(array, sort_mode)
+    .then(result => {
+        // returns { array, indices, time_execution }
+        return result;
+    })
+// or if you wish to get only the array then you may use:
+const cocktail_sort = SortLib.cocktail_sort_array_async(array, sort_mode)
+    .then(output => {
+        // returns { array, time_execution }
+        return output;
+    })
+```
+
 6. Selection sort.
 
 The selection sort is inefficient sorting algorithm for medium and large arrays.
@@ -834,6 +921,21 @@ output:
 sorted with the instance selection sort for 0.10490612853050234 seconds.
 sorted with js sort for 0.003398091759681702 seconds.
 ```
+From version 4.0.0 you may use also the asynchronous mode of that methods:
+
+```js
+const integrated_selection = SortLib.selection_sort_async(array, sort_mode)
+    .then(result => {
+        // returns { array, indices, time_execution }
+        return result;
+    })
+// or if you wish to get only the sorted array, then use:
+const selection_sort = SortLib.selection_sort_array_async(array, sort_mode)
+    .then(output => {
+        // returns { array, time_execution }
+        return output;
+    })
+```
 
 7. Insertion sort - the insertion sort is inefficient sorting algorithm, which sometimes is used in other more efficient algorithms, like bucket sort or even quick sort. In our library we use the insertion sort only in the bucket sort.
 
@@ -965,6 +1067,23 @@ output:
 sorted with the instance insertion sort for 0.49409857907772065 seconds.
 sorted with js sort for 0.0037493426752090455 seconds.
 ```
+
+From version 4.0.0 you may use also the asynchronous mode of the methods:
+
+```js
+const integrated_IS = SortLib.insertion_sort_async(array, sort_mode)
+    .then(result => {
+        // returns {array, indices, time_execution}
+        return result;
+    })
+// or if you want to obtain only the sorted array, then you have to use:
+const insertion_sort = SortLib.insertion_sort_async(array, sort_mode)
+    .then(output => {
+        // returns { array, time_execution }
+        return output;
+    })
+```
+
 8. Bubble sort algorithm.
 
 The bubble sort is also inefficient sorting algorithm, but for small arrays it is commonly used like the insertion sort, because it is very simple for implementation. Some sorting routines use the bubble sort when implement the quick sort, merge sort and bucket sort. In our library we prefer the insertion sort algorithm. Our selection was made randomly without some mathematical arguments. We was suggested for the insertion sort choice from the book of Manolis Lukakis.
@@ -1093,6 +1212,23 @@ output:
 sorted with the instance bubble sort for 0.4207113573551179 seconds.
 sorted with js sort for 0.004196393752098084 seconds.
 ```
+
+From version 4.0.0 you also may use the asynchronous mode of these methods:
+
+```js
+const integrated_bubble_sort = SortLib.bubble_sort_async(array, sort_mode)
+    .then(result => {
+        // returns { array, indices, time_execution }
+        return result;
+    })
+// or if you want to obtain only the sorted array then you may use:
+const bubble_sort = SortLib.bubble_sort_array_async(array, sort_mode)
+    .then(output => {
+        // returns { array, time_execution }
+        return output;
+    })
+```
+
 The SortLib package provides also a set of utility methods which may be used for sorting of object arrays by given property, where this property is number or string. Some of these methods are:
 
 9. Adding element in sorted array:
@@ -1138,6 +1274,12 @@ output:
 average time of SortLib.add --> 0.12212278446197508 vs 
 average time conventional sort 0.09989086256027223
 ```
+From version 4.0.0 this method may be used also in asynchronous mode:
+
+```js
+SortLib.add_elements_in_sorted_array_async(array, element, sort_mode);
+```
+Note that in this case the method returns a Promise instance.
 
 10. Add element in sorted object array by some property. 
 
@@ -1184,6 +1326,13 @@ average time conventional sort 0.3231743433189391
 ```
 
 If the sort_array parameter is set to true, then the array will be tested for correctly defined structure, which will slow down the method execution.
+
+From version 4.0.0 this method is also available in asynchronous mode:
+
+```js
+SortLib.add_element_in_sorted_object_array_by_property_async(array, property, element, sort_mode);
+```
+The arguments of the methods are the same as in the synchronous mode but in the asynchronous mode the static method returns a Promise instance.
 
 11. Find elements in sorted array. 
 
@@ -1238,6 +1387,13 @@ average time of SortLib find element --> 0.002894212322235108s
 average time conventional find 0.025960877709388736s
 ```
 
+From version 4.0.0 this method is available also in asynchronous mode:
+
+```js
+SortLib.find_element_in_sorted_array_async(array, element, sort_mode);
+```
+Note that in this case the method returns a Promise instance.
+
 12. Find elements in sorted object array by some property.
 
 If the user wishes to find some elements in array of objects which are sorted by some property, then the method which has to be used is the static method:
@@ -1285,6 +1441,14 @@ average time conventional find 3.786335378255842s
 ```
 
 Note that this method can not be used like instance method, because the SortLib constructor gets only number or string arrays.
+
+From version 4.0.0 this method may be used in asynchronous mode:
+
+```js
+SortLib.find_element_in_sorted_object_array_by_property_async(array, property, element, sort_mode);
+```
+
+Note that in this case the method returns a Promise instance.
 
 13. Removing of element from sorted array. 
 
@@ -1338,6 +1502,14 @@ sl.delete(10);
 ```
 Note that this method sorts the array if is not sorted and stores the indices with the index of the deleted element to be removed.
 
+From version 4.0.0 you may use the asynchronous mode of this method:
+
+```js
+SortLib.remove_element_from_sorted_array_async(array, element, sort_mode);
+```
+
+It is logical that in this case the method will returns a Promise instance.
+
 14. Remove element from sorted object array by property:
 
 If is given an array of object items, sorted by some of the array properties which is number or string, then in the case in which we want to delete some element of this array (the required element has to be equals to the underlined), then we have to use the static method:
@@ -1384,6 +1556,13 @@ output:
 average time of SortLib remove element from object array --> 0.21358258719921108s
 average time of conventional filter --> 0.43436287065982815s
 ```
+From version 4.0.0 is available asynchronous mode version for this method:
+
+```js
+SortLib.removed_element_from_sorted_object_array_by_property(array, property, element, sort_mode);
+```
+
+Note that in this case the method returns a Promise instance.
 
 15. Generate random array:
 
@@ -1395,6 +1574,15 @@ The syntax of the methods is:
 SortLib.generate_random_array(length:integer, seed:integer|null, callback:function(element, index));
 SortLib.generate_random_string_array(length:integer, world_size:integer, seed:integer|null, callback:function(item, index));
 ```
+
+From version 4.0.0 these methods are available also in asynchronous mode:
+
+```js
+SortLib.generate_random_array_async(length, seed, callback);
+SortLib.generate_random_string_array_async(length, word_size, seed, callback(item, index));
+```
+
+In the asynchronous mode the method returns a Promise instance.
 
 16. Find the "best" or "worst" elements in numeric/string array.
 
@@ -1453,6 +1641,16 @@ Average time worst 10 for 1000000 elements --> 0.09050923328876499s
 Average time best 10 for conventional extraction --> 1.1376828888177875s
 Average time worst 10 for conventional extraction --> 1.198225995883942s
 ```
+
+From version 4.0.0 these method are available in asynchronous mode:
+
+```js
+SortLib.find_best_elements_async(array, n);
+SortLib.find_worst_elements_async(array, n);
+```
+In the asynchronous mode the methods return Promise types.
+
+
 17. Find "best" and "worst" elements from object array by property:
 
 The find best and worst methods are extended also for array of objects. The syntax is similar to the previous static methods:
@@ -1520,6 +1718,12 @@ Average time best 10 conventional way: 2.3365322738838192s
 Average time worst 10 with SortLib: 0.3290558718633652s
 Average time worst 10 conventional way: 2.41432895591259s
 ```
+From version 4.0.0 are available asynchronous versions of these methods:
+
+```js
+SortLib.find_best_for_object_array_by_property_async(array, count);
+SortLib.find_worst_for_object_array_by_property_async(array, count);
+```
 
 18. Sort array of objects by given number/string property value.
 
@@ -1570,6 +1774,15 @@ Results for the tests of time efficiency for arrays of 1000000 elements from 100
 Average time of sort object array by property: 0.6153991694879534s.
 Average time of sort object array with the conventional way: 1.7935129843378073s.
 ```
+
+From version 4.0.0 this method is available also in asynchronous form:
+
+```js
+SortLib.sort_object_array_by_property_async(array, property, sort_mode, algorithm);
+```
+
+In the asynchronous case the method returns a Promise.
+
 19. Filter the elements of an array using the validator library:
 
 The static method
@@ -1613,6 +1826,12 @@ Average time conventional filter: 0.0030568875789642336s.
 ```
 This method is very inefficient!!!
 
+From version 4.0.0 was added an asynchronous version of the method: 
+
+```js
+SortLib.filter_with_validator_async(array, callback);
+```
+The method returns a Promise type.
 
 20. Filter the array with arbitrary callback function.
 
@@ -1659,4 +1878,12 @@ output:
 ```
 Average time filter: 0.0008685545998625457s.
 Average time conventional filter: 0.0004637260998599232s.
+```
+From version 4.0.0 this method is available in asynchronous mode:
+
+```js
+SortLib.filter_async(array, callback)
+    .then(result => {
+        return result;
+    })
 ```
