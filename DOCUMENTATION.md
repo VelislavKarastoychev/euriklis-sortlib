@@ -14,7 +14,7 @@ const SortLib = require("@euriklis/sortlib");
 ```
 
 The SortLib class provides both static and instance methods for sorting, searching, removing and adding of elements in arrays of numbers/strings as well as in object arrays by given property (key).
-The static methods are more fast but the instance methods test the arguments if are correctly declared.
+The static methods are more fast but the instance methods test the arguments for correct declaration.
 
 To use the instance methods you have to define a SortLib instance, i.e.
 
