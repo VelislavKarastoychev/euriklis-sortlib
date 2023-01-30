@@ -23,7 +23,7 @@ import {
 import * as errors from './Errors/index.js';
 import * as infos from './Infos/index.js';
 import * as models from './Models/index.js';
-const package_file = { version: '4.1.0', author: 'Velislav S. Karastoychev' };
+const package_file = { version: '4.1.1', author: 'Velislav S. Karastoychev' };
 import validator from '@euriklis/validator';
 import * as warnings from './Warnings/index.js';
 class SortLib {
