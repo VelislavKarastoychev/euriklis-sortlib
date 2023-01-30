@@ -1149,7 +1149,7 @@ class SortLib {
                 }
             }
         }
-        if (IsNumber(n) && !conditions.IsInteger(n)) {
+        if (IsNumber(n) && !IsInteger(n)) {
             if (n > 0 && n < 1) n = ((array.length * n) >> 0);
             if (n === 0) n = 1;
             if (n > array.length) n = array.length;
