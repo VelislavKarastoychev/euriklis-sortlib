@@ -1,9 +1,29 @@
 'use strict';
-import * as conditions from './Conditions/index.js';
+import {
+    IsArray,
+    IsBoolean,
+    IsCorrectElement,
+    IsCorrectlyDefinedIndices,
+    IsCorrectObjectArray,
+    IsEmpty,
+    IsFunction,
+    IsInteger,
+    IsNumber,
+    IsNumberArray,
+    IsObject,
+    IsSameWithAny,
+    IsSortingAlgorithm,
+    IsSortMode,
+    IsStatus,
+    IsString,
+    IsStringArray,
+    IsStringOrNumberArray,
+    IsUndefined,
+} from './Conditions/index.js';
 import * as errors from './Errors/index.js';
 import * as infos from './Infos/index.js';
 import * as models from './Models/index.js';
-const package_file = { version: '4.0.0', author: 'Velislav S. Karastoychev' };
+const package_file = { version: '4.1.0', author: 'Velislav S. Karastoychev' };
 import validator from '@euriklis/validator';
 import * as warnings from './Warnings/index.js';
 class SortLib {
@@ -26,8 +46,8 @@ class SortLib {
      * algorithm and sort mode to use the sorting algorithms of this library. 
      */
     constructor(options) {
-        if (conditions.IsObject(options)) {
-            if (conditions.IsUndefined(options.array)) {
+        if (IsObject(options)) {
+            if (IsUndefined(options.array)) {
                 if (this.show_warnings) warnings.UndefinedArrayInSortLibConstructor();
             } else this.array = options.array;
             this.algorithm = options.algorithm;
@@ -41,7 +61,7 @@ class SortLib {
         return this.#warnings;
     }
     set show_warnings(warnings) {
-        if (conditions.IsBoolean(warnings)) this.#warnings = warnings;
+        if (IsBoolean(warnings)) this.#warnings = warnings;
     }
     static version = package_file.version;
     static author = package_file.author;
@@ -59,7 +79,7 @@ class SortLib {
      * instance.
      */
     static addElementInSortedArray(array, element, ascending_order) {
-        if (!conditions.IsCorrectArray(array)) {
+        if (!IsStringOrNumberArray(array) && !IsEmpty(array)) {
             errors.IncorrectArrayInAddElementInSortedArray();
         }
         return new SortLib({ array: array, 'sort mode': ascending_order, status: 'sorted' }).add(element);
@@ -86,7 +106,7 @@ class SortLib {
      */
     static async add_element_in_sorted_array_async(array, element, ascending_order = true) {
         const dt1 = performance.now();
-        if (!conditions.IsCorrectArray(array)) {
+        if (!IsStringOrNumberArray(array) && !IsEmpty(array)) {
             errors.IncorrectArrayInAddElementInSortedArray();
         }
         const result = new SortLib({ array: array, 'sort mode': ascending_order, status: 'sorted' }).add(element);
@@ -112,27 +132,27 @@ class SortLib {
      * only for the observed property.  
      */
     static add_element_in_sorted_object_array_by_property(array, property, element, mode, test_array = false) {
-        if (!conditions.IsObject(element)) {
+        if (!IsObject(element)) {
             errors.IncorrectElementInAddElementInSortedObjectArrayByProperty();
         }
-        if (conditions.IsString(property)) property = [property];
-        if (!conditions.IsStringArray(property)) {
+        if (IsString(property)) property = [property];
+        if (!IsStringArray(property)) {
             errors.IncorrectPropertyParameterInAddElementInSortedObjectArrayByProperty();
         }
-        if (!conditions.IsCorrectElement(element, property)) {
+        if (!IsCorrectElement(element, property)) {
             errors.IncorrectElementInAddElementInSortedObjectArrayByProperty();
         }
         if (test_array) {
-            if (!conditions.IsCorrectObjectArray(array, property)) {
+            if (!IsCorrectObjectArray(array, property)) {
                 errors.IncorrectArrayParameterInAddElementInSortedObjectArrayByProperty();
             }
         }
-        if (!conditions.IsBoolean(mode)) {
+        if (!IsBoolean(mode)) {
             if (mode === 'increase') mode = true;
             else if (mode === 'decrease') mode = false;
             else mode = true;
         }
-        if (conditions.IsEmpty(array)) return [element];
+        if (IsEmpty(array)) return [element];
         return models.AddElementInSortedObjectArrayByProperty(array, property, element, mode);
     }
     /**
@@ -150,27 +170,27 @@ class SortLib {
      */
     static async add_element_in_sorted_object_array_by_property_async(array, property, element, mode, test_array = false) {
         let dt1 = performance.now(), dt2, result;
-        if (!conditions.IsObject(element)) {
+        if (!IsObject(element)) {
             errors.IncorrectElementInAddElementInSortedObjectArrayByProperty();
         }
-        if (conditions.IsString(property)) property = [property];
-        if (!conditions.IsStringArray(property)) {
+        if (IsString(property)) property = [property];
+        if (!IsStringArray(property)) {
             errors.IncorrectPropertyParameterInAddElementInSortedObjectArrayByProperty();
         }
-        if (!conditions.IsCorrectElement(element, property)) {
+        if (!IsCorrectElement(element, property)) {
             errors.IncorrectElementInAddElementInSortedObjectArrayByProperty();
         }
         if (test_array) {
-            if (!conditions.IsCorrectObjectArray(array, property)) {
+            if (!IsCorrectObjectArray(array, property)) {
                 errors.IncorrectArrayParameterInAddElementInSortedObjectArrayByProperty();
             }
         }
-        if (!conditions.IsBoolean(mode)) {
+        if (!IsBoolean(mode)) {
             if (mode === 'increase') mode = true;
             else if (mode === 'decrease') mode = false;
             else mode = true;
         }
-        if (conditions.IsEmpty(array)) result = [element];
+        if (IsEmpty(array)) result = [element];
         result = { array: models.AddElementInSortedObjectArrayByProperty(array, property, element, mode), time_execution: 0.001 * (dt2 - dt1) };
         dt2 = performance.now();
         result.time_execution = 0.001 * [dt2 - dt1];
@@ -183,10 +203,10 @@ class SortLib {
      * @returns {{array: Array.<number | string | {}>,indices: Array.<number>}}
      */
     static filter(array, callback) {
-        if (!conditions.IsArray(array)) {
+        if (!IsArray(array)) {
             errors.IncorrectArrayParameterInFilter();
         }
-        if (!conditions.IsFunction(callback)) {
+        if (!IsFunction(callback)) {
             errors.IncorrectCallbackParameterInFilter();
         }
         return models.Filter(array, callback);
@@ -201,10 +221,10 @@ class SortLib {
      */
     static async filter_async(array, callback) {
         let dt1 = performance.now(), dt2, result;
-        if (!conditions.IsArray(array)) {
+        if (!IsArray(array)) {
             errors.IncorrectArrayParameterInFilter();
         }
-        if (!conditions.IsFunction(callback)) {
+        if (!IsFunction(callback)) {
             errors.IncorrectCallbackParameterInFilter();
         }
         result = models.Filter(array, callback);
@@ -227,10 +247,10 @@ class SortLib {
      * });
      */
     static filter_with_validator(array, callback) {
-        if (!conditions.IsArray(array)) {
+        if (!IsArray(array)) {
             errors.IncorrectArrayInFilterWithValidator();
         }
-        if (!conditions.IsFunction(callback)) {
+        if (!IsFunction(callback)) {
             errors.IncorrectArgumentOfCallbackInFilterWithValidator();
         }
         return models.FilterWithValidator(array, callback);
@@ -245,10 +265,10 @@ class SortLib {
      */
     static async filter_with_validator_async(array, callback) {
         let result, dt1 = performance.now(), dt2;
-        if (!conditions.IsArray(array)) {
+        if (!IsArray(array)) {
             errors.IncorrectArrayInFilterWithValidator();
         }
-        if (!conditions.IsFunction(callback)) {
+        if (!IsFunction(callback)) {
             errors.IncorrectArgumentOfCallbackInFilterWithValidator();
         }
         result = models.FilterWithValidator(array, callback);
@@ -277,15 +297,15 @@ class SortLib {
      * SortLib.find_element_in_sorted_array(array, 59); 
      */
     static find_elements_in_sorted_array(array, element, mode) {
-        if (!conditions.IsBoolean(mode)) {
+        if (!IsBoolean(mode)) {
             if (mode === 'increase') mode = true;
             else if (mode === 'decrease') mode = false;
             else mode = true;
         }
-        if (!conditions.IsNumber(element) && !conditions.IsString(element)) {
+        if (!IsNumber(element) && !IsString(element)) {
             errors.IncorrectElementInFindElementInSortedArray()
         }
-        if (!conditions.IsNumberArray(array) && !conditions.IsStringArray(array)) {
+        if (!IsNumberArray(array) && !IsStringArray(array) && !IsEmpty(array)) {
             errors.IncorrectArrayParameterInFindElementInSortedArray()
         }
         if (array.length === 0) return { array: [], indices: [-1] };
@@ -305,15 +325,15 @@ class SortLib {
      */
     static async find_elements_in_sorted_array_async(array, element, mode) {
         let result, dt2, dt1 = performance.now();
-        if (!conditions.IsBoolean(mode)) {
+        if (!IsBoolean(mode)) {
             if (mode === 'increase') mode = true;
             else if (mode === 'decrease') mode = false;
             else mode = true;
         }
-        if (!conditions.IsNumber(element) && !conditions.IsString(element)) {
+        if (!IsNumber(element) && !IsString(element)) {
             errors.IncorrectElementInFindElementInSortedArray()
         }
-        if (!conditions.IsNumberArray(array) && !conditions.IsStringArray(array)) {
+        if (!IsNumberArray(array) && !IsStringArray(array) && !IsEmpty(array)) {
             errors.IncorrectArrayParameterInFindElementInSortedArray()
         }
         if (array.length === 0) return { array: [], indices: [-1] };
@@ -334,17 +354,17 @@ class SortLib {
      * are equals to the object type element parameter.
      */
     static find_elements_in_sorted_object_array_by_property(array, property, element, mode) {
-        if (!conditions.IsArray(array)) {
+        if (!IsArray(array)) {
             errors.IncorrectArrayInFindElementsInSortedObjectArray()
         };
-        if (conditions.IsString(property)) property = [property];
-        if (!conditions.IsStringArray(property)) {
+        if (IsString(property)) property = [property];
+        if (!IsStringArray(property)) {
             errors.IncorrectPropertyParameterInFindElementsInSortedObjectArray();
         };
-        if (!conditions.IsCorrectElement(element, property)) {
+        if (!IsCorrectElement(element, property)) {
             errors.IncorrectElementParameterInFindElementsInSortedObjectArray();
         }
-        if (!conditions.IsBoolean(mode)) {
+        if (!IsBoolean(mode)) {
             if (mode === 'increase') mode = true;
             else if (mode === 'decrease') mode = false;
             else mode = true;
@@ -369,17 +389,17 @@ class SortLib {
      */
     static async find_elements_in_sorted_object_array_by_property_async(array, property, element, mode) {
         let result, dt2, dt1 = performance.now();
-        if (!conditions.IsArray(array)) {
+        if (!IsArray(array)) {
             errors.IncorrectArrayInFindElementsInSortedObjectArray()
         };
-        if (conditions.IsString(property)) property = [property];
-        if (!conditions.IsStringArray(property)) {
+        if (IsString(property)) property = [property];
+        if (!IsStringArray(property)) {
             errors.IncorrectPropertyParameterInFindElementsInSortedObjectArray();
         };
-        if (!conditions.IsCorrectElement(element, property)) {
+        if (!IsCorrectElement(element, property)) {
             errors.IncorrectElementParameterInFindElementsInSortedObjectArray();
         }
-        if (!conditions.IsBoolean(mode)) {
+        if (!IsBoolean(mode)) {
             if (mode === 'increase') mode = true;
             else if (mode === 'decrease') mode = false;
             else mode = true;
@@ -408,10 +428,10 @@ class SortLib {
         /*if (!conditions.IsNumberArray(array) && !conditions.IsStringArray(array)) {
             errors.IncorrectArrayInRemoveElementFromSortedArray();
         }*/
-        if (!conditions.IsNumber(element) && !conditions.IsString(element)) {
+        if (!IsNumber(element) && !IsString(element)) {
             errors.IncorrectElementParameterInRemoveElementFromSortedArray();
         }
-        if (!conditions.IsBoolean(mode)) {
+        if (!IsBoolean(mode)) {
             if (mode === 'increase') mode = true;
             else if (mode === 'decrease') mode = false;
             else mode = true;
@@ -436,10 +456,10 @@ class SortLib {
         /*if (!conditions.IsNumberArray(array) && !conditions.IsStringArray(array)) {
             errors.IncorrectArrayInRemoveElementFromSortedArray();
         }*/
-        if (!conditions.IsNumber(element) && !conditions.IsString(element)) {
+        if (!IsNumber(element) && !IsString(element)) {
             errors.IncorrectElementParameterInRemoveElementFromSortedArray();
         }
-        if (!conditions.IsBoolean(mode)) {
+        if (!IsBoolean(mode)) {
             if (mode === 'increase') mode = true;
             else if (mode === 'decrease') mode = false;
             else mode = true;
@@ -463,23 +483,23 @@ class SortLib {
      * from sorted by property array from object arrays. 
      */
     static remove_element_from_sorted_object_array_by_property(array, property, element, mode, test = false) {
-        if (conditions.IsString(property)) property = [property];
-        if (!conditions.IsStringArray(property)) {
+        if (IsString(property)) property = [property];
+        if (!IsStringArray(property)) {
             errors.IncorrectPropertyParameterInRemoveElementFromSortedObjectArray();
         }
         if (test) {
-            if (!conditions.IsCorrectObjectArray(array, property)) {
+            if (!IsCorrectObjectArray(array, property)) {
                 errors.IncorrectArrayInRemoveElementFromSortedObjectArray();
             }
         }
-        if (!conditions.IsObject(element)) {
+        if (!IsObject(element)) {
             errors.IncorrectElementParameterInRemoveElementFromSortedObjectArray();
         }
-        if (!conditions.IsCorrectElement(element, property)) {
+        if (!IsCorrectElement(element, property)) {
             errors.IncorrectElementParameterInRemoveElementFromSortedObjectArray();
         }
         // (re)define the mode
-        if (!conditions.IsBoolean(mode)) {
+        if (!IsBoolean(mode)) {
             if (mode === 'increase') mode = true;
             else if (mode === 'decrease') mode = false;
             else {
@@ -505,23 +525,23 @@ class SortLib {
      */
     static async remove_element_from_sorted_object_array_by_property_async(array, property, element, mode, test = false) {
         let result, dt2, dt1 = performance.now();
-        if (conditions.IsString(property)) property = [property];
-        if (!conditions.IsStringArray(property)) {
+        if (IsString(property)) property = [property];
+        if (!IsStringArray(property)) {
             errors.IncorrectPropertyParameterInRemoveElementFromSortedObjectArray();
         }
         if (test) {
-            if (!conditions.IsCorrectObjectArray(array, property)) {
+            if (!IsCorrectObjectArray(array, property)) {
                 errors.IncorrectArrayInRemoveElementFromSortedObjectArray();
             }
         }
-        if (!conditions.IsObject(element)) {
+        if (!IsObject(element)) {
             errors.IncorrectElementParameterInRemoveElementFromSortedObjectArray();
         }
-        if (!conditions.IsCorrectElement(element, property)) {
+        if (!IsCorrectElement(element, property)) {
             errors.IncorrectElementParameterInRemoveElementFromSortedObjectArray();
         }
         // (re)define the mode
-        if (!conditions.IsBoolean(mode)) {
+        if (!IsBoolean(mode)) {
             if (mode === 'increase') mode = true;
             else if (mode === 'decrease') mode = false;
             else {
@@ -941,8 +961,8 @@ class SortLib {
      * the bucket sort algorithm. 
      */
     static bucket_sort(array, buckets, sort_mode) {
-        if (!conditions.IsNumberArray(array)) errors.IncorrectArrayParameterInBucketSort();
-        if (!conditions.IsInteger(buckets)) buckets = array.length >> 1;
+        if (!IsNumberArray(array)) errors.IncorrectArrayParameterInBucketSort();
+        if (!IsInteger(buckets)) buckets = array.length >> 1;
         if (buckets <= 0 || buckets >= array.length) buckets = array.length - 1;
         return models.BucketSort(array, buckets, sort_mode);
     }
@@ -959,8 +979,8 @@ class SortLib {
      */
     static async bucket_sort_async(array, buckets, sort_mode) {
         let result, dt2, dt1 = performance.now();
-        if (!conditions.IsNumberArray(array)) errors.IncorrectArrayParameterInBucketSort();
-        if (!conditions.IsInteger(buckets)) buckets = array.length >> 1;
+        if (!IsNumberArray(array)) errors.IncorrectArrayParameterInBucketSort();
+        if (!IsInteger(buckets)) buckets = array.length >> 1;
         if (buckets <= 0 || buckets >= array.length) buckets = array.length - 1;
         result = models.BucketSort(array, buckets, sort_mode);
         dt2 = performance.now();
@@ -978,8 +998,8 @@ class SortLib {
      * without the indices.
      */
     static bucket_sort_array(array, buckets, sort_mode) {
-        if (!conditions.IsNumberArray(array)) errors.IncorrectArrayParameterInBucketSort();
-        if (!conditions.IsInteger(buckets)) buckets = array.length >> 1;
+        if (!IsNumberArray(array)) errors.IncorrectArrayParameterInBucketSort();
+        if (!IsInteger(buckets)) buckets = array.length >> 1;
         if (buckets <= 0 || buckets >= array.length) buckets = array.length - 1;
         return models.BucketSortArray(array, buckets, sort_mode);
     }
@@ -997,8 +1017,8 @@ class SortLib {
      */
     static async bucket_sort_array_async(__array__, buckets, sort_mode) {
         let array, time_execution, dt2, dt1 = performance.now();
-        if (!conditions.IsNumberArray(__array__)) errors.IncorrectArrayParameterInBucketSort();
-        if (!conditions.IsInteger(buckets)) buckets = __array__.length >> 1;
+        if (!IsNumberArray(__array__)) errors.IncorrectArrayParameterInBucketSort();
+        if (!IsInteger(buckets)) buckets = __array__.length >> 1;
         if (buckets <= 0 || buckets >= __array__.length) buckets = __array__.length - 1;
         array = models.BucketSortArray(__array__, buckets, sort_mode);
         dt2 = performance.now();
@@ -1034,9 +1054,9 @@ class SortLib {
      * const arr = SortLib.generate_random_array(100, null, el => (el * 100) << 0)
      **/
     static generate_random_array(n, seed = 123456, callback) {
-        if (!conditions.IsInteger(seed)) seed = 123456;
-        if (!conditions.IsInteger(n)) errors.IncorrectParameterInGRA();
-        if (!conditions.IsFunction(callback)) callback = null;
+        if (!IsInteger(seed)) seed = 123456;
+        if (!IsInteger(n)) errors.IncorrectParameterInGRA();
+        if (!IsFunction(callback)) callback = null;
         return models.GenerateRandomArray(n, seed, callback);
     }
     /**
@@ -1049,9 +1069,9 @@ class SortLib {
      * of the generate random array method of the SortLib package.
      */
     static async generate_random_array_async(n, seed = 12345, callback) {
-        if (!conditions.IsInteger(seed)) seed = 123456;
-        if (!conditions.IsInteger(n)) errors.IncorrectParameterInGRA();
-        if (!conditions.IsFunction(callback)) callback = null;
+        if (!IsInteger(seed)) seed = 123456;
+        if (!IsInteger(n)) errors.IncorrectParameterInGRA();
+        if (!IsFunction(callback)) callback = null;
         return models.GenerateRandomArray(n, seed, callback);
     }
     /**
@@ -1077,9 +1097,9 @@ class SortLib {
      * });
      */
     static generate_random_string_array(length, word_size, seed, callback) {
-        if (!conditions.IsInteger(length)) errors.IncorrectLengthInGRSA();
-        if (!conditions.IsInteger(word_size)) errors.IncorrectWordSizeInGRSA();
-        if (!conditions.IsInteger(seed)) seed = 123456;
+        if (!IsInteger(length)) errors.IncorrectLengthInGRSA();
+        if (!IsInteger(word_size)) errors.IncorrectWordSizeInGRSA();
+        if (!IsInteger(seed)) seed = 123456;
         return models.GenerateRandomStringArray(length, word_size, seed, callback);
     }
     /**
@@ -1093,9 +1113,9 @@ class SortLib {
      * generate_random_string_array() static method of the SortLib package.
      */
     static async generate_random_string_array_async(length, word_size, seed, callback) {
-        if (!conditions.IsInteger(length)) errors.IncorrectLengthInGRSA();
-        if (!conditions.IsInteger(word_size)) errors.IncorrectWordSizeInGRSA();
-        if (!conditions.IsInteger(seed)) seed = 123456;
+        if (!IsInteger(length)) errors.IncorrectLengthInGRSA();
+        if (!IsInteger(word_size)) errors.IncorrectWordSizeInGRSA();
+        if (!IsInteger(seed)) seed = 123456;
         return models.GenerateRandomStringArray(length, word_size, seed, callback);
     }
     /**
@@ -1113,23 +1133,23 @@ class SortLib {
      * as the complexity of the heap sort algorithm. 
      */
     static find_best_elements(array, n, show_warnings = false) {
-        if (!conditions.IsStringArray(array) && !conditions.IsNumberArray(array)) {
+        if (!IsStringOrNumberArray(array)) {
             errors.IncorrectArrayParameterInFindBestElements();
         }
-        if (conditions.IsUndefined(n)) n = array.length
-        if (!conditions.IsNumber(n)) {
+        if (IsUndefined(n)) n = array.length
+        if (!IsNumber(n)) {
             if (show_warnings) {
                 warnings.IncorrectCountParameterInFindBestElements()
             }
         }
-        if (conditions.IsNumber(n)) {
+        if (IsNumber(n)) {
             if (!(n >= 1) || !(n <= array.length)) {
                 if (show_warnings) {
                     warnings.IncorrectCountParameterInFindBestElements()
                 }
             }
         }
-        if (conditions.IsNumber(n) && !conditions.IsInteger(n)) {
+        if (IsNumber(n) && !conditions.IsInteger(n)) {
             if (n > 0 && n < 1) n = ((array.length * n) >> 0);
             if (n === 0) n = 1;
             if (n > array.length) n = array.length;
@@ -1149,23 +1169,23 @@ class SortLib {
      */
     static async find_best_elements_async(array, n, show_warnings = false) {
         let result, dt2, dt1 = performance.now();
-        if (!conditions.IsStringArray(array) && !conditions.IsNumberArray(array)) {
+        if (!IsStringOrNumberArray(array)) {
             errors.IncorrectArrayParameterInFindBestElements();
         }
-        if (conditions.IsUndefined(n)) n = array.length
-        if (!conditions.IsNumber(n)) {
+        if (IsUndefined(n)) n = array.length
+        if (!IsNumber(n)) {
             if (show_warnings) {
                 warnings.IncorrectCountParameterInFindBestElements()
             }
         }
-        if (conditions.IsNumber(n)) {
+        if (IsNumber(n)) {
             if (!(n >= 1) || !(n <= array.length)) {
                 if (show_warnings) {
                     warnings.IncorrectCountParameterInFindBestElements()
                 }
             }
         }
-        if (conditions.IsNumber(n) && !conditions.IsInteger(n)) {
+        if (IsNumber(n) && !IsInteger(n)) {
             if (n > 0 && n < 1) n = ((array.length * n) >> 0);
             if (n === 0) n = 1;
             if (n > array.length) n = array.length;
@@ -1189,14 +1209,14 @@ class SortLib {
      * the array.length.
      */
     static find_worst_elements(array, n, show_warnings = false) {
-        if (!conditions.IsNumberArray(array) && !conditions.IsStringArray(array)) {
+        if (!IsNumberArray(array) && !IsStringArray(array)) {
             errors.IncorrectArrayParameterInFindWorstElements();
         }
-        if (conditions.IsNumber(n)) {
-            if (!conditions.IsInteger(n) && !(n >= 0 && n <= 1) || n >= array.length) {
+        if (IsNumber(n)) {
+            if (!IsInteger(n) && !(n >= 0 && n <= 1) || n >= array.length) {
                 if (show_warnings) warnings.IncorrectCountParameterInFindWortsElements();
                 if (n >= 0 && n < 1) n = n * array.length << 0;
-                if (!conditions.IsInteger(n)) n = n << 0;
+                if (!IsInteger(n)) n = n << 0;
                 if (n > array.length) n = array.length;
             }
         } else n = array.length;
@@ -1215,14 +1235,14 @@ class SortLib {
      */
     static async find_worst_elements_async(array, n, show_warnings = false) {
         let result, dt2, dt1 = performance.now();
-        if (!conditions.IsNumberArray(array) && !conditions.IsStringArray(array)) {
+        if (!IsNumberArray(array) && !IsStringArray(array)) {
             errors.IncorrectArrayParameterInFindWorstElements();
         }
-        if (conditions.IsNumber(n)) {
-            if (!conditions.IsInteger(n) && !(n >= 0 && n <= 1) || n >= array.length) {
+        if (IsNumber(n)) {
+            if (!IsInteger(n) && !(n >= 0 && n <= 1) || n >= array.length) {
                 if (show_warnings) warnings.IncorrectCountParameterInFindWortsElements();
                 if (n >= 0 && n < 1) n = n * array.length << 0;
-                if (!conditions.IsInteger(n)) n = n << 0;
+                if (!IsInteger(n)) n = n << 0;
                 if (n > array.length) n = array.length;
             }
         } else n = array.length;
@@ -1273,20 +1293,20 @@ class SortLib {
     static sort_object_array_by_property(array, property, mode, algorithm, show_warnings = false, test = false) {
         const allowedAlgorithms = ['merge sort', 'quick sort', 'heap sort', 'bucket sort'];
         const mode_types = [true, false, 'decrease', 'increase'];
-        if (conditions.IsString(property)) property = [property];
-        if (!conditions.IsStringArray(property)) {
+        if (IsString(property)) property = [property];
+        if (!IsStringArray(property)) {
             errors.IncorrectPropertyInSortObjectArray();
         }
         if (test) {
-            if (!conditions.IsCorrectObjectArray(array, property)) {
+            if (!IsCorrectObjectArray(array, property)) {
                 errors.IncorrectArrayParameterInSortObjectArray();
             }
         }
-        if (conditions.IsUndefined(mode) || !conditions.IsSameWithAny(mode, mode_types)) {
+        if (IsUndefined(mode) || !IsSameWithAny(mode, mode_types)) {
             if (show_warnings) warnings.IncorrectOrUndefinedModeParameterInSortObjectArray();
             mode = true;
         }
-        if (conditions.IsUndefined(algorithm) || !conditions.IsSameWithAny(algorithm, allowedAlgorithms)) {
+        if (IsUndefined(algorithm) || !IsSameWithAny(algorithm, allowedAlgorithms)) {
             if (show_warnings) warnings.IncorrectOrUndefinedAlgorithmParameterInSortObjectArray();
             algorithm = 'quick sort';
         }
@@ -1309,20 +1329,20 @@ class SortLib {
         let result, dt2, dt1 = performance.now();
         const allowedAlgorithms = ['merge sort', 'quick sort', 'heap sort', 'bucket sort'];
         const mode_types = [true, false, 'decrease', 'increase'];
-        if (conditions.IsString(property)) property = [property];
-        if (!conditions.IsStringArray(property)) {
+        if (IsString(property)) property = [property];
+        if (!IsStringArray(property)) {
             errors.IncorrectPropertyInSortObjectArray();
         }
         if (test) {
-            if (!conditions.IsCorrectObjectArray(array, property)) {
+            if (!IsCorrectObjectArray(array, property)) {
                 errors.IncorrectArrayParameterInSortObjectArray();
             }
         }
-        if (conditions.IsUndefined(mode) || !conditions.IsSameWithAny(mode, mode_types)) {
+        if (IsUndefined(mode) || !IsSameWithAny(mode, mode_types)) {
             if (show_warnings) warnings.IncorrectOrUndefinedModeParameterInSortObjectArray();
             mode = true;
         }
-        if (conditions.IsUndefined(algorithm) || !conditions.IsSameWithAny(algorithm, allowedAlgorithms)) {
+        if (IsUndefined(algorithm) || !IsSameWithAny(algorithm, allowedAlgorithms)) {
             if (show_warnings) warnings.IncorrectOrUndefinedAlgorithmParameterInSortObjectArray();
             algorithm = 'quick sort';
         }
@@ -1348,17 +1368,17 @@ class SortLib {
      * will be returned.
      */
     static find_best_for_object_array_by_property(array, property, n, test = false) {
-        if (conditions.IsString(property)) property = [property];
-        if (!conditions.IsStringArray(property)) {
+        if (IsString(property)) property = [property];
+        if (!IsStringArray(property)) {
             errors.IncorrectPropertyParameterInFindBestInObjectArray();
         }
         if (test) {
-            if (!conditions.IsCorrectObjectArray(array, property)) {
+            if (!IsCorrectObjectArray(array, property)) {
                 errors.IncorrectArrayParameterInFindBestInObjectArray()
             }
         }
-        if (conditions.IsNumber(n)) {
-            if (conditions.IsInteger(n)) {
+        if (IsNumber(n)) {
+            if (IsInteger(n)) {
                 if (n <= 0 || n > array.length) n = array.length;
             } else if (n > 0 && n < 1) {
                 n = n * array.length << 0;
@@ -1380,17 +1400,17 @@ class SortLib {
      */
     static async find_best_for_object_array_by_property_async(array, property, n, test = false) {
         let result, dt2, dt1 = performance.now();
-        if (conditions.IsString(property)) property = [property];
-        if (!conditions.IsStringArray(property)) {
+        if (IsString(property)) property = [property];
+        if (!IsStringArray(property)) {
             errors.IncorrectPropertyParameterInFindBestInObjectArray();
         }
         if (test) {
-            if (!conditions.IsCorrectObjectArray(array, property)) {
+            if (!IsCorrectObjectArray(array, property)) {
                 errors.IncorrectArrayParameterInFindBestInObjectArray()
             }
         }
-        if (conditions.IsNumber(n)) {
-            if (conditions.IsInteger(n)) {
+        if (IsNumber(n)) {
+            if (IsInteger(n)) {
                 if (n <= 0 || n > array.length) n = array.length;
             } else if (n > 0 && n < 1) {
                 n = n * array.length << 0;
@@ -1418,17 +1438,17 @@ class SortLib {
      * method throws error for incorrect property parameter. 
      */
     static find_worst_for_object_array_by_property(array, property, n, test = false) {
-        if (conditions.IsString(property)) property = [property];
-        if (!conditions.IsStringArray(property)) {
+        if (IsString(property)) property = [property];
+        if (!IsStringArray(property)) {
             errors.IncorrectPropertyParameterInFindWorstInObjectArray()
         }
         if (test) {
-            if (!conditions.IsCorrectObjectArray(array, property)) {
+            if (!IsCorrectObjectArray(array, property)) {
                 errors.IncorrectArrayParameterInFindWorstInObjectArray()
             }
         }
-        if (conditions.IsNumber(n)) {
-            if (conditions.IsInteger(n)) {
+        if (IsNumber(n)) {
+            if (IsInteger(n)) {
                 if (n <= 0 || n > array.length) n = array.length;
             } else if (n > 0 && n < 1) n = n * array.length << 0;
             else n = array.length;
@@ -1448,17 +1468,17 @@ class SortLib {
      */
     static async find_worst_for_object_array_by_property_async(array, property, n, test = false) {
         let result, dt2, dt1 = performance.now();
-        if (conditions.IsString(property)) property = [property];
-        if (!conditions.IsStringArray(property)) {
+        if (IsString(property)) property = [property];
+        if (!IsStringArray(property)) {
             errors.IncorrectPropertyParameterInFindWorstInObjectArray()
         }
         if (test) {
-            if (!conditions.IsCorrectObjectArray(array, property)) {
+            if (!IsCorrectObjectArray(array, property)) {
                 errors.IncorrectArrayParameterInFindWorstInObjectArray()
             }
         }
-        if (conditions.IsNumber(n)) {
-            if (conditions.IsInteger(n)) {
+        if (IsNumber(n)) {
+            if (IsInteger(n)) {
                 if (n <= 0 || n > array.length) n = array.length;
             } else if (n > 0 && n < 1) n = n * array.length << 0;
             else n = array.length;
@@ -1479,7 +1499,7 @@ class SortLib {
      * the items of the array. 
      */
     set algorithm(algorithm) {
-        if (conditions.IsSortingAlgorithm(algorithm)) {
+        if (IsSortingAlgorithm(algorithm)) {
             this.#algorithm = algorithm;
         } else {
             this.#algorithm = 'merge sort';
@@ -1501,7 +1521,7 @@ class SortLib {
      * of the current SortLib instance.
      */
     set array(array) {
-        if (!conditions.IsCorrectArray(array)) {
+        if (!IsStringOrNumberArray(array) && !IsEmpty(array)) {
             errors.IncorrectArrayInSetterArray();
         }
         this.#array = array;
@@ -1516,9 +1536,9 @@ class SortLib {
      * property of the current SortLib instance.
      */
     set indices(indices) {
-        if (conditions.IsCorrectlyDefinedIndices(indices, this.size)) {
+        if (IsCorrectlyDefinedIndices(indices, this.size)) {
             this.#indices = indices;
-        } else if (conditions.IsUndefined(indices)) {
+        } else if (IsUndefined(indices)) {
             this.#indices = models.GenerateInitialIndices(this.size);
         } else {
             errors.IncorrectIndicesParameterInSetter()
@@ -1529,9 +1549,9 @@ class SortLib {
      * @description This method set the item of some index. 
      */
     set index(options) {
-        if (!conditions.IsObject(options)) errors.IncorrectArgumentInIndexSetter()
-        if (conditions.IsInteger(options.index)
-            && conditions.IsNumber(options.item)) {
+        if (!IsObject(options)) errors.IncorrectArgumentInIndexSetter()
+        if (IsInteger(options.index)
+            && IsNumber(options.item)) {
             if (options.index >= 0 && options.index < this.size) {
                 this.#array[options.index] = options.item;
             } else errors.IncorrectArgumentInIndexSetter()
@@ -1546,7 +1566,7 @@ class SortLib {
      * property of the current SortLib instance.
      */
     set status(status) {
-        if (!conditions.IsStatus(status)) {
+        if (!IsStatus(status)) {
             errors.IncorrectStatusInSetter();
         };
         this.#status = status;
@@ -1583,7 +1603,7 @@ class SortLib {
      * current SortLib instance. 
      */
     set sort_mode(sortMode) {
-        if (conditions.IsSortMode(sortMode)) {
+        if (IsSortMode(sortMode)) {
             this.#sort_mode = sortMode;
         } else {
             if (this.show_warnings) {
@@ -1601,7 +1621,7 @@ class SortLib {
      * to add an element in sorted array.
      */
     add(element) {
-        if (!conditions.IsNumber(element) && !conditions.IsString(element)) {
+        if (!IsNumber(element) && !IsString(element)) {
             errors.IncorrectElementInAddElementInSortedArray()
         }
         if (this.#status === 'unsorted') this.sort()
@@ -1621,7 +1641,7 @@ class SortLib {
      *  
      */
     delete(element) {
-        if (!conditions.IsNumber(element) && !conditions.IsString(element)) {
+        if (!IsNumber(element) && !IsString(element)) {
             errors.IncorrectElementParameterInRemoveElementFromSortedArray();
         }
         if (this.status !== 'sorted') this.sort();
@@ -1638,7 +1658,7 @@ class SortLib {
      * of the current SortLib instance by given function. 
      */
     filter(callback) {
-        if (!conditions.IsFunction(callback)) {
+        if (!IsFunction(callback)) {
             errors.IncorrectCallbackParameterInFilter();
         }
         const filtered = models.Filter(this.#array, callback);
