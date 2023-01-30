@@ -1,12 +1,12 @@
 {
     "name": "@euriklis/sortlib",
-    "version": "4.0.0",
+    "version": "4.1.0",
     "description": "A package that provides a collection of sorting algorithms in javascript. ",
     "type": "module",
     "main": "index.js",
     "scripts": {
         "start": "node index.js",
-        "test": "echo 'The tests for this library are available on https://github.com/VelislavKarastoychev/tests-for-sortlib'",
+        "test" : "npx @euriklis/tests-for-sortlib@latest",
         "watch": "nodemon index.js"
     },
     "repository": {
