@@ -30,3 +30,5 @@ if (first === middle) {
     break;
 }
 ```
+
+3. From version 4.1.0 of the library the conventional conditions was replaced and was inserted tests from the new package @euriklis/basic-tests. The condition "!conditions.IsCorrectArray(array)" used in many methods was replaced from the condition "!IsStringOrNumberArray(array) && !IsEmpty(array)".
