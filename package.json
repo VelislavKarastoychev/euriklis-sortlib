@@ -42,5 +42,8 @@
     "dependencies": {
         "@euriklis/basic-tests": "^1.0.0",
         "@euriklis/validator": "3.0.0"
+    },
+    "funding": {
+        "url": "https://www.paypal.com/paypalme/euriklis"
     }
 }
