@@ -305,7 +305,7 @@ class SortLib {
         if (!IsNumber(element) && !IsString(element)) {
             errors.IncorrectElementInFindElementInSortedArray()
         }
-        if (!IsNumberArray(array) && !IsStringArray(array) && !IsEmpty(array)) {
+        if (!IsStringOrNumberArray(array) && !IsEmpty(array)) {
             errors.IncorrectArrayParameterInFindElementInSortedArray()
         }
         if (array.length === 0) return { array: [], indices: [-1] };
@@ -333,7 +333,7 @@ class SortLib {
         if (!IsNumber(element) && !IsString(element)) {
             errors.IncorrectElementInFindElementInSortedArray()
         }
-        if (!IsNumberArray(array) && !IsStringArray(array) && !IsEmpty(array)) {
+        if (!IsStringOrNumberArray(array) && !IsEmpty(array)) {
             errors.IncorrectArrayParameterInFindElementInSortedArray()
         }
         if (array.length === 0) return { array: [], indices: [-1] };
@@ -1209,7 +1209,7 @@ class SortLib {
      * the array.length.
      */
     static find_worst_elements(array, n, show_warnings = false) {
-        if (!IsNumberArray(array) && !IsStringArray(array)) {
+        if (!IsStringOrNumberArray(array)) {
             errors.IncorrectArrayParameterInFindWorstElements();
         }
         if (IsNumber(n)) {
@@ -1235,7 +1235,7 @@ class SortLib {
      */
     static async find_worst_elements_async(array, n, show_warnings = false) {
         let result, dt2, dt1 = performance.now();
-        if (!IsNumberArray(array) && !IsStringArray(array)) {
+        if (!IsStringOrNumberArray(array)) {
             errors.IncorrectArrayParameterInFindWorstElements();
         }
         if (IsNumber(n)) {
